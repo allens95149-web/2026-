@@ -1,0 +1,2790 @@
+<!doctype html>
+<html lang="zh-TW" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 英美回娘家籃球交流賽</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Space+Grotesk:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
+    body { font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif; overflow: hidden; background: linear-gradient(135deg, #050812 0%, #001F3F 100%); color: #ffffff; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); } 50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); } }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes dice-roll { 0% { transform: rotateX(0) rotateY(0); } 100% { transform: rotateX(720deg) rotateY(720deg); } }
+    @keyframes podium-rise { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
+    @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+
+    .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+    .animate-slideInUp { animation: slideInUp 0.5s ease-out; }
+    .animate-slideInRight { animation: slideInRight 0.6s ease-out; }
+    .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    .animate-blink { animation: blink 1s ease-in-out infinite; }
+    .animate-dice-roll { animation: dice-roll 0.6s ease-in-out; }
+    .animate-podium-rise { animation: podium-rise 1s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .animate-confetti-fall { animation: confetti-fall 3s linear; }
+
+    .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; }
+    .glass-card-lg { background: rgba(10, 15, 31, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; }
+
+    .btn-primary { background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); transition: all 0.3s ease; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); transition: all 0.3s ease; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; }
+    .btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); border-color: #FFD700; }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .five-v-five-matchup.active { background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border-color: #FFD700; animation: pulse-glow 1.5s ease-in-out infinite; }
+
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; }
+    .btn-danger:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5); }
+    .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); transition: all 0.3s ease; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 0.75rem 1.5rem; }
+    .btn-success:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5); }
+    .btn-success:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+    .btn-md { padding: 0.75rem 1.5rem; font-size: 1rem; }
+    .btn-lg { padding: 1rem 2rem; font-size: 1.125rem; }
+
+    .input-base { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.12); color: #ffffff; padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.3s ease; }
+    .input-base:focus { outline: none; border-color: #FFD700; box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1); }
+    .input-base:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(0, 0, 0, 0.5); }
+    .input-base::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+    .score-display { font-family: 'Courier New', monospace; font-size: 2.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+
+    .nav-tab { padding: 0.75rem 1.5rem; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; transition: all 0.3s ease; color: #ffffff; font-weight: 600; }
+    .nav-tab.active { background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border-color: #FFD700; }
+
+    .player-nav-tab { padding: 0.75rem 1.5rem; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; transition: all 0.3s ease; color: #ffffff; font-weight: 600; }
+    .player-nav-tab.active { background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border-color: #FFD700; }
+
+    .page { animation: fadeIn 0.5s ease-in-out; }
+    .hidden-page { display: none; }
+
+    .readonly-badge { background: rgba(0, 0, 0, 0.3); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; color: rgba(255, 255, 255, 0.5); }
+
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
+    .dashboard-item { padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+    .dashboard-item.active { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+    .dashboard-item.completed { opacity: 0.8; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+    .status-pending { background: rgba(107, 114, 128, 0.3); color: rgba(255, 255, 255, 0.7); }
+    .status-active { background: rgba(255, 215, 0, 0.2); color: #FFD700; animation: blink 2s ease-in-out infinite; }
+    .status-completed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+
+    .dice-face { width: 80px; height: 80px; background: rgba(255, 255, 255, 0.1); border: 2px solid #FFD700; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #FFD700; }
+
+    .team-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); padding: 1rem; border-radius: 12px; transition: all 0.3s ease; }
+    .team-card:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .team-card.qualified { background: rgba(255, 215, 0, 0.1); border: 2px solid #FFD700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); animation: pulse-glow 2s ease-in-out infinite; }
+
+    .correct-btn { 
+      pointer-events: auto !important; 
+      position: relative; 
+      z-index: 100; 
+      cursor: pointer;
+    }
+
+    .podium-container { display: flex; align-items: flex-end; justify-content: center; gap: 2rem; height: 400px; margin-bottom: 2rem; }
+    .podium-column { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .podium-box { background: rgba(255, 215, 0, 0.1); border: 2px solid #FFD700; border-radius: 12px; padding: 2rem 1.5rem; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; width: 120px; }
+    .podium-box.first { height: 300px; background: rgba(255, 215, 0, 0.2); box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+    .podium-box.second { height: 200px; }
+    .podium-box.third { height: 140px; }
+    .podium-rank { font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem; }
+    .podium-name { font-weight: bold; font-size: 1rem; margin-bottom: 0.5rem; }
+    .podium-score { color: #FFD700; font-weight: 900; font-size: 1.5rem; }
+
+    .confetti { position: fixed; width: 10px; height: 10px; pointer-events: none; }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+    .data-table th { background: rgba(255, 215, 0, 0.1); font-weight: bold; color: #FFD700; }
+    .data-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+    .data-table button { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
+
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+      .score-display { font-size: 2rem; }
+      .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+      .podium-container { height: 300px; gap: 1rem; }
+      .podium-box.first { height: 225px; }
+      .podium-box.second { height: 150px; }
+      .podium-box.third { height: 105px; }
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full w-full">
+  <div id="app" class="h-full w-full flex flex-col">
+   <div id="role-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-lg z-50 flex items-center justify-center">
+    <div class="glass-card-lg p-8 max-w-md w-full mx-4 animate-slideInUp">
+     <h2 class="text-2xl font-bold text-yellow-400 mb-2">歡迎使用</h2>
+     <p class="text-gray-300 mb-6">2026 英美回娘家籃球交流賽</p>
+     <p class="text-sm text-gray-500 mb-8">請選擇您的身分</p>
+     <div class="space-y-3"><button id="role-staff" class="w-full btn-primary py-3 text-lg">?? 工作人員</button> <button id="role-player" class="w-full btn-secondary py-3 text-lg">?? 球員/校友</button>
+     </div>
+    </div>
+   </div>
+   <header class="bg-black/30 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex-shrink-0">
+    <div class="max-w-full mx-auto flex items-center justify-between">
+     <div class="flex items-center gap-3"><span class="text-3xl">??</span>
+      <div>
+       <h1 id="app-title" class="text-lg font-bold text-yellow-400">2026 英美回娘家籃球交流賽</h1>
+       <p class="text-xs text-gray-500">Basketball Exchange Tournament</p>
+      </div>
+     </div>
+     <div class="flex items-center gap-3"><button id="role-toggle" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2"> <span id="role-icon">??</span> <span id="role-label">示範</span> </button> <button id="guide-btn" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2"> <span>??</span> </button>
+     </div>
+     <div id="readonly-badge" class="readonly-badge hidden">
+      ?? 唯讀模式
+     </div>
+    </div>
+   </header>
+   <nav class="bg-black/20 border-b border-white/10 px-4 py-2 flex-shrink-0 overflow-x-auto">
+    <div class="flex gap-2"><button class="nav-tab active" data-page="0">?? 首頁</button> <button class="nav-tab" data-page="1">?? 趣味競賽</button> <button class="nav-tab" data-page="2">?? 三分磚頭王</button> <button class="nav-tab" data-page="3">?? 五五賽</button> <button class="nav-tab" data-page="4">?? 頒獎台</button>
+    </div>
+   </nav>
+   <div id="guide-drawer" class="fixed right-0 top-0 h-full w-96 max-w-full glass-card-lg border-l border-white/10 transform translate-x-full transition-transform duration-300 z-30 overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-4">
+     <h3 class="text-lg font-bold text-yellow-400">?? 說明指南</h3><button id="guide-close" class="btn-secondary btn-sm">?</button>
+    </div>
+    <div id="guide-content" class="text-sm text-gray-300 space-y-4"></div>
+   </div>
+   <main class="flex-1 overflow-auto w-full">
+    <div class="px-4 py-6 w-full">
+     <div class="max-w-7xl mx-auto">
+      <!-- 首頁、各賽事頁面 HTML（保持不變，省略以節省空間） -->
+      <section id="page-0" class="page">
+       <h2 class="text-2xl font-bold text-yellow-400 mb-8" style="text-align: center; font-size: 2.5rem; letter-spacing: 1px;">?? 活動進度總覽</h2>
+       <div class="dashboard-grid mb-12">
+        <div class="dashboard-item glass-card" data-stage="0">
+         <div class="text-5xl mb-3">
+          ??
+         </div>
+         <p class="font-bold text-base mb-3">分組</p>
+         <div class="status-badge status-pending mt-2 mx-auto w-fit">
+          未開始
+         </div>
+        </div>
+        <div class="dashboard-item glass-card" data-stage="1">
+         <div class="text-5xl mb-3">
+          ??
+         </div>
+         <p class="font-bold text-base mb-3">趣味競賽</p>
+         <div class="status-badge status-pending mt-2 mx-auto w-fit">
+          未開始
+         </div>
+        </div>
+        <div class="dashboard-item glass-card" data-stage="2">
+         <div class="text-5xl mb-3">
+          ??
+         </div>
+         <p class="font-bold text-base mb-3">三分磚頭王</p>
+         <div class="status-badge status-pending mt-2 mx-auto w-fit">
+          未開始
+         </div>
+        </div>
+        <div class="dashboard-item glass-card" data-stage="3">
+         <div class="text-5xl mb-3">
+          ??
+         </div>
+         <p class="font-bold text-base mb-3">五五賽</p>
+         <div class="status-badge status-pending mt-2 mx-auto w-fit">
+          未開始
+         </div>
+        </div>
+       </div>
+       <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%); border: 2px solid #FFD700; border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px);">
+        <h3 class="text-2xl font-bold text-yellow-400 mb-6" style="text-align: center;">?? 各隊總積分排行</h3>
+        <div class="grid grid-cols-3 gap-6">
+         <div style="background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+           ??? Team A
+          </div>
+          <div class="score-display text-5xl" id="dash-a-score">
+           0
+          </div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+           局
+          </div>
+         </div>
+         <div style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #f87171; padding: 1.5rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+           ??? Team B
+          </div>
+          <div class="score-display text-5xl" id="dash-b-score">
+           0
+          </div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+           局
+          </div>
+         </div>
+         <div style="background: rgba(34, 197, 94, 0.15); border-left: 4px solid #4ade80; padding: 1.5rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+           ?? Team C
+          </div>
+          <div class="score-display text-5xl" id="dash-c-score">
+           0
+          </div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+           局
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="page-1" class="page hidden-page">
+       <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 趣味競賽 - 兩輪制計時挑戰</h2>
+       <div class="glass-card p-4 mb-6">
+        <div class="grid grid-cols-3 gap-4">
+         <div class="text-center">
+          <p class="text-xs text-gray-400 mb-1">當前進度</p>
+          <p id="dice-round-label" class="text-lg font-bold text-yellow-400">第一輪：Team A</p>
+         </div>
+         <div class="text-center">
+          <p class="text-xs text-gray-400 mb-1">隊伍進度</p>
+          <p id="dice-team-progress" class="text-lg font-bold text-yellow-400">1/3</p>
+         </div>
+         <div class="text-center">
+          <p class="text-xs text-gray-400 mb-1">賽制狀態</p>
+          <p id="dice-status" class="text-lg font-bold text-green-400">進行中</p>
+         </div>
+        </div>
+       </div>
+       <div class="glass-card p-6 mb-6">
+        <div class="grid grid-cols-3 gap-6">
+         <div class="text-center">
+          <p class="text-gray-400 text-sm mb-2">當前隊伍</p>
+          <h3 id="dice-team" class="text-3xl font-bold text-yellow-400 mb-4">Team A</h3>
+          <div id="dice-timer" class="font-digital text-5xl text-yellow-400 mb-6">
+           00:00.0
+          </div>
+          <div class="space-y-2"><button id="dice-start-btn" class="btn-primary w-full">?? 開始計時</button> <button id="dice-stop-btn" class="btn-secondary w-full" disabled>?? 停止</button>
+          </div>
+         </div>
+         <div class="text-center flex flex-col items-center justify-center"><button id="dice-roll-btn" class="btn-primary btn-lg mb-4">?? 投擲骰子</button>
+          <div class="dice-face" id="dice-display">
+           ?
+          </div>
+          <p id="dice-action" class="text-gray-400 text-sm mt-4">等待投擲...</p>
+         </div>
+         <div class="space-y-2">
+          <p class="text-yellow-400 text-sm font-bold">?? 骰子對應動作</p>
+          <div class="bg-white/5 rounded p-3 text-xs space-y-1 max-h-64 overflow-y-auto">
+           <div>
+            ??1 = 右手上籃
+           </div>
+           <div>
+            ??2 = 左手上籃
+           </div>
+           <div>
+            ??3 = 三分出手
+           </div>
+           <div>
+            ??4 = 騎馬射箭
+           </div>
+           <div>
+            ??5 = 轉五圈投籃
+           </div>
+           <div>
+            ??6 = 波比跳
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="glass-card p-4 mb-6 flex gap-2 justify-center flex-wrap"><button id="dice-next-team-btn" class="btn-primary btn-sm">?? 下一隊</button> <button id="dice-start-round2-btn" class="btn-success btn-sm hidden">?? 開始第二輪</button> <button id="dice-finalize-btn" class="btn-danger btn-sm hidden">? 結束趣味競賽</button>
+       </div>
+       <div class="glass-card p-6">
+        <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 各隊成績</h3>
+        <div class="grid grid-cols-3 gap-4">
+         <div class="team-card">
+          <h4 class="font-bold text-blue-400 mb-3">Team A</h4>
+          <div class="space-y-2 text-sm">
+           <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="a-r1" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="a-r2" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="a-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+           </div>
+          </div>
+         </div>
+         <div class="team-card">
+          <h4 class="font-bold text-red-400 mb-3">Team B</h4>
+          <div class="space-y-2 text-sm">
+           <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="b-r1" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="b-r2" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="b-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+           </div>
+          </div>
+         </div>
+         <div class="team-card">
+          <h4 class="font-bold text-green-400 mb-3">Team C</h4>
+          <div class="space-y-2 text-sm">
+           <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="c-r1" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="c-r2" class="font-digital text-yellow-400">--:--.-</span>
+           </div>
+           <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="c-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="glass-card p-4">
+        <button id="dice-records-toggle" class="w-full flex items-center justify-between p-3 hover:bg-white/5 rounded transition-all" style="border: none; background: transparent; cursor: pointer; color: #FFD700; font-weight: 600;"> <span>?? 查看詳細紀錄</span> <span id="dice-records-icon" style="font-size: 1.2rem; transition: transform 0.3s ease;">▼</span> </button>
+        <div id="dice-records-content" class="hidden mt-4">
+         <table class="data-table w-full text-sm">
+          <thead>
+           <tr>
+            <th style="color: #FFD700; background: rgba(255, 215, 0, 0.1);">隊伍</th>
+            <th style="color: #FFD700; background: rgba(255, 215, 0, 0.1);">輪次</th>
+            <th style="color: #FFD700; background: rgba(255, 215, 0, 0.1);">完成時間</th>
+            <th style="color: #FFD700; background: rgba(255, 215, 0, 0.1);">記錄時間</th>
+           </tr>
+          </thead>
+          <tbody id="dice-records-body"></tbody>
+         </table>
+        </div>
+       </div>
+      </section>
+      <section id="page-2" class="page hidden-page">
+       <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 三分磚頭王 - 10人制小組賽 → 決賽</h2>
+       <div class="glass-card p-4 mb-6">
+        <div class="flex items-center gap-4 flex-wrap">
+         <div class="text-center flex-1 min-w-[150px]">
+          <p class="text-xs text-gray-400 mb-1">賽制進度</p>
+          <p id="threepoint-phase" class="text-lg font-bold text-yellow-400">第一輪（小組賽）</p>
+         </div><button id="threepoint-round1-btn" class="btn-success btn-sm">?? 結算第一輪</button> <button id="threepoint-finals-btn" class="btn-danger btn-sm hidden">??? 結算決賽</button>
+        </div>
+       </div>
+       <div id="threepoint-round1" class="glass-card p-6 mb-6">
+        <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 第一輪 - 小組賽</h3>
+        <div class="grid grid-cols-3 gap-6">
+         <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+          <h4 class="font-bold text-blue-400 mb-4">Team A</h4>
+          <div class="grid grid-cols-2 gap-2 mb-4" id="threepoint-a-inputs"></div>
+          <div class="flex justify-between items-center border-t border-white/10 pt-3"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="threepoint-a-total" class="score-display text-2xl">0</span>
+          </div>
+         </div>
+         <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+          <h4 class="font-bold text-red-400 mb-4">Team B</h4>
+          <div class="grid grid-cols-2 gap-2 mb-4" id="threepoint-b-inputs"></div>
+          <div class="flex justify-between items-center border-t border-white/10 pt-3"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="threepoint-b-total" class="score-display text-2xl">0</span>
+          </div>
+         </div>
+         <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+          <h4 class="font-bold text-green-400 mb-4">Team C</h4>
+          <div class="grid grid-cols-2 gap-2 mb-4" id="threepoint-c-inputs"></div>
+          <div class="flex justify-between items-center border-t border-white/10 pt-3"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="threepoint-c-total" class="score-display text-2xl">0</span>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div id="threepoint-finals" class="glass-card p-6 hidden">
+        <h3 class="text-lg font-bold text-yellow-400 mb-4">??? 決賽 - 最終對決</h3>
+        <div class="grid grid-cols-2 gap-6">
+         <div class="bg-white/5 border-2 border-yellow-400/50 rounded-lg p-4">
+          <h4 id="finals-team1-name" class="font-bold text-yellow-400 mb-4">Team A</h4>
+          <div class="grid grid-cols-2 gap-2 mb-4" id="finals-team1-inputs"></div>
+          <div class="flex justify-between items-center border-t border-white/10 pt-3"><span class="text-gray-400 font-bold">決賽總分</span> <span id="finals-team1-total" class="score-display text-2xl">0</span>
+          </div>
+         </div>
+         <div class="bg-white/5 border-2 border-yellow-400/50 rounded-lg p-4">
+          <h4 id="finals-team2-name" class="font-bold text-yellow-400 mb-4">Team B</h4>
+          <div class="grid grid-cols-2 gap-2 mb-4" id="finals-team2-inputs"></div>
+          <div class="flex justify-between items-center border-t border-white/10 pt-3"><span class="text-gray-400 font-bold">決賽總分</span> <span id="finals-team2-total" class="score-display text-2xl">0</span>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="page-3" class="page hidden-page">
+       <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 五五賽</h2>
+       <div class="glass-card p-4 mb-6">
+        <div class="flex items-center gap-2 flex-wrap justify-center mb-4">
+         <button class="five-v-five-matchup btn-secondary btn-sm active" data-match="ab">A vs B</button> <button class="five-v-five-matchup btn-secondary btn-sm" data-match="ac">A vs C</button> <button class="five-v-five-matchup btn-secondary btn-sm" data-match="bc">B vs C</button>
+        </div>
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+         <div class="text-center flex-1 min-w-[100px]">
+          <p class="text-xs text-gray-400 mb-1">節數</p>
+          <p id="fvf-quarter" class="text-2xl font-bold text-yellow-400">Q1</p>
+         </div>
+         <div class="text-center flex-1 min-w-[100px]">
+          <p class="text-xs text-gray-400 mb-1">剩餘時間</p>
+          <p id="fvf-timer" class="font-digital text-2xl text-yellow-400">10:00</p>
+         </div><button id="fvf-timer-btn" class="btn-primary btn-sm">?? 開始</button>
+        </div>
+       </div>
+       <div class="glass-card p-6">
+        <div class="grid grid-cols-3 gap-6" id="fvf-scoreboard">
+         <div class="bg-blue-500/10 border-2 border-blue-400 rounded-lg p-6 text-center">
+          <h3 id="fvf-team1-name" class="text-xl font-bold text-blue-400 mb-4">Team A</h3>
+          <div class="score-display text-6xl text-blue-400 mb-4" id="fvf-team1-score">
+           0
+          </div>
+          <div class="flex gap-2 justify-center flex-wrap">
+           <button class="fvf-btn btn-primary btn-sm" data-team="1" data-points="+1">+1</button> <button class="fvf-btn btn-primary btn-sm" data-team="1" data-points="+2">+2</button> <button class="fvf-btn btn-primary btn-sm" data-team="1" data-points="+3">+3</button> <button class="fvf-btn btn-secondary btn-sm" data-team="1" data-points="-1">-1</button>
+          </div>
+         </div>
+         <div class="bg-gray-500/10 border-2 border-gray-400 rounded-lg p-6 text-center flex flex-col items-center justify-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">
+           vs
+          </div><button id="fvf-reset-btn" class="btn-danger btn-sm">重置比分</button>
+         </div>
+         <div class="bg-red-500/10 border-2 border-red-400 rounded-lg p-6 text-center">
+          <h3 id="fvf-team2-name" class="text-xl font-bold text-red-400 mb-4">Team B</h3>
+          <div class="score-display text-6xl text-red-400 mb-4" id="fvf-team2-score">
+           0
+          </div>
+          <div class="flex gap-2 justify-center flex-wrap">
+           <button class="fvf-btn btn-primary btn-sm" data-team="2" data-points="+1">+1</button> <button class="fvf-btn btn-primary btn-sm" data-team="2" data-points="+2">+2</button> <button class="fvf-btn btn-primary btn-sm" data-team="2" data-points="+3">+3</button> <button class="fvf-btn btn-secondary btn-sm" data-team="2" data-points="-1">-1</button>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="glass-card p-6 mt-6">
+        <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 五五賽全場累積積分</h3>
+        <div class="grid grid-cols-3 gap-4 text-center">
+         <div class="bg-blue-500/10 border border-blue-400 rounded p-3">
+          <div class="text-sm text-gray-400 mb-2">
+           Team A
+          </div>
+          <div class="score-display text-4xl text-blue-400" id="fvf-cumulative-a">
+           0
+          </div>
+          <div class="text-xs text-gray-500 mt-1">
+           分
+          </div>
+         </div>
+         <div class="bg-red-500/10 border border-red-400 rounded p-3">
+          <div class="text-sm text-gray-400 mb-2">
+           Team B
+          </div>
+          <div class="score-display text-4xl text-red-400" id="fvf-cumulative-b">
+           0
+          </div>
+          <div class="text-xs text-gray-500 mt-1">
+           分
+          </div>
+         </div>
+         <div class="bg-green-500/10 border border-green-400 rounded p-3">
+          <div class="text-sm text-gray-400 mb-2">
+           Team C
+          </div>
+          <div class="score-display text-4xl text-green-400" id="fvf-cumulative-c">
+           0
+          </div>
+          <div class="text-xs text-gray-500 mt-1">
+           分
+          </div>
+         </div>
+        </div>
+       </div><button id="fvf-finalize-btn" class="btn-success btn-lg w-full mt-6">? 結算比賽進入下一場</button>
+      </section>
+      <section id="page-4" class="page hidden-page">
+       <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">?? 頒獎台</h2>
+       <div class="glass-card p-8">
+        <div class="podium-container" id="podium-container">
+         <div class="podium-column">
+          <div class="podium-box second animate-podium-rise" style="animation-delay: 0.2s">
+           <div class="podium-rank">
+            ??
+           </div>
+           <div class="podium-name" id="podium-2nd-name">
+            Team B
+           </div>
+           <div class="podium-score" id="podium-2nd-score">
+            0
+           </div>
+          </div>
+         </div>
+         <div class="podium-column">
+          <div class="podium-box first animate-podium-rise" style="animation-delay: 0s">
+           <div class="podium-rank">
+            ??
+           </div>
+           <div class="podium-name" id="podium-1st-name">
+            Team A
+           </div>
+           <div class="podium-score" id="podium-1st-score">
+            0
+           </div>
+          </div>
+         </div>
+         <div class="podium-column">
+          <div class="podium-box third animate-podium-rise" style="animation-delay: 0.4s">
+           <div class="podium-rank">
+            ??
+           </div>
+           <div class="podium-name" id="podium-3rd-name">
+            Team C
+           </div>
+           <div class="podium-score" id="podium-3rd-score">
+            0
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </div>
+   </main>
+   <div id="player-view-overlay" class="hidden w-full h-full" style="display: flex; flex-direction: column; background: linear-gradient(135deg, #050812 0%, #001F3F 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40; padding: 0;">
+    <!-- 頂部標題欄 -->
+    <header class="bg-black/30 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex-shrink-0">
+     <div class="max-w-full mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3"><span class="text-3xl">??</span>
+       <div>
+        <h1 id="player-app-title" class="text-lg font-bold text-yellow-400">2026 英美回娘家籃球交流賽</h1>
+        <p class="text-xs text-gray-500">球員實時觀看</p>
+       </div>
+      </div><button id="player-switch-to-staff" class="px-3 py-1.5 rounded-full text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 transition-all flex items-center gap-2 border border-yellow-400/30"> <span>?????</span> <span>工作人員模式</span> </button>
+     </div>
+    </header><!-- 分頁導航 -->
+    <nav class="bg-black/20 border-b border-white/10 px-4 py-2 flex-shrink-0 overflow-x-auto">
+     <div class="flex gap-2"><button class="player-nav-tab active" data-page="0">?? 首頁</button> <button class="player-nav-tab" data-page="1">?? 趣味競賽</button> <button class="player-nav-tab" data-page="2">?? 三分磚頭王</button> <button class="player-nav-tab" data-page="3">?? 五五賽</button> <button class="player-nav-tab" data-page="4">?? 頒獎台</button>
+     </div>
+    </nav><!-- 主要內容區 -->
+    <main class="flex-1 overflow-auto w-full">
+     <div class="px-4 py-6 w-full">
+      <div class="max-w-7xl mx-auto"><!-- 球員首頁 -->
+       <section id="player-page-0" class="player-page">
+        <h2 class="text-2xl font-bold text-yellow-400 mb-8" style="text-align: center; font-size: 2.5rem; letter-spacing: 1px;">?? 活動進度總覽</h2>
+        <div class="dashboard-grid mb-12">
+         <div class="dashboard-item glass-card" data-stage="0">
+          <div class="text-5xl mb-3">
+           ??
+          </div>
+          <p class="font-bold text-base mb-3">分組</p>
+          <div id="player-dash-status-0" class="status-badge status-pending mt-2 mx-auto w-fit">
+           未開始
+          </div>
+         </div>
+         <div class="dashboard-item glass-card" data-stage="1">
+          <div class="text-5xl mb-3">
+           ??
+          </div>
+          <p class="font-bold text-base mb-3">趣味競賽</p>
+          <div id="player-dash-status-1" class="status-badge status-pending mt-2 mx-auto w-fit">
+           未開始
+          </div>
+         </div>
+         <div class="dashboard-item glass-card" data-stage="2">
+          <div class="text-5xl mb-3">
+           ??
+          </div>
+          <p class="font-bold text-base mb-3">三分磚頭王</p>
+          <div id="player-dash-status-2" class="status-badge status-pending mt-2 mx-auto w-fit">
+           未開始
+          </div>
+         </div>
+         <div class="dashboard-item glass-card" data-stage="3">
+          <div class="text-5xl mb-3">
+           ??
+          </div>
+          <p class="font-bold text-base mb-3">五五賽</p>
+          <div id="player-dash-status-3" class="status-badge status-pending mt-2 mx-auto w-fit">
+           未開始
+          </div>
+         </div>
+        </div>
+        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%); border: 2px solid #FFD700; border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px);">
+         <h3 class="text-2xl font-bold text-yellow-400 mb-6" style="text-align: center;">?? 各隊總積分排行</h3>
+         <div class="grid grid-cols-3 gap-6">
+          <div style="background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 12px; text-align: center;">
+           <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+            ??? Team A
+           </div>
+           <div class="score-display text-5xl" id="player-dash-a-score">
+            0
+           </div>
+           <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+            局
+           </div>
+          </div>
+          <div style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #f87171; padding: 1.5rem; border-radius: 12px; text-align: center;">
+           <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+            ??? Team B
+           </div>
+           <div class="score-display text-5xl" id="player-dash-b-score">
+            0
+           </div>
+           <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+            局
+           </div>
+          </div>
+          <div style="background: rgba(34, 197, 94, 0.15); border-left: 4px solid #4ade80; padding: 1.5rem; border-radius: 12px; text-align: center;">
+           <div style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; font-weight: 600;">
+            ?? Team C
+           </div>
+           <div class="score-display text-5xl" id="player-dash-c-score">
+            0
+           </div>
+           <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 0.75rem;">
+            局
+           </div>
+          </div>
+         </div>
+        </div>
+       </section><!-- 球員趣味競賽頁 -->
+       <section id="player-page-1" class="player-page hidden-page">
+        <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 趣味競賽 - 兩輪制計時挑戰</h2>
+        <div class="glass-card p-4 mb-6">
+         <div class="grid grid-cols-3 gap-4">
+          <div class="text-center">
+           <p class="text-xs text-gray-400 mb-1">當前進度</p>
+           <p id="player-dice-round-label" class="text-lg font-bold text-yellow-400">第一輪：Team A</p>
+          </div>
+          <div class="text-center">
+           <p class="text-xs text-gray-400 mb-1">隊伍進度</p>
+           <p id="player-dice-team-progress" class="text-lg font-bold text-yellow-400">1/3</p>
+          </div>
+          <div class="text-center">
+           <p class="text-xs text-gray-400 mb-1">賽制狀態</p>
+           <p id="player-dice-status" class="text-lg font-bold text-green-400">等待中</p>
+          </div>
+         </div>
+        </div>
+        <div class="glass-card p-6">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 各隊成績（唯讀）</h3>
+         <div class="grid grid-cols-3 gap-4">
+          <div class="team-card">
+           <h4 class="font-bold text-blue-400 mb-3">Team A</h4>
+           <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="player-a-r1" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="player-a-r2" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="player-a-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+            </div>
+           </div>
+          </div>
+          <div class="team-card">
+           <h4 class="font-bold text-red-400 mb-3">Team B</h4>
+           <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="player-b-r1" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="player-b-r2" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="player-b-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+            </div>
+           </div>
+          </div>
+          <div class="team-card">
+           <h4 class="font-bold text-green-400 mb-3">Team C</h4>
+           <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-400">第一輪</span> <span id="player-c-r1" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between"><span class="text-gray-400">第二輪</span> <span id="player-c-r2" class="font-digital text-yellow-400">--:--.-</span>
+            </div>
+            <div class="flex justify-between border-t border-white/10 pt-2 mt-2"><span class="text-gray-400 font-bold">總時間</span> <span id="player-c-total" class="font-digital text-green-400 font-bold">--:--.-</span>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div id="player-dice-winner" class="glass-card p-6 mt-6 hidden">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 冠軍</h3>
+         <div id="player-dice-winner-content" style="text-align: center; font-size: 1.5rem; color: #FFD700; font-weight: bold;"></div>
+        </div>
+       </section><!-- 球員三分磚頭王頁 -->
+       <section id="player-page-2" class="player-page hidden-page">
+        <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 三分磚頭王 - 10人制小組賽 → 決賽</h2>
+        <div class="glass-card p-4 mb-6">
+         <div class="text-center">
+          <p class="text-xs text-gray-400 mb-1">賽制進度</p>
+          <p id="player-threepoint-phase" class="text-lg font-bold text-yellow-400">第一輪（小組賽）</p>
+         </div>
+        </div>
+        <div id="player-threepoint-round1" class="glass-card p-6 mb-6">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 第一輪 - 小組賽（唯讀）</h3>
+         <div class="grid grid-cols-3 gap-6">
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+           <h4 class="font-bold text-blue-400 mb-4">Team A</h4>
+           <div class="flex justify-between items-center"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="player-threepoint-a-total" class="score-display text-2xl">0</span>
+           </div>
+          </div>
+          <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+           <h4 class="font-bold text-red-400 mb-4">Team B</h4>
+           <div class="flex justify-between items-center"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="player-threepoint-b-total" class="score-display text-2xl">0</span>
+           </div>
+          </div>
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+           <h4 class="font-bold text-green-400 mb-4">Team C</h4>
+           <div class="flex justify-between items-center"><span class="text-gray-400 font-bold">隊伍總分</span> <span id="player-threepoint-c-total" class="score-display text-2xl">0</span>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div id="player-threepoint-finals" class="glass-card p-6 hidden">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">??? 決賽 - 最終對決（唯讀）</h3>
+         <div class="grid grid-cols-2 gap-6">
+          <div class="bg-white/5 border-2 border-yellow-400/50 rounded-lg p-4">
+           <h4 id="player-finals-team1-name" class="font-bold text-yellow-400 mb-4">Team A</h4>
+           <div class="flex justify-between items-center"><span class="text-gray-400 font-bold">決賽總分</span> <span id="player-finals-team1-total" class="score-display text-2xl">0</span>
+           </div>
+          </div>
+          <div class="bg-white/5 border-2 border-yellow-400/50 rounded-lg p-4">
+           <h4 id="player-finals-team2-name" class="font-bold text-yellow-400 mb-4">Team B</h4>
+           <div class="flex justify-between items-center"><span class="text-gray-400 font-bold">決賽總分</span> <span id="player-finals-team2-total" class="score-display text-2xl">0</span>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div id="player-threepoint-winner" class="glass-card p-6 mt-6 hidden">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 冠軍</h3>
+         <div id="player-threepoint-winner-content" style="text-align: center; font-size: 1.5rem; color: #FFD700; font-weight: bold;"></div>
+        </div>
+       </section><!-- 球員五五賽頁 -->
+       <section id="player-page-3" class="player-page hidden-page">
+        <h2 class="text-2xl font-bold text-yellow-400 mb-6">?? 五五賽</h2>
+        <div class="glass-card p-4 mb-6">
+         <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="text-center flex-1 min-w-[100px]">
+           <p class="text-xs text-gray-400 mb-1">進行中的比賽</p>
+           <p id="player-fvf-matchup" class="text-lg font-bold text-yellow-400">A vs B</p>
+          </div>
+          <div class="text-center flex-1 min-w-[100px]">
+           <p class="text-xs text-gray-400 mb-1">節數</p>
+           <p id="player-fvf-quarter" class="text-lg font-bold text-yellow-400">Q1</p>
+          </div>
+         </div>
+        </div>
+        <div class="glass-card p-6">
+         <div class="grid grid-cols-3 gap-6">
+          <div class="bg-blue-500/10 border-2 border-blue-400 rounded-lg p-6 text-center">
+           <h3 class="text-xl font-bold text-blue-400 mb-4">Team A</h3>
+           <div class="score-display text-6xl text-blue-400 mb-4" id="player-fvf-team1-score">
+            0
+           </div>
+           <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">
+            分
+           </div>
+          </div>
+          <div class="bg-gray-500/10 border-2 border-gray-400 rounded-lg p-6 text-center flex flex-col items-center justify-center">
+           <div style="font-size: 2rem; margin-bottom: 1rem;">
+            vs
+           </div>
+          </div>
+          <div class="bg-red-500/10 border-2 border-red-400 rounded-lg p-6 text-center">
+           <h3 class="text-xl font-bold text-red-400 mb-4">Team B</h3>
+           <div class="score-display text-6xl text-red-400 mb-4" id="player-fvf-team2-score">
+            0
+           </div>
+           <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">
+            分
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="glass-card p-6 mt-6">
+         <h3 class="text-lg font-bold text-yellow-400 mb-4">?? 五五賽全場累積積分</h3>
+         <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="bg-blue-500/10 border border-blue-400 rounded p-3">
+           <div class="text-sm text-gray-400 mb-2">
+            Team A
+           </div>
+           <div class="score-display text-4xl text-blue-400" id="player-fvf-cumulative-a">
+            0
+           </div>
+           <div class="text-xs text-gray-500 mt-1">
+            分
+           </div>
+          </div>
+          <div class="bg-red-500/10 border border-red-400 rounded p-3">
+           <div class="text-sm text-gray-400 mb-2">
+            Team B
+           </div>
+           <div class="score-display text-4xl text-red-400" id="player-fvf-cumulative-b">
+            0
+           </div>
+           <div class="text-xs text-gray-500 mt-1">
+            分
+           </div>
+          </div>
+          <div class="bg-green-500/10 border border-green-400 rounded p-3">
+           <div class="text-sm text-gray-400 mb-2">
+            Team C
+           </div>
+           <div class="score-display text-4xl text-green-400" id="player-fvf-cumulative-c">
+            0
+           </div>
+           <div class="text-xs text-gray-500 mt-1">
+            分
+           </div>
+          </div>
+         </div>
+        </div>
+       </section><!-- 球員頒獎台頁 -->
+       <section id="player-page-4" class="player-page hidden-page">
+        <h2 class="text-2xl font-bold text-yellow-400 mb-6 text-center">?? 頒獎台</h2>
+        <div class="glass-card p-8">
+         <div class="podium-container" id="player-podium-container">
+          <div class="podium-column">
+           <div class="podium-box second animate-podium-rise" style="animation-delay: 0.2s">
+            <div class="podium-rank">
+             ??
+            </div>
+            <div class="podium-name" id="player-podium-2nd-name">
+             Team B
+            </div>
+            <div class="podium-score" id="player-podium-2nd-score">
+             0
+            </div>
+           </div>
+          </div>
+          <div class="podium-column">
+           <div class="podium-box first" style="visibility: hidden; opacity: 0;">
+            <div class="podium-rank">
+             ??
+            </div>
+            <div class="podium-name" id="player-podium-1st-name">
+             Team A
+            </div>
+            <div class="podium-score" id="player-podium-1st-score">
+             0
+            </div>
+           </div>
+          </div>
+          <div class="podium-column">
+           <div class="podium-box third animate-podium-rise" style="animation-delay: 0.4s">
+            <div class="podium-rank">
+             ??
+            </div>
+            <div class="podium-name" id="player-podium-3rd-name">
+             Team C
+            </div>
+            <div class="podium-score" id="player-podium-3rd-score">
+             0
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </section>
+      </div>
+     </div>
+    </main>
+   </div>
+  </div>
+  <script>
+    // ============ 安全 DOM 更新函數 ============
+    function safeSet(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function safeHTML(id, html) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    }
+
+    // ============ SINGLE STATE & DATA DECLARATIONS ============
+    let userRole = 'player';
+    let timerInterval = null;
+    let timerStartTime = 0;
+    let timerElapsedMs = 0;
+    let isTimerRunning = false;
+    let currentDiceTeamIndex = 0;
+    let diceRound = 1;
+    const diceTeams = ['A', 'B', 'C'];
+    let diceRound1Complete = false;
+    let activeStep = 0;
+    let winnerState = { dice: null, threePoint: null, fiveVFive: null };
+    let announcementVisible = false;
+    let matchWinners = { dice: null, threePoint: null, fiveVFive: null };
+    let championWins = { A: 0, B: 0, C: 0 };
+
+    const teamStatus = {
+      A: '準備就緒',
+      B: '準備就緒',
+      C: '準備就緒'
+    };
+
+    const gameData = {
+      teams: { 
+        A: { score: 0, name: 'Team A', color: '#3b82f6' }, 
+        B: { score: 0, name: 'Team B', color: '#f87171' }, 
+        C: { score: 0, name: 'Team C', color: '#4ade80' } 
+      },
+      dice: { 
+        A: [null, null], 
+        B: [null, null], 
+        C: [null, null],
+        details: { A: [], B: [], C: [] }
+      },
+      diceWinner: null,
+      threePoint: { 
+        round1: { A: {players: Array(10).fill(0), total: 0}, B: {players: Array(10).fill(0), total: 0}, C: {players: Array(10).fill(0), total: 0} },
+        finals: { qualified: [], teams: {} }
+      },
+      threePointWinner: null,
+      fiveVFive: { A: 0, B: 0, C: 0 },
+      logs: []
+    };
+
+    const guideContent = {
+      0: '?? 首頁：監控活動 4 大階段與三隊總得分。實時顯示 Team A、B、C 的累積局數與進度。',
+      1: '?? 趣味競賽：兩輪制（上下半場）。各隊隊員輪流投擲骰子，決定執行的動作。骰子規則：1=右手上籃、2=左手上籃、3=三分出手、4=騎馬射箭、5=轉五圈投籃、6=波比跳。工作人員計時每隊兩輪總時間，時間最短者獲得 1 局積分。',
+      2: '?? 三分磚頭王：第一輪小組賽（10人制），每隊 10 名球員各投 1 次三分球，計算隊伍進球總數。進球數前兩名隊伍進入決賽。決賽中兩支隊伍各派 10 名球員再投 1 次，進球最多的隊伍獲得 1 局積分。',
+      3: '?? 五五賽：循環賽制（A vs B、A vs C、B vs C 三場比賽）。每場比賽分上下半場，各 10 分鐘。上半場結束時自動哨聲提醒，工作人員停止上半場計時並啟動下半場。三場賽事全部完成後，累積得分最高的隊伍獲得 1 局積分。',
+      4: '?? 頒獎台：依據三大項目積分（最多 3 局）排名。如果有隊伍積分相同，觸發「吃分驟死賽」，各隊各投 1 分三分球，先中先贏，勝者額外獲得 1 局積分作為第 4 局。最終獲勝隊伍在頒獎台上展示。'
+    };
+
+    const diceActions = {
+      1: '右手上籃',
+      2: '左手上籃',
+      3: '三分出手',
+      4: '騎馬射箭',
+      5: '轉五圈投籃',
+      6: '波比跳'
+    };
+
+    function loadGameData() {
+      const saved = localStorage.getItem('basketballGameData');
+      if (saved) {
+        Object.assign(gameData, JSON.parse(saved));
+        console.log('? 已載入存檔資料');
+      }
+    }
+
+    function saveGameData() {
+      localStorage.setItem('basketballGameData', JSON.stringify(gameData));
+    }
+
+    function formatTime(milliseconds) {
+      const totalSeconds = Math.floor(milliseconds / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      const ms = Math.floor((milliseconds % 1000) / 100);
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${ms}`;
+    }
+
+    function setActiveStep(step) {
+      activeStep = step;
+      updateProgressIndicators();
+      saveGameData();
+    }
+
+    function updateProgressIndicators() {
+      const stages = ['分組', '趣味競賽', '三分磚頭王', '五五賽'];
+      document.querySelectorAll('.dashboard-item').forEach((item, idx) => {
+        const badge = item.querySelector('.status-badge');
+        if (!badge) return;
+        badge.className = 'status-badge mt-2 mx-auto w-fit';
+        item.classList.remove('active', 'completed');
+        
+        if (idx < activeStep) {
+          badge.classList.add('status-completed');
+          badge.innerHTML = '? 已完成';
+          item.classList.add('completed');
+        } else if (idx === activeStep && activeStep > 0) {
+          badge.classList.add('status-active');
+          badge.innerHTML = '? 進行中';
+          item.classList.add('active');
+        } else {
+          badge.classList.add('status-pending');
+          badge.innerHTML = '未開始';
+        }
+      });
+    }
+
+    function updateTeamStatusDisplay() {
+      ['A', 'B', 'C'].forEach(team => {
+        const statusEl = document.querySelector(`.team-status-${team.toLowerCase()}`);
+        if (statusEl && teamStatus[team]) {
+          statusEl.textContent = teamStatus[team];
+          statusEl.className = 'status-badge w-full justify-center';
+          if (teamStatus[team].includes('比賽中')) {
+            statusEl.classList.add('status-active');
+          } else if (teamStatus[team].includes('成績已上傳')) {
+            statusEl.classList.add('status-completed');
+          } else {
+            statusEl.classList.add('status-pending');
+          }
+        }
+      });
+    }
+
+    function setTeamStatus(team, status) {
+      teamStatus[team] = status;
+      if (!gameData.teamStatus) gameData.teamStatus = {};
+      gameData.teamStatus[team] = status;
+      updateTeamStatusDisplay();
+      saveGameData();
+    }
+
+    function startTimer() {
+      if (userRole !== 'staff') return;
+      if (isTimerRunning) return;
+      const currentTeam = diceTeams[currentDiceTeamIndex];
+      setTeamStatus(currentTeam, `?? 比賽中 (Team ${currentTeam})`);
+      setActiveStep(1);
+      isTimerRunning = true;
+      timerStartTime = Date.now() - timerElapsedMs;
+      document.getElementById('dice-start-btn').disabled = true;
+      document.getElementById('dice-stop-btn').disabled = false;
+      timerInterval = setInterval(() => {
+        timerElapsedMs = Date.now() - timerStartTime;
+        document.getElementById('dice-timer').textContent = formatTime(timerElapsedMs);
+      }, 50);
+    }
+
+    function stopTimer() {
+      if (userRole !== 'staff') return;
+      if (!isTimerRunning) return;
+      isTimerRunning = false;
+      if (timerInterval) clearInterval(timerInterval);
+      const currentTeam = diceTeams[currentDiceTeamIndex];
+      gameData.dice[currentTeam][diceRound - 1] = timerElapsedMs;
+      gameData.dice.details[currentTeam].push({
+        round: diceRound,
+        time: timerElapsedMs,
+        timestamp: new Date().toISOString()
+      });
+      setTeamStatus(currentTeam, `? 成績已上傳 (${formatTime(timerElapsedMs)})`);
+      document.getElementById('dice-start-btn').disabled = false;
+      document.getElementById('dice-stop-btn').disabled = true;
+      updateDiceRecords();
+      updatePlayerDisplay();
+      saveGameData();
+    }
+
+    function resetTimer() {
+      if (userRole !== 'staff') return;
+      isTimerRunning = false;
+      if (timerInterval) clearInterval(timerInterval);
+      timerElapsedMs = 0;
+      document.getElementById('dice-timer').textContent = '00:00.0';
+      document.getElementById('dice-start-btn').disabled = false;
+      document.getElementById('dice-stop-btn').disabled = true;
+    }
+
+    function rollDice() {
+      if (userRole !== 'staff') return;
+      const result = Math.floor(Math.random() * 6) + 1;
+      const diceDisplay = document.getElementById('dice-display');
+      const diceAction = document.getElementById('dice-action');
+      diceDisplay.classList.remove('animate-dice-roll');
+      void diceDisplay.offsetWidth;
+      diceDisplay.classList.add('animate-dice-roll');
+      setTimeout(() => {
+        diceDisplay.textContent = result;
+        if (diceAction) diceAction.textContent = `? ${diceActions[result]}`;
+      }, 600);
+    }
+
+    function updateDiceRecords() {
+      ['A', 'B', 'C'].forEach(team => {
+        const r1 = gameData.dice[team][0];
+        const r2 = gameData.dice[team][1];
+        const r1Elem = document.getElementById(`${team.toLowerCase()}-r1`);
+        const r2Elem = document.getElementById(`${team.toLowerCase()}-r2`);
+        const totalElem = document.getElementById(`${team.toLowerCase()}-total`);
+        if (r1Elem) safeSet(`${team.toLowerCase()}-r1`, r1 !== null ? formatTime(r1) : '--:--.-');
+        if (r2Elem) safeSet(`${team.toLowerCase()}-r2`, r2 !== null ? formatTime(r2) : '--:--.-');
+        if (r1 !== null && r2 !== null) {
+          const total = r1 + r2;
+          if (totalElem) safeSet(`${team.toLowerCase()}-total`, formatTime(total));
+        } else if (totalElem) {
+          safeSet(`${team.toLowerCase()}-total`, '--:--.-');
+        }
+      });
+    }
+
+    function updateDiceUI() {
+      const currentTeam = diceTeams[currentDiceTeamIndex];
+      const teamCount = currentDiceTeamIndex + 1;
+      safeSet('dice-team', currentTeam);
+      safeSet('dice-round-label', `第${diceRound}輪：${currentTeam}`);
+      safeSet('dice-team-progress', `${teamCount}/3`);
+      resetTimer();
+    }
+
+    function nextDiceTeam() {
+      if (userRole !== 'staff') return;
+      if (isTimerRunning) stopTimer();
+      currentDiceTeamIndex++;
+      if (currentDiceTeamIndex >= 3) {
+        if (diceRound === 1) {
+          document.getElementById('dice-next-team-btn').classList.add('hidden');
+          document.getElementById('dice-start-round2-btn').classList.remove('hidden');
+          document.getElementById('dice-status').textContent = '第一輪完成';
+          diceRound1Complete = true;
+        } else {
+          document.getElementById('dice-next-team-btn').classList.add('hidden');
+          document.getElementById('dice-finalize-btn').classList.remove('hidden');
+          document.getElementById('dice-status').textContent = '第二輪完成';
+          calculateDiceRanking();
+        }
+        return;
+      }
+      updateDiceUI();
+    }
+
+    function startRound2() {
+      if (userRole !== 'staff') return;
+      diceRound = 2;
+      currentDiceTeamIndex = 0;
+      document.getElementById('dice-start-round2-btn').classList.add('hidden');
+      document.getElementById('dice-next-team-btn').classList.remove('hidden');
+      document.getElementById('dice-status').textContent = '進行中';
+      updateDiceUI();
+    }
+
+    function calculateDiceRanking() {
+      // ? 防止重複結算
+      if (finalizationState.diceFinalized) return;
+      
+      const times = ['A', 'B', 'C'].map(team => ({
+        team,
+        time: (gameData.dice[team][0] || 0) + (gameData.dice[team][1] || 0)
+      })).filter(t => t.time > 0).sort((a, b) => a.time - b.time);
+
+      const scores = { A: 0, B: 0, C: 0 };
+      const points = [30, 20, 10];
+      times.forEach((item, idx) => {
+        scores[item.team] = points[idx] || 0;
+      });
+
+      Object.assign(gameData.teams.A, { diceScore: scores.A });
+      Object.assign(gameData.teams.B, { diceScore: scores.B });
+      Object.assign(gameData.teams.C, { diceScore: scores.C });
+      
+      const winner = times[0];
+      gameData.diceWinner = winner.team;
+      matchWinners.dice = winner.team;
+      
+      // ? 修正：驟死賽權重 - 每項僅獲得 1 局
+      championWins[winner.team] += 1;
+
+      winnerState.dice = {
+        team: winner.team,
+        time: winner.time
+      };
+
+      updateTeamTotalScores();
+      setActiveStep(2);
+      showDiceWinnerAnnouncement(winner.team, winner.time);
+      
+      // 鎖定結算狀態
+      finalizationState.diceFinalized = true;
+      lockDiceInputs();
+      updateDiceFinalizeBtnStatus();
+      
+      saveGameData();
+    }
+
+    function showDiceWinnerAnnouncement(team, time) {
+      if (announcementVisible) return;
+      announcementVisible = true;
+      const announcement = document.createElement('div');
+      announcement.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        animation: fadeIn 0.5s ease-out;
+      `;
+      announcement.innerHTML = `
+        <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">??</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">趣味競賽冠軍</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">?? Team ${team} ??</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">總時間: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${formatTime(time)}</span></div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">? 確認</button>
+        </div>
+      `;
+      document.body.appendChild(announcement);
+    }
+
+    function initThreePointInputs() {
+      ['A', 'B', 'C'].forEach(team => {
+        const container = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`);
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'threepoint-input input-base text-center';
+          input.placeholder = i;
+          input.dataset.team = team;
+          input.dataset.player = i;
+          input.min = '0';
+          input.disabled = false;
+          input.addEventListener('input', function(e) {
+            const val = parseInt(this.value) || 0;
+            if (!gameData.threePoint.round1[team]) {
+              gameData.threePoint.round1[team] = { players: Array(10).fill(0), total: 0 };
+            }
+            gameData.threePoint.round1[team].players[i - 1] = val;
+            updateThreePointTotal(team);
+            updatePlayerDisplay();
+            saveGameData();
+          });
+          container.appendChild(input);
+        }
+      });
+    }
+
+    function updateThreePointTotal(team) {
+      const total = gameData.threePoint.round1[team].players.reduce((sum, val) => sum + (val || 0), 0);
+      gameData.threePoint.round1[team].total = total;
+      safeSet(`threepoint-${team.toLowerCase()}-total`, total);
+    }
+
+    function finalizeRound1() {
+      if (userRole !== 'staff') return;
+      ['A', 'B', 'C'].forEach(team => {
+        finalizeTeamScore(team);
+      });
+      const scores = ['A', 'B', 'C'].map(team => ({
+        team,
+        score: gameData.threePoint.round1[team].total
+      })).sort((a, b) => b.score - a.score);
+
+      gameData.threePoint.finals.qualified = [scores[0].team, scores[1].team];
+      const eliminatedTeam = scores[2].team;
+      
+      ['A', 'B', 'C'].forEach(team => {
+        const container = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`).closest('div[class*="bg-"]');
+        if (eliminatedTeam === team) {
+          container.style.opacity = '0.4';
+          container.style.pointerEvents = 'none';
+          container.style.filter = 'grayscale(80%)';
+          container.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        } else {
+          container.classList.add('qualified');
+        }
+      });
+
+      document.getElementById('threepoint-round1').classList.add('hidden');
+      document.getElementById('threepoint-finals').classList.remove('hidden');
+      document.getElementById('threepoint-phase').textContent = '決賽（最終對決）';
+      document.getElementById('threepoint-round1-btn').classList.add('hidden');
+      document.getElementById('threepoint-finals-btn').classList.remove('hidden');
+      initFinalsInputs(scores[0].team, scores[1].team);
+      updatePlayerDisplay();
+    }
+
+    function finalizeTeamScore(team) {
+      if (userRole !== 'staff') return;
+      if (!gameData.threePoint.round1[team]) {
+        gameData.threePoint.round1[team] = { players: Array(10).fill(0), total: 0 };
+      }
+      updateThreePointTotal(team);
+      saveGameData();
+    }
+
+    function initFinalsInputs(team1, team2) {
+      document.getElementById('finals-team1-name').textContent = team1;
+      document.getElementById('finals-team2-name').textContent = team2;
+      const container1 = document.getElementById('finals-team1-inputs');
+      const container2 = document.getElementById('finals-team2-inputs');
+      if (!container1 || !container2) return;
+      container1.innerHTML = '';
+      container2.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        const createInput = (team) => {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'threepoint-finals-input input-base text-center';
+          input.placeholder = i;
+          input.dataset.team = team;
+          input.dataset.player = i;
+          input.min = '0';
+          input.disabled = false;
+          input.addEventListener('input', function(e) {
+            const val = parseInt(this.value) || 0;
+            if (!gameData.threePoint.finals.teams[team]) {
+              gameData.threePoint.finals.teams[team] = { players: Array(10).fill(0), total: 0 };
+            }
+            gameData.threePoint.finals.teams[team].players[i - 1] = val;
+            const total = gameData.threePoint.finals.teams[team].players.reduce((sum, v) => sum + (v || 0), 0);
+            gameData.threePoint.finals.teams[team].total = total;
+            document.getElementById(`finals-team${team === team1 ? '1' : '2'}-total`).textContent = total;
+            updatePlayerDisplay();
+            saveGameData();
+          });
+          return input;
+        };
+        container1.appendChild(createInput(team1));
+        container2.appendChild(createInput(team2));
+      }
+    }
+
+    function finalizeFinals() {
+      if (userRole !== 'staff') return;
+      // ? 防止重複結算
+      if (finalizationState.threePointFinalized) return;
+      
+      const [team1, team2] = gameData.threePoint.finals.qualified;
+      const t1Score = gameData.threePoint.finals.teams[team1]?.total || 0;
+      const t2Score = gameData.threePoint.finals.teams[team2]?.total || 0;
+
+      Object.assign(gameData.teams[team1], { threePointScore: t1Score });
+      Object.assign(gameData.teams[team2], { threePointScore: t2Score });
+      Object.assign(gameData.teams['ABC'.replace(team1, '').replace(team2, '')], { threePointScore: 0 });
+
+      const winner = t1Score >= t2Score ? team1 : team2;
+      gameData.threePointWinner = winner;
+      matchWinners.threePoint = winner;
+      
+      // ? 修正：驟死賽權重 - 每項僅獲得 1 局
+      championWins[winner] += 1;
+
+      winnerState.threePoint = {
+        team: winner,
+        score: Math.max(t1Score, t2Score)
+      };
+
+      updateTeamTotalScores();
+      setActiveStep(3);
+      showThreePointWinnerAnnouncement(winner, Math.max(t1Score, t2Score));
+      
+      // 鎖定結算狀態
+      finalizationState.threePointFinalized = true;
+      lockThreePointInputs();
+      updateThreePointFinalizeBtnStatus();
+      
+      saveGameData();
+    }
+
+    function showThreePointWinnerAnnouncement(team, score) {
+      if (announcementVisible) return;
+      announcementVisible = true;
+      const announcement = document.createElement('div');
+      announcement.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        animation: fadeIn 0.5s ease-out;
+      `;
+      announcement.innerHTML = `
+        <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">??</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">三分磚頭王</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">?? Team ${team} ??</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">決賽得分: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${score}</span> 分</div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">? 確認</button>
+        </div>
+      `;
+      document.body.appendChild(announcement);
+    }
+
+    function updateTeamTotalScores() {
+      ['A', 'B', 'C'].forEach(team => {
+        const score = (gameData.teams[team].diceScore || 0) + 
+                      (gameData.teams[team].threePointScore || 0) + 
+                      (gameData.fiveVFive[team] || 0);
+        gameData.teams[team].score = score;
+      });
+      updateDashboardScores();
+    }
+
+    function updateDashboardScores() {
+      safeSet('dash-a-score', gameData.teams.A.score);
+      safeSet('dash-b-score', gameData.teams.B.score);
+      safeSet('dash-c-score', gameData.teams.C.score);
+    }
+
+    function updatePodium() {
+      const maxWins = Math.max(championWins.A, championWins.B, championWins.C);
+      const winCounts = [championWins.A, championWins.B, championWins.C];
+      const uniqueWins = new Set(winCounts).size;
+
+      if (uniqueWins < 3 && maxWins >= 1 && winCounts.filter(w => w === maxWins).length > 1) {
+        showSuddenDeathScreen();
+        return;
+      }
+
+      const teams = ['A', 'B', 'C'].map(t => ({
+        name: gameData.teams[t].name,
+        score: gameData.teams[t].score,
+        wins: championWins[t]
+      })).sort((a, b) => b.wins - a.wins || b.score - a.score);
+
+      const podium1st = document.querySelector('.podium-box.first');
+      if (podium1st) {
+        podium1st.style.visibility = 'hidden';
+        podium1st.style.opacity = '0';
+      }
+
+      document.getElementById('podium-2nd-name').textContent = teams[1].name;
+      document.getElementById('podium-2nd-score').textContent = `${teams[1].wins} 局`;
+      document.getElementById('podium-3rd-name').textContent = teams[2].name;
+      document.getElementById('podium-3rd-score').textContent = `${teams[2].wins} 局`;
+
+      const existingBtn = document.querySelector('.reveal-champion-btn');
+      if (existingBtn) existingBtn.remove();
+
+      const podiumContainer = document.getElementById('podium-container');
+      if (podiumContainer && podiumContainer.parentElement) {
+        const revealBtn = document.createElement('button');
+        revealBtn.className = 'reveal-champion-btn btn-primary';
+        revealBtn.style.cssText = `
+          margin-top: 3rem;
+          animation: pulse-glow 2s ease-in-out infinite;
+          width: 100%;
+          max-width: 500px;
+          padding: 1.5rem 3rem;
+          font-size: 1.5rem;
+          font-weight: 900;
+          border-radius: 16px;
+          cursor: pointer;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          transition: all 0.3s ease;
+        `;
+        revealBtn.textContent = '?? 揭曉冠軍 ??';
+        revealBtn.onmouseover = function() { this.style.transform = 'scale(1.05)'; };
+        revealBtn.onmouseout = function() { this.style.transform = 'scale(1)'; };
+        revealBtn.onclick = () => revealChampion(teams[0], revealBtn);
+        podiumContainer.parentElement.appendChild(revealBtn);
+      }
+    }
+
+    function showSuddenDeathScreen() {
+      const podiumContainer = document.getElementById('podium-container');
+      if (!podiumContainer) return;
+      podiumContainer.innerHTML = `
+        <div style="
+          text-align: center;
+          animation: slideInUp 0.8s ease-out;
+          width: 100%;
+          padding: 3rem 2rem;
+        ">
+          <div style="
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: blink 1s ease-in-out infinite;
+          ">
+            ???
+          </div>
+          <h1 style="
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #FF4444;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.8);
+            animation: pulse-glow 1.5s ease-in-out infinite;
+          ">
+            ?? 吃分驟死賽 ??
+          </h1>
+          <div style="
+            font-size: 1.5rem;
+            color: #FFD700;
+            margin-bottom: 2rem;
+            font-weight: 600;
+          ">
+            積分相同！進入最後對決！
+          </div>
+          <div id="sudden-death-btns" style="
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+          ">
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('A')">
+              ?? Team A 獲勝
+            </button>
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('B')">
+              ?? Team B 獲勝
+            </button>
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('C')">
+              ?? Team C 獲勝
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectChampion(team) {
+      if (userRole !== 'staff') return;
+      // ? 驟死賽修正：每項僅獲得 1 局
+      championWins[team] += 1;
+      const teams = ['A', 'B', 'C'].map(t => ({
+        name: gameData.teams[t].name,
+        score: gameData.teams[t].score,
+        wins: championWins[t]
+      })).sort((a, b) => b.wins - a.wins || b.score - a.score);
+
+      const btnsContainer = document.getElementById('sudden-death-btns');
+      if (btnsContainer) btnsContainer.innerHTML = '';
+
+      const podiumContainer = document.getElementById('podium-container');
+      podiumContainer.innerHTML = `
+        <div class="podium-column">
+          <div class="podium-box second animate-podium-rise" style="animation-delay: 0.2s">
+            <div class="podium-rank">??</div>
+            <div class="podium-name">${teams[1].name}</div>
+            <div class="podium-score">${teams[1].wins} 局</div>
+          </div>
+        </div>
+        <div class="podium-column">
+          <div class="podium-box first" style="visibility: visible; opacity: 1; animation: slideInUp 0.8s ease-out;">
+            <div class="podium-rank">??</div>
+            <div class="podium-name">${teams[0].name}</div>
+            <div class="podium-score">${teams[0].wins} 局</div>
+          </div>
+        </div>
+        <div class="podium-column">
+          <div class="podium-box third animate-podium-rise" style="animation-delay: 0.4s">
+            <div class="podium-rank">??</div>
+            <div class="podium-name">${teams[2].name}</div>
+            <div class="podium-score">${teams[2].wins} 局</div>
+          </div>
+        </div>
+      `;
+
+      createConfetti();
+      updatePlayerViewDisplay();
+      saveGameData();
+    }
+
+    function revealChampion(champion, btn) {
+      if (btn) {
+        btn.style.display = 'none';
+      }
+      const podium1st = document.querySelector('.podium-box.first');
+      if (podium1st) {
+        podium1st.style.visibility = 'visible';
+        podium1st.style.opacity = '1';
+        podium1st.style.transition = 'all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        podium1st.style.animation = 'slideInUp 0.8s ease-out';
+      }
+      document.getElementById('podium-1st-name').textContent = champion.name;
+      document.getElementById('podium-1st-score').textContent = `${champion.wins} 局`;
+      setTimeout(() => createConfetti(), 300);
+      updatePlayerViewDisplay();
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti animate-confetti-fall';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = ['#FFD700', '#FFA500', '#FF69B4'][Math.floor(Math.random() * 3)];
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3500);
+      }
+    }
+
+    function updateUIForRole() {
+      const badge = document.getElementById('readonly-badge');
+      const roleIcon = document.getElementById('role-icon');
+      const roleLabel = document.getElementById('role-label');
+      const roleToggle = document.getElementById('role-toggle');
+      const nav = document.querySelector('nav');
+      const mainContent = document.querySelector('main');
+      const playerViewOverlay = document.getElementById('player-view-overlay');
+
+      if (userRole === 'staff') {
+        badge.classList.add('hidden');
+        roleIcon.textContent = '?????';
+        roleLabel.textContent = '工作人員';
+        
+        if (roleToggle) {
+          roleToggle.style.border = '2px solid #FFD700';
+          roleToggle.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.6)';
+          roleToggle.style.background = 'rgba(255, 215, 0, 0.1)';
+        }
+
+        if (nav) nav.style.display = '';
+        if (playerViewOverlay) {
+          playerViewOverlay.classList.add('hidden');
+          playerViewOverlay.style.display = 'none';
+        }
+        if (mainContent) mainContent.style.display = '';
+
+        document.querySelectorAll('input, button').forEach(el => {
+          if (el.id && (el.id.includes('start') || el.id.includes('stop') || el.id.includes('btn') || el.id.includes('finalize') || el.id.includes('round'))) {
+            el.disabled = false;
+          }
+          if (el.classList.contains('threepoint-input') || el.classList.contains('threepoint-finals-input')) {
+            el.disabled = false;
+          }
+        });
+
+        setTimeout(() => {
+          const firstTab = document.querySelector('.nav-tab[data-page="0"]');
+          if (firstTab) firstTab.click();
+        }, 100);
+
+      } else {
+        badge.classList.remove('hidden');
+        roleIcon.textContent = '??';
+        roleLabel.textContent = '球員';
+        
+        if (roleToggle) {
+          roleToggle.style.border = '';
+          roleToggle.style.boxShadow = '';
+          roleToggle.style.background = '';
+        }
+
+        if (nav) nav.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'none';
+        if (playerViewOverlay) {
+          playerViewOverlay.classList.remove('hidden');
+          playerViewOverlay.style.display = 'flex';
+        }
+
+        document.querySelectorAll('input, button').forEach(el => {
+          if (el.classList.contains('threepoint-input') || el.classList.contains('threepoint-finals-input') || (el.id && (el.id.includes('start') || el.id.includes('stop') || el.id.includes('btn') || el.id.includes('finalize') || el.id.includes('round')))) {
+            el.disabled = true;
+          }
+        });
+
+        updatePlayerDisplay();
+      }
+
+      updateTeamStatusDisplay();
+      saveGameData();
+    }
+
+    function updatePlayerViewDisplay() {
+      const stages = ['分組', '趣味競賽', '三分磚頭王', '五五賽', '頒獎台'];
+      const stageEmojis = ['??', '??', '??', '??', '??'];
+      
+      let stageName = '活動未開始';
+      if (activeStep >= 0 && activeStep <= 4) {
+        stageName = `${stageEmojis[activeStep]} ${stages[activeStep]}`;
+      }
+
+      document.getElementById('player-stage-display').textContent = stageName;
+
+      if (activeStep === 3) {
+        updatePlayerFiveVFiveScores();
+      } else {
+        document.getElementById('player-score-a').textContent = gameData.teams.A.score;
+        document.getElementById('player-score-b').textContent = gameData.teams.B.score;
+        document.getElementById('player-score-c').textContent = gameData.teams.C.score;
+      }
+
+      // ? 懸疑感：activeStep === 4 時，顯示『?? 最終結算中...』
+      if (activeStep === 4 && finalizationState.fiveVFiveFinalized) {
+        // 檢查是否存在「揭曉冠軍」按鈕，如果沒有才顯示結算中
+        if (!document.querySelector('.reveal-champion-btn') && !document.querySelector('.podium-box.first').style.visibility) {
+          const winnerSection = document.getElementById('player-winner-section');
+          if (winnerSection) {
+            winnerSection.innerHTML = `
+              <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse-glow 1.5s ease-in-out infinite;">?</div>
+              <div style="font-size: 2rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">?? 最終結算中...</div>
+              <div style="font-size: 1.2rem; color: rgba(255,255,255,0.6); margin-top: 1rem; font-style: italic;">工作人員正在揭曉冠軍隊伍</div>
+            `;
+          }
+          return;
+        }
+      }
+
+      updatePlayerWinnerDisplay();
+      updatePlayerDetailsDisplay();
+      
+      if (activeStep === 4) {
+        updatePlayerPodiumDisplay();
+      }
+    }
+
+    function updatePlayerPodiumDisplay() {
+      const maxWins = Math.max(championWins.A, championWins.B, championWins.C);
+      const winCounts = [championWins.A, championWins.B, championWins.C];
+      const uniqueWins = new Set(winCounts).size;
+
+      if (uniqueWins < 3 && maxWins >= 1 && winCounts.filter(w => w === maxWins).length > 1) {
+        const winnerSection = document.getElementById('player-winner-section');
+        if (winnerSection) {
+          winnerSection.style.borderColor = '#FF4444';
+          winnerSection.style.background = 'linear-gradient(135deg, rgba(255, 68, 68, 0.2) 0%, rgba(255, 68, 68, 0.05) 100%)';
+          winnerSection.innerHTML = `
+            <div style="font-size: 3rem; margin-bottom: 1rem; animation: blink 1s ease-in-out infinite;">???</div>
+            <div style="font-size: 2rem; font-weight: 900; color: #FF4444; text-shadow: 0 0 20px rgba(255, 68, 68, 0.8);">?? 吃分驟死賽 ??</div>
+            <div style="font-size: 1.2rem; color: #FFD700; margin-top: 1rem;">各隊積分相同！進入最後對決！</div>
+          `;
+        }
+      } else {
+        const teams = ['A', 'B', 'C'].map(t => ({
+          name: t,
+          wins: championWins[t]
+        })).sort((a, b) => b.wins - a.wins);
+
+        const winnerSection = document.getElementById('player-winner-section');
+        if (winnerSection) {
+          winnerSection.style.borderColor = '#FFD700';
+          winnerSection.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%)';
+          winnerSection.innerHTML = `
+            <div style="font-size: 3rem; margin-bottom: 1rem;">??</div>
+            <div style="font-size: 2.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); margin-bottom: 1rem;">最終排名</div>
+            <div style="font-size: 1.5rem; color: #FFD700; margin-bottom: 0.5rem;">?? Team ${teams[0].name} - ${teams[0].wins} 局</div>
+            <div style="font-size: 1.3rem; color: rgba(255, 215, 0, 0.8); margin-bottom: 0.5rem;">?? Team ${teams[1].name} - ${teams[1].wins} 局</div>
+            <div style="font-size: 1.3rem; color: rgba(255, 215, 0, 0.8);">?? Team ${teams[2].name} - ${teams[2].wins} 局</div>
+          `;
+        }
+      }
+    }
+
+    function updatePlayerFiveVFiveScores() {
+      const matchups = {
+        ab: ['A', 'B'],
+        ac: ['A', 'C'],
+        bc: ['B', 'C']
+      };
+      
+      const [team1, team2] = matchups[fiveVFiveState.currentMatchup];
+      
+      document.getElementById('player-score-a').textContent = team1 === 'A' ? fiveVFiveState.team1Score : (team2 === 'A' ? fiveVFiveState.team2Score : 0);
+      document.getElementById('player-score-b').textContent = team1 === 'B' ? fiveVFiveState.team1Score : (team2 === 'B' ? fiveVFiveState.team2Score : 0);
+      document.getElementById('player-score-c').textContent = team1 === 'C' ? fiveVFiveState.team1Score : (team2 === 'C' ? fiveVFiveState.team2Score : 0);
+      
+      // ? 顯示累積比分：字體大小 4rem，金色顯眼
+      const winnerSection = document.getElementById('player-winner-section');
+      if (winnerSection && activeStep === 3) {
+        winnerSection.innerHTML = `
+          <div style="font-size: 1.5rem; color: #FFD700; font-weight: 600; text-align: center;">
+            <div style="margin-bottom: 1rem;">?? 五五賽全場累積積分</div>
+            <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+              <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7);">Team A: <span style="color: #3b82f6; font-weight: 900; font-size: 4rem; font-family: 'Space Grotesk', monospace; display: block; margin-top: 0.5rem;">${gameData.fiveVFive.A || 0}</span></div>
+              <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7);">Team B: <span style="color: #ef4444; font-weight: 900; font-size: 4rem; font-family: 'Space Grotesk', monospace; display: block; margin-top: 0.5rem;">${gameData.fiveVFive.B || 0}</span></div>
+              <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7);">Team C: <span style="color: #22c55e; font-weight: 900; font-size: 4rem; font-family: 'Space Grotesk', monospace; display: block; margin-top: 0.5rem;">${gameData.fiveVFive.C || 0}</span></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function showPlayerNotification(message, type = 'success') {
+      const notification = document.getElementById('player-notification');
+      if (!notification) return;
+      
+      notification.textContent = message;
+      notification.style.display = 'block';
+      notification.style.animation = 'slideInUp 0.5s ease-out';
+      
+      // ? 3秒後自動消失
+      setTimeout(() => {
+        notification.style.animation = 'fadeIn 0.5s ease-out reverse';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          notification.style.display = 'none';
+          notification.style.opacity = '1';
+        }, 500);
+      }, 3000);
+    }
+
+    function updatePlayerDetailsDisplay() {
+      const detailsSection = document.getElementById('player-details-section');
+      const detailsContent = document.getElementById('player-details-content');
+      
+      if (!detailsContent) return;
+      
+      let html = '';
+
+      // ? 趣味競賽詳細紀錄
+      if (activeStep >= 1 && (gameData.dice.details.A.length > 0 || gameData.dice.details.B.length > 0 || gameData.dice.details.C.length > 0)) {
+        detailsSection.style.display = 'block';
+        html += `
+          <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              ?? 趣味競賽成績
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+              <tr style="background: rgba(255, 215, 0, 0.1); border-bottom: 1px solid rgba(255, 215, 0, 0.2);">
+                <th style="padding: 0.75rem; text-align: left; color: #FFD700; font-weight: 600;">隊伍</th>
+                <th style="padding: 0.75rem; text-align: center; color: #FFD700; font-weight: 600;">第一輪</th>
+                <th style="padding: 0.75rem; text-align: center; color: #FFD700; font-weight: 600;">第二輪</th>
+                <th style="padding: 0.75rem; text-align: center; color: #FFD700; font-weight: 600;">總時間</th>
+              </tr>
+              ${['A', 'B', 'C'].map(team => {
+                const r1 = gameData.dice[team][0];
+                const r2 = gameData.dice[team][1];
+                const total = (r1 || 0) + (r2 || 0);
+                return `
+                  <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <td style="padding: 0.75rem; color: rgba(255,255,255,0.8); font-weight: 600;">Team ${team}</td>
+                    <td style="padding: 0.75rem; text-align: center; color: #FFD700; font-family: 'Space Grotesk', monospace;">${r1 !== null ? formatTime(r1) : '--:--.-'}</td>
+                    <td style="padding: 0.75rem; text-align: center; color: #FFD700; font-family: 'Space Grotesk', monospace;">${r2 !== null ? formatTime(r2) : '--:--.-'}</td>
+                    <td style="padding: 0.75rem; text-align: center; color: #22c55e; font-weight: 700; font-family: 'Space Grotesk', monospace;">${total > 0 ? formatTime(total) : '--:--.-'}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </table>
+          </div>
+        `;
+      }
+
+      // ? 三分磚頭王詳細紀錄
+      if (activeStep >= 2 && (gameData.threePoint.round1.A.total > 0 || gameData.threePoint.round1.B.total > 0 || gameData.threePoint.round1.C.total > 0)) {
+        html += `
+          <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              ?? 三分磚頭王成績
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); padding: 1rem; border-radius: 8px;">
+                <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.5rem;">小組賽</div>
+                ${['A', 'B', 'C'].map(team => `
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="color: rgba(255,255,255,0.7);">Team ${team}</span>
+                    <span style="color: #FFD700; font-weight: 600; font-family: 'Space Grotesk', monospace;">${gameData.threePoint.round1[team].total} 分</span>
+                  </div>
+                `).join('')}
+              </div>
+              ${gameData.threePointWinner ? `
+                <div style="background: rgba(255, 215, 0, 0.1); border: 2px solid #FFD700; padding: 1rem; border-radius: 8px;">
+                  <div style="font-weight: 600; color: #FFD700; margin-bottom: 0.5rem;">決賽冠軍</div>
+                  <div style="font-size: 1.2rem; color: #FFD700; font-weight: 900; margin-bottom: 0.5rem;">?? Team ${gameData.threePointWinner}</div>
+                  <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">決賽得分: <span style="color: #FFD700; font-weight: 600; font-family: 'Space Grotesk', monospace;">${gameData.threePoint.finals.teams[gameData.threePointWinner]?.total || 0} 分</span></div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // ? 五五賽詳細紀錄
+      if (activeStep >= 3 && (gameData.fiveVFive.A > 0 || gameData.fiveVFive.B > 0 || gameData.fiveVFive.C > 0)) {
+        html += `
+          <div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              ?? 五五賽全場累積
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+              <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 8px; text-align: center;">
+                <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.75rem;">Team A</div>
+                <div style="font-size: 2.5rem; color: #3b82f6; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.A || 0}</div>
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem;">分</div>
+              </div>
+              <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 8px; text-align: center;">
+                <div style="font-weight: 600; color: #ef4444; margin-bottom: 0.75rem;">Team B</div>
+                <div style="font-size: 2.5rem; color: #ef4444; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.B || 0}</div>
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem;">分</div>
+              </div>
+              <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.3); padding: 1rem; border-radius: 8px; text-align: center;">
+                <div style="font-weight: 600; color: #22c55e; margin-bottom: 0.75rem;">Team C</div>
+                <div style="font-size: 2.5rem; color: #22c55e; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.C || 0}</div>
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem;">分</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (html) {
+        detailsContent.innerHTML = html;
+        detailsSection.style.display = 'block';
+      }
+    }
+
+    function updatePlayerWinnerDisplay() {
+      const winnerSection = document.getElementById('player-winner-section');
+      if (!winnerSection) return;
+
+      let winnerHTML = '';
+      if (winnerState.dice) {
+        winnerHTML = `
+          <div style="color: #FFD700; font-size: 2.5rem; font-weight: 900; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); letter-spacing: 1px;">?? 趣味競賽冠軍</div>
+          <div style="color: #FFD700; font-size: 4rem; font-weight: 900; text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);">Team ${winnerState.dice.team}</div>
+          <div style="color: rgba(255, 215, 0, 0.8); font-size: 1.2rem; font-family: 'Courier New', monospace;">?? 總時間: ${formatTime(winnerState.dice.time)}</div>
+        `;
+      } else if (winnerState.threePoint) {
+        winnerHTML = `
+          <div style="color: #FFD700; font-size: 2.5rem; font-weight: 900; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); letter-spacing: 1px;">?? 三分磚頭王</div>
+          <div style="color: #FFD700; font-size: 4rem; font-weight: 900; text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);">Team ${winnerState.threePoint.team}</div>
+          <div style="color: rgba(255, 215, 0, 0.8); font-size: 1.2rem; font-family: 'Courier New', monospace;">?? 決賽得分: ${winnerState.threePoint.score} 分</div>
+        `;
+      } else {
+        winnerHTML = `<div style="font-size: 1.5rem; color: rgba(255,255,255,0.5); font-style: italic;">? 等待比賽結果...</div>`;
+      }
+
+      winnerSection.innerHTML = winnerHTML;
+    }
+
+    function finalizeDice() {
+      if (userRole === 'staff') {
+        calculateDiceRanking();
+      }
+    }
+
+    function updateDiceRecordsDisplay() {
+      const recordsBody = document.getElementById('dice-records-body');
+      if (!recordsBody) return;
+
+      recordsBody.innerHTML = '';
+      let hasRecords = false;
+
+      ['A', 'B', 'C'].forEach(team => {
+        const details = gameData.dice.details[team] || [];
+        details.forEach((record, idx) => {
+          hasRecords = true;
+          const row = recordsBody.insertRow();
+          row.style.cssText = 'color: #fff;';
+          row.innerHTML = `
+            <td style="padding: 0.75rem;">${team}</td>
+            <td style="padding: 0.75rem;">第 ${record.round} 輪</td>
+            <td style="padding: 0.75rem; font-family: 'Courier New', monospace; color: #FFD700;">${formatTime(record.time)}</td>
+            <td style="padding: 0.75rem; font-size: 0.85rem; color: rgba(255,255,255,0.6);">${new Date(record.timestamp).toLocaleTimeString('zh-TW')}</td>
+          `;
+        });
+      });
+
+      if (!hasRecords) {
+        recordsBody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; text-align: center; color: rgba(255,255,255,0.5);">暫無紀錄</td></tr>';
+      }
+    }
+
+    let fiveVFiveState = {
+      currentMatchup: 'ab',
+      team1: 'A',
+      team2: 'B',
+      team1Score: 0,
+      team2Score: 0,
+      half: 1,
+      timerRunning: false,
+      timerInterval: null,
+      timeRemaining: 600,
+      restingTime: false,
+      firstHalfTimer: null,
+      secondHalfTimer: null,
+      firstHalfRunning: false,
+      secondHalfRunning: false,
+      firstHalfTime: 600,
+      secondHalfTime: 600
+    };
+
+    // 追蹤結算狀態，防止重複結算
+    let finalizationState = {
+      diceFinalized: false,
+      threePointFinalized: false,
+      fiveVFiveFinalized: false
+    };
+
+    function updateFiveVFiveUI() {
+      const matchups = {
+        ab: { team1: 'A', team2: 'B' },
+        ac: { team1: 'A', team2: 'C' },
+        bc: { team1: 'B', team2: 'C' }
+      };
+
+      const match = matchups[fiveVFiveState.currentMatchup];
+      fiveVFiveState.team1 = match.team1;
+      fiveVFiveState.team2 = match.team2;
+
+      safeSet('fvf-team1-name', `Team ${fiveVFiveState.team1}`);
+      safeSet('fvf-team2-name', `Team ${fiveVFiveState.team2}`);
+      safeSet('fvf-team1-score', fiveVFiveState.team1Score);
+      safeSet('fvf-team2-score', fiveVFiveState.team2Score);
+
+      // ? 雙計時器顯示
+      const mins1 = Math.floor(fiveVFiveState.firstHalfTime / 60);
+      const secs1 = fiveVFiveState.firstHalfTime % 60;
+      const mins2 = Math.floor(fiveVFiveState.secondHalfTime / 60);
+      const secs2 = fiveVFiveState.secondHalfTime % 60;
+
+      safeSet('fvf-quarter', `上半場: ${String(mins1).padStart(2, '0')}:${String(secs1).padStart(2, '0')} | 下半場: ${String(mins2).padStart(2, '0')}:${String(secs2).padStart(2, '0')}`);
+
+      if (userRole === 'player' && activeStep === 3) {
+        updatePlayerFiveVFiveScores();
+      }
+    }
+
+    // ? 上半場計時器
+    function startFirstHalfTimer() {
+      if (userRole !== 'staff') return;
+      if (fiveVFiveState.firstHalfRunning) return;
+
+      setActiveStep(3);
+      fiveVFiveState.firstHalfRunning = true;
+      const btn = document.getElementById('fvf-timer-btn');
+      btn.textContent = '?? 暫停上半場';
+
+      fiveVFiveState.firstHalfTimer = setInterval(() => {
+        fiveVFiveState.firstHalfTime--;
+
+        if (fiveVFiveState.firstHalfTime <= 0) {
+          clearInterval(fiveVFiveState.firstHalfTimer);
+          fiveVFiveState.firstHalfRunning = false;
+          playWhistleSound();
+          alert('?? 上半場結束！準備下半場');
+          fiveVFiveState.firstHalfTime = 0;
+          updateFiveVFiveUI();
+        }
+
+        updateFiveVFiveUI();
+      }, 1000);
+    }
+
+    function pauseFirstHalfTimer() {
+      if (!fiveVFiveState.firstHalfRunning) return;
+
+      clearInterval(fiveVFiveState.firstHalfTimer);
+      fiveVFiveState.firstHalfRunning = false;
+      document.getElementById('fvf-timer-btn').textContent = '?? 開始上半場';
+    }
+
+    // ? 下半場計時器
+    function startSecondHalfTimer() {
+      if (userRole !== 'staff') return;
+      if (fiveVFiveState.secondHalfRunning) return;
+
+      fiveVFiveState.secondHalfRunning = true;
+      const btn = document.getElementById('fvf-timer-btn-second');
+      if (btn) btn.textContent = '?? 暫停下半場';
+
+      fiveVFiveState.secondHalfTimer = setInterval(() => {
+        fiveVFiveState.secondHalfTime--;
+
+        if (fiveVFiveState.secondHalfTime <= 0) {
+          clearInterval(fiveVFiveState.secondHalfTimer);
+          fiveVFiveState.secondHalfRunning = false;
+          playWhistleSound();
+          alert('?? 下半場結束！比賽完成');
+          fiveVFiveState.secondHalfTime = 0;
+          updateFiveVFiveUI();
+        }
+
+        updateFiveVFiveUI();
+      }, 1000);
+    }
+
+    function pauseSecondHalfTimer() {
+      if (!fiveVFiveState.secondHalfRunning) return;
+
+      clearInterval(fiveVFiveState.secondHalfTimer);
+      fiveVFiveState.secondHalfRunning = false;
+      const btn = document.getElementById('fvf-timer-btn-second');
+      if (btn) btn.textContent = '?? 開始下半場';
+    }
+
+    // ? 哨聲特效
+    function playWhistleSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+
+    function addFiveVFiveScore(team, points) {
+      if (userRole !== 'staff') return;
+
+      const pointValue = parseInt(points);
+      if (team === '1') {
+        fiveVFiveState.team1Score = Math.max(0, fiveVFiveState.team1Score + pointValue);
+      } else {
+        fiveVFiveState.team2Score = Math.max(0, fiveVFiveState.team2Score + pointValue);
+      }
+      updateFiveVFiveUI();
+      updateFiveVFiveCumulativeDisplay();
+      
+      // ? 同步到球員端
+      if (userRole === 'staff') {
+        updatePlayerDisplay();
+      }
+      
+      saveGameData();
+    }
+
+    function updateFiveVFiveCumulativeDisplay() {
+      safeSet('fvf-cumulative-a', gameData.fiveVFive.A || 0);
+      safeSet('fvf-cumulative-b', gameData.fiveVFive.B || 0);
+      safeSet('fvf-cumulative-c', gameData.fiveVFive.C || 0);
+    }
+
+    function finalizeMatch() {
+      if (userRole !== 'staff') return;
+      // ? 防止重複結算
+      if (finalizationState.fiveVFiveFinalized) return;
+
+      // ? 自動停止計時
+      if (fiveVFiveState.firstHalfRunning) pauseFirstHalfTimer();
+      if (fiveVFiveState.secondHalfRunning) pauseSecondHalfTimer();
+
+      gameData.fiveVFive[fiveVFiveState.team1] = (gameData.fiveVFive[fiveVFiveState.team1] || 0) + fiveVFiveState.team1Score;
+      gameData.fiveVFive[fiveVFiveState.team2] = (gameData.fiveVFive[fiveVFiveState.team2] || 0) + fiveVFiveState.team2Score;
+
+      updateTeamTotalScores();
+      updateFiveVFiveCumulativeDisplay();
+      saveGameData();
+
+      const matchOrder = ['ab', 'ac', 'bc'];
+      const currentIdx = matchOrder.indexOf(fiveVFiveState.currentMatchup);
+      
+      if (currentIdx < matchOrder.length - 1) {
+        const nextMatch = matchOrder[currentIdx + 1];
+        const nextBtn = document.querySelector(`.five-v-five-matchup[data-match="${nextMatch}"]`);
+        if (nextBtn) {
+          fiveVFiveState.team1Score = 0;
+          fiveVFiveState.team2Score = 0;
+          fiveVFiveState.half = 1;
+          fiveVFiveState.firstHalfTime = 600;
+          fiveVFiveState.secondHalfTime = 600;
+          fiveVFiveState.restingTime = false;
+          nextBtn.click();
+        }
+      } else {
+        // ? 三場五五賽結束，比對累積分數最高者給予 1 局獲勝
+        const fiveVFiveScores = [
+          { team: 'A', score: gameData.fiveVFive.A || 0 },
+          { team: 'B', score: gameData.fiveVFive.B || 0 },
+          { team: 'C', score: gameData.fiveVFive.C || 0 }
+        ].sort((a, b) => b.score - a.score);
+
+        const fiveVFiveWinner = fiveVFiveScores[0].team;
+        championWins[fiveVFiveWinner] += 1;
+        matchWinners.fiveVFive = fiveVFiveWinner;
+        
+        // 鎖定結算狀態
+        finalizationState.fiveVFiveFinalized = true;
+        lockFiveVFiveInputs();
+        updateFiveVFiveFinalizeBtnStatus();
+        
+        // 顯示五五賽冠軍公告
+        showFiveVFiveWinnerAnnouncement();
+        setActiveStep(4);
+      }
+    }
+
+    function showFiveVFiveWinnerAnnouncement() {
+      if (announcementVisible) return;
+      announcementVisible = true;
+
+      const teams = ['A', 'B', 'C'].map(t => ({
+        name: t,
+        score: gameData.fiveVFive[t] || 0
+      })).sort((a, b) => b.score - a.score);
+
+      const winner = teams[0];
+
+      const announcement = document.createElement('div');
+      announcement.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        animation: fadeIn 0.5s ease-out;
+      `;
+      announcement.innerHTML = `
+        <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">??</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">五五賽冠軍</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">?? Team ${winner.name} ??</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">全場累積: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${winner.score}</span> 分</div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">? 確認</button>
+        </div>
+      `;
+      document.body.appendChild(announcement);
+    }
+
+    // ============ 數據鎖定與修正函數 ============
+    function lockDiceInputs() {
+      // ? 修正：排除 .btn-danger 紅色修正按鈕
+      document.querySelectorAll('#page-1 button:not(.btn-danger), #page-1 input').forEach(el => {
+        el.disabled = true;
+        el.style.opacity = '0.5';
+      });
+      // ? 確保修正按鈕始終可點擊
+      const correctBtn = document.getElementById('dice-correct-btn');
+      if (correctBtn) {
+        correctBtn.disabled = false;
+        correctBtn.style.opacity = '1';
+        correctBtn.style.pointerEvents = 'auto';
+        correctBtn.style.zIndex = '100';
+      }
+      // 鎖定整個頁面背景（保留 pointerEvents 允許修正按鈕可點擊）
+      const pageSection = document.getElementById('page-1');
+      if (pageSection) {
+        pageSection.style.opacity = '0.7';
+        pageSection.style.background = 'rgba(107, 114, 128, 0.2)';
+        // 新增視覺提示：顯示數據已鎖定
+        if (!pageSection.querySelector('.lock-badge')) {
+          const badge = document.createElement('div');
+          badge.className = 'lock-badge';
+          badge.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            z-index: 50;
+            animation: slideInUp 0.5s ease-out;
+          `;
+          badge.textContent = '?? 趣味競賽數據已鎖定';
+          pageSection.appendChild(badge);
+          // ? 3秒後自動消失
+          setTimeout(() => {
+            badge.style.transition = 'opacity 0.5s ease-out';
+            badge.style.opacity = '0';
+            setTimeout(() => badge.remove(), 500);
+          }, 3000);
+        }
+      }
+    }
+
+    function unlockDiceInputs() {
+      document.querySelectorAll('#page-1 input, #page-1 button').forEach(el => {
+        if (el.id && (el.id.includes('start') || el.id.includes('stop') || el.id.includes('roll') || el.id.includes('next') || el.id.includes('round'))) {
+          el.disabled = false;
+          el.style.opacity = '1';
+          el.style.pointerEvents = 'auto';
+        }
+      });
+      // 恢復頁面背景
+      const pageSection = document.getElementById('page-1');
+      if (pageSection) {
+        pageSection.style.opacity = '1';
+        pageSection.style.background = '';
+      }
+    }
+
+    function updateDiceFinalizeBtnStatus() {
+      const btn = document.getElementById('dice-finalize-btn');
+      if (btn) {
+        if (finalizationState.diceFinalized) {
+          btn.textContent = '? 已結算';
+          btn.style.opacity = '0.5';
+          btn.style.pointerEvents = 'none';
+          btn.style.background = '#6B7280';
+          btn.style.cursor = 'not-allowed';
+          addDiceCorrectBtn();
+        }
+      }
+    }
+
+    function addDiceCorrectBtn() {
+      const existingBtn = document.getElementById('dice-correct-btn');
+      if (existingBtn) return;
+      
+      const container = document.querySelector('#page-1 .flex.gap-2');
+      if (container) {
+        const correctBtn = document.createElement('button');
+        correctBtn.id = 'dice-correct-btn';
+        correctBtn.className = 'btn-danger btn-sm correct-btn';
+        correctBtn.textContent = '?? 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.diceFinalized = false;
+            championWins.A -= matchWinners.dice === 'A' ? 1 : 0;
+            championWins.B -= matchWinners.dice === 'B' ? 1 : 0;
+            championWins.C -= matchWinners.dice === 'C' ? 1 : 0;
+            unlockDiceInputs();
+            updateDiceFinalizeBtnStatus();
+            // 移除鎖定提示
+            const badge = document.querySelector('#page-1 .lock-badge');
+            if (badge) badge.remove();
+            alert('? 數據已解鎖，可重新編輯');
+            saveGameData();
+          } else {
+            alert('? 密碼錯誤');
+          }
+        };
+        container.appendChild(correctBtn);
+      }
+    }
+
+    function lockThreePointInputs() {
+      // ? 修正：排除 .btn-danger 紅色修正按鈕
+      document.querySelectorAll('#page-2 button:not(.btn-danger), #page-2 input').forEach(el => {
+        el.disabled = true;
+        el.style.opacity = '0.5';
+      });
+      // ? 確保修正按鈕始終可點擊
+      const correctBtn = document.getElementById('threepoint-correct-btn');
+      if (correctBtn) {
+        correctBtn.disabled = false;
+        correctBtn.style.opacity = '1';
+        correctBtn.style.pointerEvents = 'auto';
+        correctBtn.style.zIndex = '100';
+      }
+      // 鎖定整個頁面背景（保留 pointerEvents 允許修正按鈕可點擊）
+      const pageSection = document.getElementById('page-2');
+      if (pageSection) {
+        pageSection.style.opacity = '0.7';
+        pageSection.style.background = 'rgba(107, 114, 128, 0.2)';
+        // 新增視覺提示：顯示數據已鎖定
+        if (!pageSection.querySelector('.lock-badge')) {
+          const badge = document.createElement('div');
+          badge.className = 'lock-badge';
+          badge.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            z-index: 50;
+            animation: slideInUp 0.5s ease-out;
+          `;
+          badge.textContent = '?? 三分磚頭王數據已鎖定';
+          pageSection.appendChild(badge);
+        }
+      }
+    }
+
+    function unlockThreePointInputs() {
+      document.querySelectorAll('#page-2 input, #page-2 button').forEach(el => {
+        if (el.classList.contains('threepoint-input') || el.classList.contains('threepoint-finals-input') || el.id.includes('round1-btn') || el.id.includes('finals-btn')) {
+          el.disabled = false;
+          el.style.opacity = '1';
+          el.style.pointerEvents = 'auto';
+        }
+      });
+      // 恢復頁面背景
+      const pageSection = document.getElementById('page-2');
+      if (pageSection) {
+        pageSection.style.opacity = '1';
+        pageSection.style.background = '';
+      }
+    }
+
+    function updateThreePointFinalizeBtnStatus() {
+      const btn = document.getElementById('threepoint-finals-btn');
+      if (btn) {
+        if (finalizationState.threePointFinalized) {
+          btn.textContent = '? 已結算';
+          btn.style.opacity = '0.5';
+          btn.style.pointerEvents = 'none';
+          btn.style.background = '#6B7280';
+          btn.style.cursor = 'not-allowed';
+          addThreePointCorrectBtn();
+        }
+      }
+    }
+
+    function addThreePointCorrectBtn() {
+      const existingBtn = document.getElementById('threepoint-correct-btn');
+      if (existingBtn) return;
+      
+      const container = document.querySelector('#page-2 .flex.items-center');
+      if (container) {
+        const correctBtn = document.createElement('button');
+        correctBtn.id = 'threepoint-correct-btn';
+        correctBtn.className = 'btn-danger btn-sm correct-btn';
+        correctBtn.textContent = '?? 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.threePointFinalized = false;
+            championWins.A -= matchWinners.threePoint === 'A' ? 1 : 0;
+            championWins.B -= matchWinners.threePoint === 'B' ? 1 : 0;
+            championWins.C -= matchWinners.threePoint === 'C' ? 1 : 0;
+            unlockThreePointInputs();
+            updateThreePointFinalizeBtnStatus();
+            // 移除鎖定提示
+            const badge = document.querySelector('#page-2 .lock-badge');
+            if (badge) badge.remove();
+            alert('? 數據已解鎖，可重新編輯');
+            saveGameData();
+          } else {
+            alert('? 密碼錯誤');
+          }
+        };
+        container.appendChild(correctBtn);
+      }
+    }
+
+    function lockFiveVFiveInputs() {
+      // ? 修正：排除 .btn-danger 紅色修正按鈕
+      document.querySelectorAll('#page-3 button:not(.btn-danger)').forEach(el => {
+        el.disabled = true;
+        el.style.opacity = '0.5';
+      });
+      // ? 確保修正按鈕始終可點擊
+      const correctBtn = document.getElementById('fvf-correct-btn');
+      if (correctBtn) {
+        correctBtn.disabled = false;
+        correctBtn.style.opacity = '1';
+        correctBtn.style.pointerEvents = 'auto';
+        correctBtn.style.zIndex = '100';
+      }
+      // 鎖定整個頁面背景（保留 pointerEvents 允許修正按鈕可點擊）
+      const pageSection = document.getElementById('page-3');
+      if (pageSection) {
+        pageSection.style.opacity = '0.7';
+        pageSection.style.background = 'rgba(107, 114, 128, 0.2)';
+        // 新增視覺提示：顯示數據已鎖定
+        if (!pageSection.querySelector('.lock-badge')) {
+          const badge = document.createElement('div');
+          badge.className = 'lock-badge';
+          badge.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            z-index: 50;
+            animation: slideInUp 0.5s ease-out;
+          `;
+          badge.textContent = '?? 五五賽數據已鎖定';
+          pageSection.appendChild(badge);
+        }
+      }
+    }
+
+    function unlockFiveVFiveInputs() {
+      document.querySelectorAll('#page-3 button').forEach(el => {
+        if (el.classList.contains('fvf-btn') || el.id.includes('fvf-timer-btn') || el.id.includes('fvf-reset-btn') || el.classList.contains('five-v-five-matchup')) {
+          el.disabled = false;
+          el.style.opacity = '1';
+          el.style.pointerEvents = 'auto';
+        }
+      });
+      // 恢復頁面背景
+      const pageSection = document.getElementById('page-3');
+      if (pageSection) {
+        pageSection.style.opacity = '1';
+        pageSection.style.background = '';
+      }
+    }
+
+    function updateFiveVFiveFinalizeBtnStatus() {
+      const btn = document.getElementById('fvf-finalize-btn');
+      if (btn) {
+        if (finalizationState.fiveVFiveFinalized) {
+          btn.textContent = '? 已結算';
+          btn.style.opacity = '0.5';
+          btn.style.pointerEvents = 'none';
+          btn.style.background = '#6B7280';
+          btn.style.cursor = 'not-allowed';
+          addFiveVFiveCorrectBtn();
+        }
+      }
+    }
+
+    function addFiveVFiveCorrectBtn() {
+      const existingBtn = document.getElementById('fvf-correct-btn');
+      if (existingBtn) return;
+      
+      const container = document.querySelector('#page-3 button[id="fvf-finalize-btn"]')?.parentElement;
+      if (container) {
+        const correctBtn = document.createElement('button');
+        correctBtn.id = 'fvf-correct-btn';
+        correctBtn.className = 'btn-danger btn-sm correct-btn';
+        correctBtn.textContent = '?? 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.fiveVFiveFinalized = false;
+            championWins.A -= matchWinners.fiveVFive === 'A' ? 1 : 0;
+            championWins.B -= matchWinners.fiveVFive === 'B' ? 1 : 0;
+            championWins.C -= matchWinners.fiveVFive === 'C' ? 1 : 0;
+            unlockFiveVFiveInputs();
+            updateFiveVFiveFinalizeBtnStatus();
+            // 移除鎖定提示
+            const badge = document.querySelector('#page-3 .lock-badge');
+            if (badge) badge.remove();
+            alert('? 數據已解鎖，可重新編輯');
+            saveGameData();
+          } else {
+            alert('? 密碼錯誤');
+          }
+        };
+        container.appendChild(correctBtn);
+      }
+    }
+
+    function resetFiveVFiveScore() {
+      if (userRole !== 'staff') return;
+      fiveVFiveState.team1Score = 0;
+      fiveVFiveState.team2Score = 0;
+      updateFiveVFiveUI();
+    }
+
+    function closeRoleOverlay() {
+      const overlay = document.getElementById('role-overlay');
+      overlay.style.transition = 'opacity 0.3s ease';
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // ? 修復：確保按鈕事件綁定正確
+      const staffBtn = document.getElementById('role-staff');
+      const playerBtn = document.getElementById('role-player');
+      
+      console.log('?? 檢查按鈕:', staffBtn, playerBtn);
+      
+      if (staffBtn) {
+        staffBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('? 工作人員按鈕被點擊');
+          userRole = 'staff';
+          closeRoleOverlay();
+          updateUIForRole();
+          setTimeout(() => {
+            const firstTab = document.querySelector('.nav-tab[data-page="0"]');
+            if (firstTab) firstTab.click();
+          }, 100);
+        });
+      }
+
+      if (playerBtn) {
+        playerBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('? 球員按鈕被點擊');
+          userRole = 'player';
+          closeRoleOverlay();
+          updateUIForRole();
+        });
+      }
+
+      document.getElementById('role-toggle').addEventListener('click', () => {
+        userRole = userRole === 'staff' ? 'player' : 'staff';
+        updateUIForRole();
+        if (userRole === 'staff') {
+          setTimeout(() => {
+            const firstTab = document.querySelector('.nav-tab[data-page="0"]');
+            if (firstTab) firstTab.click();
+          }, 100);
+        }
+      });
+
+      const switchToStaffBtn = document.getElementById('player-switch-to-staff');
+      if (switchToStaffBtn) {
+        switchToStaffBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          userRole = 'staff';
+          updateUIForRole();
+          setTimeout(() => {
+            const firstTab = document.querySelector('.nav-tab[data-page="0"]');
+            if (firstTab) firstTab.click();
+          }, 100);
+        });
+      }
+
+      const switchToStaffBtn = document.getElementById('player-switch-to-staff');
+      if (switchToStaffBtn) {
+        switchToStaffBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          userRole = 'staff';
+          updateUIForRole();
+          setTimeout(() => {
+            const firstTab = document.querySelector('.nav-tab[data-page="0"]');
+            if (firstTab) firstTab.click();
+          }, 100);
+        });
+      }
+
+      document.getElementById('guide-close').addEventListener('click', () => {
+        document.getElementById('guide-drawer').style.transform = 'translateX(100%)';
+      });
+
+      // ? 球員側頁簽導航
+      document.querySelectorAll('.player-nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          if (userRole !== 'player') return;
+          const page = parseInt(tab.dataset.page);
+          document.querySelectorAll('.player-nav-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.player-page').forEach(p => p.classList.add('hidden-page'));
+          document.getElementById(`player-page-${page}`).classList.remove('hidden-page');
+        });
+      });
+
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          if (userRole === 'player') return;
+          const page = parseInt(tab.dataset.page);
+          document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page'));
+          document.getElementById(`page-${page}`).classList.remove('hidden-page');
+          document.getElementById('guide-content').innerHTML = `<p>${guideContent[page]}</p>`;
+          if (page === 4) updatePodium();
+        });
+      });
+
+      if (document.getElementById('dice-records-toggle')) {
+        document.getElementById('dice-records-toggle').addEventListener('click', () => {
+          const content = document.getElementById('dice-records-content');
+          const icon = document.getElementById('dice-records-icon');
+          content.classList.toggle('hidden');
+          icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+          if (!content.classList.contains('hidden')) {
+            updateDiceRecordsDisplay();
+          }
+        });
+      }
+
+      if (document.getElementById('player-details-toggle')) {
+        document.getElementById('player-details-toggle').addEventListener('click', () => {
+          const content = document.getElementById('player-details-content');
+          const icon = document.getElementById('player-details-icon');
+          content.classList.toggle('hidden');
+          icon.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+          updatePlayerDetailsDisplay();
+        });
+      }
+
+      document.querySelectorAll('.five-v-five-matchup').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (userRole !== 'staff') return;
+          document.querySelectorAll('.five-v-five-matchup').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          fiveVFiveState.currentMatchup = btn.dataset.match;
+          fiveVFiveState.team1Score = 0;
+          fiveVFiveState.team2Score = 0;
+          fiveVFiveState.quarter = 1;
+          fiveVFiveState.timeRemaining = 600;
+          if (fiveVFiveState.timerRunning) pauseFiveVFiveTimer();
+          updateFiveVFiveUI();
+        });
+      });
+
+      document.getElementById('fvf-timer-btn').addEventListener('click', () => {
+        if (!fiveVFiveState.firstHalfRunning) {
+          startFirstHalfTimer();
+        } else {
+          pauseFirstHalfTimer();
+        }
+      });
+
+      document.querySelectorAll('.fvf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const team = btn.dataset.team;
+          const points = btn.dataset.points;
+          addFiveVFiveScore(team, points);
+        });
+      });
+
+      if (document.getElementById('fvf-reset-btn')) {
+        document.getElementById('fvf-reset-btn').addEventListener('click', resetFiveVFiveScore);
+      }
+
+      if (document.getElementById('fvf-finalize-btn')) {
+        document.getElementById('fvf-finalize-btn').addEventListener('click', () => {
+          finalizeMatch();
+          showPlayerNotification('?? 比賽已結算，進入下一場！');
+        });
+      }
+
+      document.getElementById('dice-start-btn').addEventListener('click', startTimer);
+      document.getElementById('dice-stop-btn').addEventListener('click', stopTimer);
+      document.getElementById('dice-roll-btn').addEventListener('click', rollDice);
+      document.getElementById('dice-next-team-btn').addEventListener('click', nextDiceTeam);
+      document.getElementById('dice-start-round2-btn').addEventListener('click', startRound2);
+      document.getElementById('dice-finalize-btn').addEventListener('click', () => {
+        finalizeDice();
+        showPlayerNotification('?? 趣味競賽結果已出爐！');
+      });
+      document.getElementById('threepoint-round1-btn').addEventListener('click', finalizeRound1);
+      document.getElementById('threepoint-finals-btn').addEventListener('click', () => {
+        finalizeFinals();
+        showPlayerNotification('?? 三分磚頭王決賽結果已公布！');
+      });
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig: {
+            event_title: '2026 英美回娘家籃球交流賽'
+          },
+          onConfigChange: (config) => {
+            document.getElementById('app-title').textContent = config.event_title;
+          },
+          mapToCapabilities: () => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
+          mapToEditPanelValues: (config) => new Map([
+            ['event_title', config.event_title]
+          ])
+        });
+      }
+
+      loadGameData();
+      initThreePointInputs();
+      updateDiceRecords();
+      updateDashboardScores();
+      updateFiveVFiveCumulativeDisplay();
+      updateProgressIndicators();
+      document.getElementById('guide-content').innerHTML = `<p>${guideContent[0]}</p>`;
+      
+      // 強制更新球員端顯示
+      setTimeout(() => {
+        loadGameData();
+        updateUIForRole();
+        if (userRole === 'player') {
+          updatePlayerDisplay();
+        }
+      }, 500);
+
+      // ? 讀寫分離 - 僅工作人員保存，球員實時讀取
+      setInterval(() => {
+        if (userRole === 'staff') {
+          saveGameData();
+        } else {
+          // 球員端：每 200ms 讀取一次最新數據
+          loadGameData();
+          updateTeamStatusDisplay();
+          updatePlayerDisplay();
+        }
+      }, 200);
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d974adde3bf6b86',t:'MTc3MzAzMDA4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
