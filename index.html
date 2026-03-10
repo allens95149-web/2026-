@@ -11,28 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    html, body { height: 100%; width: 100%; transition: background 0.5s ease; }
+    html, body { height: 100%; width: 100%; }
     body { font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif; overflow: hidden; background: linear-gradient(135deg, #050812 0%, #001F3F 100%); color: #ffffff; }
-
-    /* ============ 球員亮色系主題覆蓋 ============ */
-    body.player-mode { 
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
-        color: #0f172a; 
-    }
-    body.player-mode .glass-card, body.player-mode .glass-card-lg { 
-        background: rgba(255, 255, 255, 0.85); 
-        border-color: rgba(0,0,0,0.1); 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-        color: #0f172a;
-    }
-    body.player-mode .text-yellow-400 { color: #b45309 !important; text-shadow: none !important; }
-    body.player-mode .text-gray-300, body.player-mode .text-gray-400 { color: #475569 !important; }
-    body.player-mode .text-gray-500 { color: #64748b !important; }
-    body.player-mode .bg-black\/30 { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
-    body.player-mode .bg-black\/20 { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
-    body.player-mode .player-nav-tab { color: #334155; border-color: rgba(0,0,0,0.1); }
-    body.player-mode .player-nav-tab.active { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border-color: #f59e0b; }
-    body.player-mode #player-view-overlay { background: transparent !important; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
@@ -131,6 +111,42 @@
     .data-table th { background: rgba(255, 215, 0, 0.1); font-weight: bold; color: #FFD700; }
     .data-table tr:hover { background: rgba(255, 255, 255, 0.05); }
 
+    /* 身分模式切換樣式 */
+    body.staff-mode {
+      background: linear-gradient(135deg, #050812 0%, #001F3F 100%) !important; color: #ffffff; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.player-mode {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef5 100%) !important; color: #1a1a1a; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.player-mode * { color: #1a1a1a; }
+    body.player-mode header, body.player-mode nav, body.player-mode main {
+      background: rgba(255, 255, 255, 0.95) !important; border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+    body.player-mode .glass-card { background: rgba(255, 255, 255, 0.9) !important; border: 1px solid rgba(0, 0, 0, 0.08) !important; color: #1a1a1a; }
+    body.player-mode .glass-card-lg { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid rgba(0, 0, 0, 0.1) !important; color: #1a1a1a; }
+    body.player-mode .btn-primary { background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; }
+    body.player-mode .btn-secondary { background: rgba(0, 0, 0, 0.08); color: #333; border: 1px solid rgba(0, 0, 0, 0.15); }
+    body.player-mode .btn-secondary:hover { background: rgba(0, 0, 0, 0.12); }
+    body.player-mode .input-base { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.15); color: #1a1a1a; }
+    body.player-mode .status-badge { color: #333; }
+    body.player-mode .readonly-badge { background: rgba(255, 215, 0, 0.2); color: #d97706; }
+
+    /* Canva AI 原版發光提示圖標 */
+    .player-info-icon {
+      position: fixed; bottom: 2rem; right: 2rem; width: 50px; height: 50px;
+      background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); transition: all 0.3s ease; z-index: 40;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    .player-info-icon:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6); }
+    .player-info-tooltip {
+      position: fixed; bottom: 5rem; right: 2rem; background: rgba(0, 0, 0, 0.95); color: #FFD700;
+      padding: 1rem 1.5rem; border-radius: 12px; border: 2px solid #FFD700; font-size: 0.9rem; font-weight: 600;
+      max-width: 250px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); animation: slideInUp 0.3s ease-out;
+      pointer-events: none; z-index: 40; white-space: pre-wrap; line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
       body { font-size: 14px; }
       .score-display { font-size: 2rem; }
@@ -144,7 +160,7 @@
  </head>
  <body class="h-full w-full">
   <div id="app" class="h-full w-full flex flex-col">
-   <div id="role-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-lg z-[9999] flex items-center justify-center">
+   <div id="role-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-lg z-50 flex items-center justify-center">
     <div class="glass-card-lg p-8 max-w-md w-full mx-4 animate-slideInUp">
      <h2 class="text-2xl font-bold text-yellow-400 mb-2">歡迎使用</h2>
      <p class="text-gray-300 mb-6">2026 英美回娘家籃球交流賽</p>
@@ -198,23 +214,19 @@
        <h2 class="text-2xl font-bold text-yellow-400 mb-8" style="text-align: center; font-size: 2.5rem; letter-spacing: 1px;">📊 活動進度總覽</h2>
        <div class="dashboard-grid mb-12">
         <div class="dashboard-item glass-card" data-stage="0">
-         <div class="text-5xl mb-3">📋</div>
-         <p class="font-bold text-base mb-3">分組</p>
+         <div class="text-5xl mb-3">📋</div><p class="font-bold text-base mb-3">分組</p>
          <div class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
         </div>
         <div class="dashboard-item glass-card" data-stage="1">
-         <div class="text-5xl mb-3">🎲</div>
-         <p class="font-bold text-base mb-3">趣味競賽</p>
+         <div class="text-5xl mb-3">🎲</div><p class="font-bold text-base mb-3">趣味競賽</p>
          <div class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
         </div>
         <div class="dashboard-item glass-card" data-stage="2">
-         <div class="text-5xl mb-3">🧱</div>
-         <p class="font-bold text-base mb-3">三分磚頭王</p>
+         <div class="text-5xl mb-3">🧱</div><p class="font-bold text-base mb-3">三分磚頭王</p>
          <div class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
         </div>
         <div class="dashboard-item glass-card" data-stage="3">
-         <div class="text-5xl mb-3">⚔️</div>
-         <p class="font-bold text-base mb-3">五五賽</p>
+         <div class="text-5xl mb-3">⚔️</div><p class="font-bold text-base mb-3">五五賽</p>
          <div class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
         </div>
        </div>
@@ -244,18 +256,9 @@
        <h2 class="text-2xl font-bold text-yellow-400 mb-6">🎲 趣味競賽 - 兩輪制計時挑戰</h2>
        <div class="glass-card p-4 mb-6">
         <div class="grid grid-cols-3 gap-4">
-         <div class="text-center">
-          <p class="text-xs text-gray-400 mb-1">當前進度</p>
-          <p id="dice-round-label" class="text-lg font-bold text-yellow-400">第一輪：Team A</p>
-         </div>
-         <div class="text-center">
-          <p class="text-xs text-gray-400 mb-1">隊伍進度</p>
-          <p id="dice-team-progress" class="text-lg font-bold text-yellow-400">1/3</p>
-         </div>
-         <div class="text-center">
-          <p class="text-xs text-gray-400 mb-1">賽制狀態</p>
-          <p id="dice-status" class="text-lg font-bold text-green-400">進行中</p>
-         </div>
+         <div class="text-center"><p class="text-xs text-gray-400 mb-1">當前進度</p><p id="dice-round-label" class="text-lg font-bold text-yellow-400">第一輪：Team A</p></div>
+         <div class="text-center"><p class="text-xs text-gray-400 mb-1">隊伍進度</p><p id="dice-team-progress" class="text-lg font-bold text-yellow-400">1/3</p></div>
+         <div class="text-center"><p class="text-xs text-gray-400 mb-1">賽制狀態</p><p id="dice-status" class="text-lg font-bold text-green-400">進行中</p></div>
         </div>
        </div>
        <div class="glass-card p-6 mb-6">
@@ -277,12 +280,8 @@
          <div class="space-y-2">
           <p class="text-yellow-400 text-sm font-bold">📋 骰子對應動作</p>
           <div class="bg-white/5 rounded p-3 text-xs space-y-1 max-h-64 overflow-y-auto">
-           <div>⚀1 = 右手上籃</div>
-           <div>⚁2 = 左手上籃</div>
-           <div>⚂3 = 三分出手</div>
-           <div>⚃4 = 騎馬射箭</div>
-           <div>⚄5 = 轉五圈投籃</div>
-           <div>⚅6 = 波比跳</div>
+           <div>⚀1 = 右手上籃</div><div>⚁2 = 左手上籃</div><div>⚂3 = 三分出手</div>
+           <div>⚃4 = 騎馬射箭</div><div>⚄5 = 轉五圈投籃</div><div>⚅6 = 波比跳</div>
           </div>
          </div>
         </div>
@@ -322,7 +321,9 @@
         </div>
        </div>
        <div class="glass-card p-4">
-        <button id="dice-records-toggle" class="w-full flex items-center justify-between p-3 hover:bg-white/5 rounded transition-all" style="border: none; background: transparent; cursor: pointer; color: #FFD700; font-weight: 600;"> <span>📋 查看詳細紀錄</span> <span id="dice-records-icon" style="font-size: 1.2rem; transition: transform 0.3s ease;">▼</span> </button>
+        <button id="dice-records-toggle" class="w-full flex items-center justify-between p-3 hover:bg-white/5 rounded transition-all" style="border: none; background: transparent; cursor: pointer; color: #FFD700; font-weight: 600;"> 
+            <span>📋 查看詳細紀錄</span> <span id="dice-records-icon" style="font-size: 1.2rem; transition: transform 0.3s ease;">▼</span> 
+        </button>
         <div id="dice-records-content" class="hidden mt-4">
          <table class="data-table w-full text-sm">
           <thead>
@@ -398,12 +399,10 @@
         </div>
         <div class="flex items-center justify-between gap-4 flex-wrap">
          <div class="text-center flex-1 min-w-[100px]">
-          <p class="text-xs text-gray-400 mb-1">節數</p>
-          <p id="fvf-quarter" class="text-2xl font-bold text-yellow-400">Q1</p>
+          <p class="text-xs text-gray-400 mb-1">節數</p><p id="fvf-quarter" class="text-2xl font-bold text-yellow-400">Q1</p>
          </div>
          <div class="text-center flex-1 min-w-[100px]">
-          <p class="text-xs text-gray-400 mb-1">剩餘時間</p>
-          <p id="fvf-timer" class="font-digital text-2xl text-yellow-400">10:00</p>
+          <p class="text-xs text-gray-400 mb-1">剩餘時間</p><p id="fvf-timer" class="font-digital text-2xl text-yellow-400">10:00</p>
          </div>
          <button id="fvf-timer-btn" class="btn-primary btn-sm">▶️ 開始</button>
         </div>
@@ -440,19 +439,13 @@
         <h3 class="text-lg font-bold text-yellow-400 mb-4">📈 五五賽全場累積積分</h3>
         <div class="grid grid-cols-3 gap-4 text-center">
          <div class="bg-blue-500/10 border border-blue-400 rounded p-3">
-          <div class="text-sm text-gray-400 mb-2">Team A</div>
-          <div class="score-display text-4xl text-blue-400" id="fvf-cumulative-a">0</div>
-          <div class="text-xs text-gray-500 mt-1">分</div>
+          <div class="text-sm text-gray-400 mb-2">Team A</div><div class="score-display text-4xl text-blue-400" id="fvf-cumulative-a">0</div><div class="text-xs text-gray-500 mt-1">分</div>
          </div>
          <div class="bg-red-500/10 border border-red-400 rounded p-3">
-          <div class="text-sm text-gray-400 mb-2">Team B</div>
-          <div class="score-display text-4xl text-red-400" id="fvf-cumulative-b">0</div>
-          <div class="text-xs text-gray-500 mt-1">分</div>
+          <div class="text-sm text-gray-400 mb-2">Team B</div><div class="score-display text-4xl text-red-400" id="fvf-cumulative-b">0</div><div class="text-xs text-gray-500 mt-1">分</div>
          </div>
          <div class="bg-green-500/10 border border-green-400 rounded p-3">
-          <div class="text-sm text-gray-400 mb-2">Team C</div>
-          <div class="score-display text-4xl text-green-400" id="fvf-cumulative-c">0</div>
-          <div class="text-xs text-gray-500 mt-1">分</div>
+          <div class="text-sm text-gray-400 mb-2">Team C</div><div class="score-display text-4xl text-green-400" id="fvf-cumulative-c">0</div><div class="text-xs text-gray-500 mt-1">分</div>
          </div>
         </div>
        </div>
@@ -465,23 +458,17 @@
         <div class="podium-container" id="podium-container">
          <div class="podium-column">
           <div class="podium-box second animate-podium-rise" style="animation-delay: 0.2s">
-           <div class="podium-rank">🥈</div>
-           <div class="podium-name" id="podium-2nd-name">Team B</div>
-           <div class="podium-score" id="podium-2nd-score">0</div>
+           <div class="podium-rank">🥈</div><div class="podium-name" id="podium-2nd-name">Team B</div><div class="podium-score" id="podium-2nd-score">0</div>
           </div>
          </div>
          <div class="podium-column">
           <div class="podium-box first animate-podium-rise" style="animation-delay: 0s">
-           <div class="podium-rank">🥇</div>
-           <div class="podium-name" id="podium-1st-name">Team A</div>
-           <div class="podium-score" id="podium-1st-score">0</div>
+           <div class="podium-rank">🥇</div><div class="podium-name" id="podium-1st-name">Team A</div><div class="podium-score" id="podium-1st-score">0</div>
           </div>
          </div>
          <div class="podium-column">
           <div class="podium-box third animate-podium-rise" style="animation-delay: 0.4s">
-           <div class="podium-rank">🥉</div>
-           <div class="podium-name" id="podium-3rd-name">Team C</div>
-           <div class="podium-score" id="podium-3rd-score">0</div>
+           <div class="podium-rank">🥉</div><div class="podium-name" id="podium-3rd-name">Team C</div><div class="podium-score" id="podium-3rd-score">0</div>
           </div>
          </div>
         </div>
@@ -491,15 +478,7 @@
     </div>
    </main>
 
-   <div id="player-view-overlay" class="hidden w-full h-full" style="flex-direction: column; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40; padding: 0;">
-    <div class="fixed bottom-4 right-4 bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-2xl p-3 flex items-center gap-3 z-50 animate-slideInUp">
-        <div class="bg-blue-100 text-blue-600 rounded-full w-10 h-10 flex items-center justify-center text-xl">👀</div>
-        <div>
-            <p class="text-sm font-bold text-gray-800 m-0">唯讀觀賽模式</p>
-            <p class="text-xs text-gray-500 m-0">📡 數據實時雲端同步中</p>
-        </div>
-    </div>
-
+   <div id="player-view-overlay" class="hidden w-full h-full" style="display: flex; flex-direction: column; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40; padding: 0;">
     <header class="bg-black/30 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex-shrink-0">
      <div class="max-w-full mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3"><span class="text-3xl">🏀</span>
@@ -527,31 +506,15 @@
     <main class="flex-1 overflow-auto w-full">
      <div class="px-4 py-6 w-full">
       <div class="max-w-7xl mx-auto">
+       
        <section id="player-page-0" class="player-page">
         <h2 class="text-2xl font-bold text-yellow-400 mb-8" style="text-align: center; font-size: 2.5rem; letter-spacing: 1px;">📊 活動進度總覽</h2>
-        <div class="dashboard-grid mb-12">
-         <div class="dashboard-item glass-card" data-stage="0">
-          <div class="text-5xl mb-3">📋</div>
-          <p class="font-bold text-base mb-3">分組</p>
-          <div id="player-dash-status-0" class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
-         </div>
-         <div class="dashboard-item glass-card" data-stage="1">
-          <div class="text-5xl mb-3">🎲</div>
-          <p class="font-bold text-base mb-3">趣味競賽</p>
-          <div id="player-dash-status-1" class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
-         </div>
-         <div class="dashboard-item glass-card" data-stage="2">
-          <div class="text-5xl mb-3">🧱</div>
-          <p class="font-bold text-base mb-3">三分磚頭王</p>
-          <div id="player-dash-status-2" class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
-         </div>
-         <div class="dashboard-item glass-card" data-stage="3">
-          <div class="text-5xl mb-3">⚔️</div>
-          <p class="font-bold text-base mb-3">五五賽</p>
-          <div id="player-dash-status-3" class="status-badge status-pending mt-2 mx-auto w-fit">未開始</div>
-         </div>
+        
+        <div id="player-winner-section" style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; text-align: center; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+          <div style="font-size: 1.5rem; color: rgba(255,255,255,0.5); font-style: italic;">⏳ 等待比賽結果...</div>
         </div>
-        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%); border: 2px solid #FFD700; border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px);">
+
+        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%); border: 2px solid #FFD700; border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px); margin-bottom: 2rem;">
          <h3 class="text-2xl font-bold text-yellow-400 mb-6" style="text-align: center;">🏆 各隊總積分排行</h3>
          <div class="grid grid-cols-3 gap-6">
           <div style="background: rgba(59, 130, 246, 0.15); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 12px; text-align: center;">
@@ -571,26 +534,14 @@
           </div>
          </div>
         </div>
+
+        <div id="player-details-section" style="display: none; background: rgba(0, 0, 0, 0.3); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+           <div id="player-details-content"></div>
+        </div>
        </section>
 
        <section id="player-page-1" class="player-page hidden-page">
         <h2 class="text-2xl font-bold text-yellow-400 mb-6">🎲 趣味競賽 - 兩輪制計時挑戰</h2>
-        <div class="glass-card p-4 mb-6">
-         <div class="grid grid-cols-3 gap-4">
-          <div class="text-center">
-           <p class="text-xs text-gray-400 mb-1">當前進度</p>
-           <p id="player-dice-round-label" class="text-lg font-bold text-yellow-400">第一輪：Team A</p>
-          </div>
-          <div class="text-center">
-           <p class="text-xs text-gray-400 mb-1">隊伍進度</p>
-           <p id="player-dice-team-progress" class="text-lg font-bold text-yellow-400">1/3</p>
-          </div>
-          <div class="text-center">
-           <p class="text-xs text-gray-400 mb-1">賽制狀態</p>
-           <p id="player-dice-status" class="text-lg font-bold text-green-400">等待中</p>
-          </div>
-         </div>
-        </div>
         <div class="glass-card p-6">
          <h3 class="text-lg font-bold text-yellow-400 mb-4">📊 各隊成績（唯讀）</h3>
          <div class="grid grid-cols-3 gap-4">
@@ -620,20 +571,10 @@
           </div>
          </div>
         </div>
-        <div id="player-dice-winner" class="glass-card p-6 mt-6 hidden">
-         <h3 class="text-lg font-bold text-yellow-400 mb-4">🏆 冠軍</h3>
-         <div id="player-dice-winner-content" style="text-align: center; font-size: 1.5rem; color: #FFD700; font-weight: bold;"></div>
-        </div>
        </section>
 
        <section id="player-page-2" class="player-page hidden-page">
         <h2 class="text-2xl font-bold text-yellow-400 mb-6">🧱 三分磚頭王 - 10人制小組賽 → 決賽</h2>
-        <div class="glass-card p-4 mb-6">
-         <div class="text-center">
-          <p class="text-xs text-gray-400 mb-1">賽制進度</p>
-          <p id="player-threepoint-phase" class="text-lg font-bold text-yellow-400">第一輪（小組賽）</p>
-         </div>
-        </div>
         <div id="player-threepoint-round1" class="glass-card p-6 mb-6">
          <h3 class="text-lg font-bold text-yellow-400 mb-4">👥 第一輪 - 小組賽（唯讀）</h3>
          <div class="grid grid-cols-3 gap-6">
@@ -664,26 +605,10 @@
           </div>
          </div>
         </div>
-        <div id="player-threepoint-winner" class="glass-card p-6 mt-6 hidden">
-         <h3 class="text-lg font-bold text-yellow-400 mb-4">🏆 冠軍</h3>
-         <div id="player-threepoint-winner-content" style="text-align: center; font-size: 1.5rem; color: #FFD700; font-weight: bold;"></div>
-        </div>
        </section>
 
        <section id="player-page-3" class="player-page hidden-page">
         <h2 class="text-2xl font-bold text-yellow-400 mb-6">⚔️ 五五賽</h2>
-        <div class="glass-card p-4 mb-6">
-         <div class="flex items-center justify-between gap-4 flex-wrap">
-          <div class="text-center flex-1 min-w-[100px]">
-           <p class="text-xs text-gray-400 mb-1">進行中的比賽</p>
-           <p id="player-fvf-matchup" class="text-lg font-bold text-yellow-400">A vs B</p>
-          </div>
-          <div class="text-center flex-1 min-w-[100px]">
-           <p class="text-xs text-gray-400 mb-1">節數</p>
-           <p id="player-fvf-quarter" class="text-lg font-bold text-yellow-400">Q1</p>
-          </div>
-         </div>
-        </div>
         <div class="glass-card p-6">
          <div class="grid grid-cols-3 gap-6">
           <div class="bg-blue-500/10 border-2 border-blue-400 rounded-lg p-6 text-center">
@@ -698,26 +623,6 @@
            <h3 class="text-xl font-bold text-red-400 mb-4">Team B</h3>
            <div class="score-display text-6xl text-red-400 mb-4" id="player-fvf-team2-score">0</div>
            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">分</div>
-          </div>
-         </div>
-        </div>
-        <div class="glass-card p-6 mt-6">
-         <h3 class="text-lg font-bold text-yellow-400 mb-4">📈 五五賽全場累積積分</h3>
-         <div class="grid grid-cols-3 gap-4 text-center">
-          <div class="bg-blue-500/10 border border-blue-400 rounded p-3">
-           <div class="text-sm text-gray-400 mb-2">Team A</div>
-           <div class="score-display text-4xl text-blue-400" id="player-fvf-cumulative-a">0</div>
-           <div class="text-xs text-gray-500 mt-1">分</div>
-          </div>
-          <div class="bg-red-500/10 border border-red-400 rounded p-3">
-           <div class="text-sm text-gray-400 mb-2">Team B</div>
-           <div class="score-display text-4xl text-red-400" id="player-fvf-cumulative-b">0</div>
-           <div class="text-xs text-gray-500 mt-1">分</div>
-          </div>
-          <div class="bg-green-500/10 border border-green-400 rounded p-3">
-           <div class="text-sm text-gray-400 mb-2">Team C</div>
-           <div class="score-display text-4xl text-green-400" id="player-fvf-cumulative-c">0</div>
-           <div class="text-xs text-gray-500 mt-1">分</div>
           </div>
          </div>
         </div>
@@ -758,34 +663,24 @@
   </div>
 
   <script>
-    // ============ Firebase 雲端資料庫設定 ============
-    const firebaseConfig = {
-      apiKey: "AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",
-      authDomain: "basketball-2026.firebaseapp.com",
-      databaseURL: "https://basketball-2026-default-rtdb.firebaseio.com",
-      projectId: "basketball-2026",
-      storageBucket: "basketball-2026.firebasestorage.app",
-      messagingSenderId: "547540210764",
-      appId: "1:547540210764:web:7f367fbc58e633859090e9"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.database();
-
     // ============ 安全 DOM 更新函數 ============
     function safeSet(id, text) {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     }
 
-    function safeHTML(id, html) {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = html;
+    // ============ 強制隱藏遮罩層函數 ============
+    function forceHideRoleOverlay() {
+      const overlay = document.getElementById('role-overlay');
+      if (overlay) {
+        overlay.style.setProperty('display', 'none', 'important');
+        overlay.style.setProperty('opacity', '0', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+        overlay.style.setProperty('visibility', 'hidden', 'important');
+      }
     }
 
-    // ============ 狀態宣告 ============
+    // ============ SINGLE STATE & DATA DECLARATIONS ============
     let userRole = 'player';
     let timerInterval = null;
     let timerStartTime = 0;
@@ -802,33 +697,13 @@
     let championWins = { A: 0, B: 0, C: 0 };
     
     let fiveVFiveState = {
-      currentMatchup: 'ab',
-      team1: 'A',
-      team2: 'B',
-      team1Score: 0,
-      team2Score: 0,
-      half: 1,
-      timerRunning: false,
-      timerInterval: null,
-      timeRemaining: 600,
-      restingTime: false,
-      firstHalfTimer: null,
-      secondHalfTimer: null,
-      firstHalfRunning: false,
-      secondHalfRunning: false,
-      firstHalfTime: 600,
-      secondHalfTime: 600
+      currentMatchup: 'ab', team1: 'A', team2: 'B', team1Score: 0, team2Score: 0, half: 1, timerRunning: false,
+      firstHalfTimer: null, secondHalfTimer: null, firstHalfRunning: false, secondHalfRunning: false,
+      firstHalfTime: 600, secondHalfTime: 600
     };
 
-    let finalizationState = {
-      diceFinalized: false,
-      threePointFinalized: false,
-      fiveVFiveFinalized: false
-    };
-
-    const teamStatus = {
-      A: '準備就緒', B: '準備就緒', C: '準備就緒'
-    };
+    let finalizationState = { diceFinalized: false, threePointFinalized: false, fiveVFiveFinalized: false };
+    const teamStatus = { A: '準備就緒', B: '準備就緒', C: '準備就緒' };
 
     const gameData = {
       teams: { 
@@ -836,10 +711,7 @@
         B: { score: 0, name: 'Team B', color: '#f87171' }, 
         C: { score: 0, name: 'Team C', color: '#4ade80' } 
       },
-      dice: { 
-        A: [null, null], B: [null, null], C: [null, null],
-        details: { A: [], B: [], C: [] }
-      },
+      dice: { A: [null, null], B: [null, null], C: [null, null], details: { A: [], B: [], C: [] } },
       diceWinner: null,
       threePoint: { 
         round1: { A: {players: Array(10).fill(0), total: 0}, B: {players: Array(10).fill(0), total: 0}, C: {players: Array(10).fill(0), total: 0} },
@@ -854,110 +726,89 @@
       1: '右手上籃', 2: '左手上籃', 3: '三分出手', 4: '騎馬射箭', 5: '轉五圈投籃', 6: '波比跳'
     };
 
-    // ============ Firebase 實時同步邏輯 ============
+    // ============ Firebase 實時同步 (已修復為 v8 版本) ============
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",
+      authDomain: "basketball-2026.firebaseapp.com",
+      databaseURL: "https://basketball-2026-default-rtdb.firebaseio.com",
+      projectId: "basketball-2026",
+      storageBucket: "basketball-2026.firebasestorage.app",
+      messagingSenderId: "547540210764",
+      appId: "1:547540210764:web:7f367fbc58e633859090e9"
+    };
+
+    let firebaseReady = false;
+    try {
+      if (firebase && firebase.apps && firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+        firebaseReady = true;
+        console.log('✅ Firebase 已初始化');
+      }
+    } catch (err) {
+      console.warn('❌ Firebase 初始化失敗', err);
+    }
+
+    function syncToFirebase() {
+      if (!firebaseReady || userRole !== 'staff') return;
+      try {
+        const db = firebase.database();
+        const syncData = { gameData, activeStep, championWins, matchWinners, fiveVFiveState, winnerState, finalizationState, teamStatus };
+        db.ref('yingmei2026').set(syncData);
+      } catch (err) {
+        console.error('Firebase 同步失敗:', err);
+      }
+    }
+
+    function setupFirebaseListener() {
+      if (!firebaseReady) return;
+      try {
+        const db = firebase.database();
+        db.ref('yingmei2026').on('value', (snapshot) => {
+          const remoteData = snapshot.val();
+          if (remoteData) {
+            if (remoteData.gameData) Object.assign(gameData, remoteData.gameData);
+            if (remoteData.activeStep !== undefined) activeStep = remoteData.activeStep;
+            if (remoteData.championWins) Object.assign(championWins, remoteData.championWins);
+            if (remoteData.matchWinners) Object.assign(matchWinners, remoteData.matchWinners);
+            if (remoteData.fiveVFiveState) Object.assign(fiveVFiveState, remoteData.fiveVFiveState);
+            if (remoteData.winnerState) Object.assign(winnerState, remoteData.winnerState);
+            if (remoteData.finalizationState) Object.assign(finalizationState, remoteData.finalizationState);
+            if (remoteData.teamStatus) Object.assign(teamStatus, remoteData.teamStatus);
+
+            updateProgressIndicators();
+            updateDashboardScores();
+            updateTeamStatusDisplay();
+            
+            if (userRole === 'player') {
+              updatePlayerViewDisplay();
+              updatePlayerDetailsDisplay();
+            } else {
+              updateFiveVFiveUI();
+            }
+
+            // 同步鎖定狀態
+            if (finalizationState.diceFinalized) lockDiceInputs();
+            if (finalizationState.threePointFinalized) lockThreePointInputs();
+            if (finalizationState.fiveVFiveFinalized) lockFiveVFiveInputs();
+          }
+        });
+      } catch (err) {
+          console.error('Firebase 監聽失敗', err);
+      }
+    }
+
+    function loadGameData() {
+      const saved = localStorage.getItem('basketballGameData');
+      if (saved) Object.assign(gameData, JSON.parse(saved));
+    }
+
     function saveGameData() {
       if (userRole !== 'staff') return;
-      const syncData = {
-          gameData, activeStep, championWins, matchWinners, fiveVFiveState, winnerState, finalizationState, teamStatus
-      };
-      db.ref('yingmei2026').set(syncData);
+      localStorage.setItem('basketballGameData', JSON.stringify(gameData));
+      syncToFirebase(); // 只要有變動就推播，達到零延遲
     }
 
-    function initRealtimeSync() {
-      db.ref('yingmei2026').on('value', (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-              if (data.gameData) Object.assign(gameData, data.gameData);
-              if (data.activeStep !== undefined) activeStep = data.activeStep;
-              if (data.championWins) Object.assign(championWins, data.championWins);
-              if (data.matchWinners) Object.assign(matchWinners, data.matchWinners);
-              if (data.fiveVFiveState) Object.assign(fiveVFiveState, data.fiveVFiveState);
-              if (data.winnerState) Object.assign(winnerState, data.winnerState);
-              if (data.finalizationState) Object.assign(finalizationState, data.finalizationState);
-              if (data.teamStatus) Object.assign(teamStatus, data.teamStatus);
-
-              updateProgressIndicators();
-              updateDashboardScores();
-              updateDiceRecords();
-              updateFiveVFiveCumulativeDisplay();
-              updateTeamStatusDisplay();
-
-              if (userRole === 'player') {
-                  updatePlayerViewDisplay();
-              } else {
-                  updateFiveVFiveUI();
-              }
-
-              // UI 鎖定狀態同步
-              if (finalizationState.diceFinalized) lockDiceInputs();
-              if (finalizationState.threePointFinalized) lockThreePointInputs();
-              if (finalizationState.fiveVFiveFinalized) lockFiveVFiveInputs();
-          }
-      });
-    }
-
-    // ============ 介面與身分強制切換 ============
-    function forceEnterSystem(role) {
-        userRole = role;
-        
-        // 強制隱藏初始遮罩
-        const overlay = document.getElementById('role-overlay');
-        if (overlay) {
-            overlay.style.setProperty('display', 'none', 'important');
-            overlay.classList.add('hidden');
-        }
-
-        // 動態切換背景顏色主題
-        if (role === 'player') {
-            document.body.classList.add('player-mode');
-        } else {
-            document.body.classList.remove('player-mode');
-        }
-
-        updateUIForRole();
-
-        // 強制導航至首頁
-        if (role === 'staff') {
-            const firstTab = document.querySelector('.nav-tab[data-page="0"]');
-            if (firstTab) firstTab.click();
-        } else {
-            const firstPlayerTab = document.querySelector('.player-nav-tab[data-page="0"]');
-            if (firstPlayerTab) firstPlayerTab.click();
-        }
-    }
-
-    function updateUIForRole() {
-      const isStaff = (userRole === 'staff');
-      const badge = document.getElementById('readonly-badge');
-      const nav = document.querySelector('nav');
-      const mainContent = document.querySelector('main');
-      const playerViewOverlay = document.getElementById('player-view-overlay');
-
-      if (badge) badge.classList.toggle('hidden', isStaff);
-      
-      const roleIcon = document.getElementById('role-icon');
-      const roleLabel = document.getElementById('role-label');
-      if(roleIcon) roleIcon.textContent = isStaff ? '👨‍💻' : '🏀';
-      if(roleLabel) roleLabel.textContent = isStaff ? '工作人員' : '球員';
-
-      if (nav) nav.style.display = isStaff ? 'flex' : 'none';
-      if (mainContent) mainContent.style.display = isStaff ? 'block' : 'none';
-      if (playerViewOverlay) {
-          playerViewOverlay.classList.toggle('hidden', isStaff);
-          playerViewOverlay.style.display = isStaff ? 'none' : 'flex';
-      }
-
-      // 禁用與啟用輸入
-      document.querySelectorAll('input, button').forEach(el => {
-        if (el.classList.contains('threepoint-input') || el.classList.contains('threepoint-finals-input') || (el.id && (el.id.includes('start') || el.id.includes('stop') || el.id.includes('btn') || el.id.includes('finalize') || el.id.includes('round')))) {
-          el.disabled = !isStaff;
-        }
-      });
-
-      if (!isStaff) updatePlayerViewDisplay();
-    }
-
-    // ============ 格式化與計時輔助 ============
+    // ============ UI & Format ============
     function formatTime(milliseconds) {
       const totalSeconds = Math.floor(milliseconds / 1000);
       const minutes = Math.floor(totalSeconds / 60);
@@ -980,35 +831,21 @@
         item.classList.remove('active', 'completed');
         
         if (idx < activeStep) {
-          badge.classList.add('status-completed');
-          badge.innerHTML = '✅ 已完成';
-          item.classList.add('completed');
+          badge.classList.add('status-completed'); badge.innerHTML = '✅ 已完成'; item.classList.add('completed');
         } else if (idx === activeStep && activeStep > 0) {
-          badge.classList.add('status-active');
-          badge.innerHTML = '🔥 進行中';
-          item.classList.add('active');
+          badge.classList.add('status-active'); badge.innerHTML = '🔥 進行中'; item.classList.add('active');
         } else {
-          badge.classList.add('status-pending');
-          badge.innerHTML = '未開始';
+          badge.classList.add('status-pending'); badge.innerHTML = '未開始';
         }
       });
     }
 
-    function updateTeamStatusDisplay() {
-      ['A', 'B', 'C'].forEach(team => {
-        const statusEl = document.querySelector(`.team-status-${team.toLowerCase()}`);
-        if (statusEl && teamStatus[team]) {
-          statusEl.textContent = teamStatus[team];
-          statusEl.className = 'status-badge w-full justify-center';
-          if (teamStatus[team].includes('比賽中')) statusEl.classList.add('status-active');
-          else if (teamStatus[team].includes('成績已上傳')) statusEl.classList.add('status-completed');
-          else statusEl.classList.add('status-pending');
-        }
-      });
-    }
+    function updateTeamStatusDisplay() {}
 
     function setTeamStatus(team, status) {
       teamStatus[team] = status;
+      if (!gameData.teamStatus) gameData.teamStatus = {};
+      gameData.teamStatus[team] = status;
       updateTeamStatusDisplay();
       saveGameData();
     }
@@ -1035,9 +872,7 @@
       if (timerInterval) clearInterval(timerInterval);
       const currentTeam = diceTeams[currentDiceTeamIndex];
       gameData.dice[currentTeam][diceRound - 1] = timerElapsedMs;
-      gameData.dice.details[currentTeam].push({
-        round: diceRound, time: timerElapsedMs, timestamp: new Date().toISOString()
-      });
+      gameData.dice.details[currentTeam].push({ round: diceRound, time: timerElapsedMs, timestamp: new Date().toISOString() });
       setTeamStatus(currentTeam, `✅ 成績已上傳 (${formatTime(timerElapsedMs)})`);
       document.getElementById('dice-start-btn').disabled = false;
       document.getElementById('dice-stop-btn').disabled = true;
@@ -1060,25 +895,19 @@
       const result = Math.floor(Math.random() * 6) + 1;
       const diceDisplay = document.getElementById('dice-display');
       const diceAction = document.getElementById('dice-action');
-      diceDisplay.classList.remove('animate-dice-roll');
-      void diceDisplay.offsetWidth;
-      diceDisplay.classList.add('animate-dice-roll');
-      setTimeout(() => {
-        diceDisplay.textContent = result;
-        if (diceAction) diceAction.textContent = `🎯 ${diceActions[result]}`;
-      }, 600);
+      diceDisplay.classList.remove('animate-dice-roll'); void diceDisplay.offsetWidth; diceDisplay.classList.add('animate-dice-roll');
+      setTimeout(() => { diceDisplay.textContent = result; if (diceAction) diceAction.textContent = `🎯 ${diceActions[result]}`; }, 600);
     }
 
     function updateDiceRecords() {
       ['A', 'B', 'C'].forEach(team => {
-        const r1 = gameData.dice[team][0];
-        const r2 = gameData.dice[team][1];
+        const r1 = gameData.dice[team][0]; const r2 = gameData.dice[team][1];
+        const totalElem = document.getElementById(`${team.toLowerCase()}-total`);
         safeSet(`${team.toLowerCase()}-r1`, r1 !== null ? formatTime(r1) : '--:--.-');
         safeSet(`${team.toLowerCase()}-r2`, r2 !== null ? formatTime(r2) : '--:--.-');
-        const totalElem = document.getElementById(`${team.toLowerCase()}-total`);
-        if (r1 !== null && r2 !== null && totalElem) {
-          safeSet(`${team.toLowerCase()}-total`, formatTime(r1 + r2));
-        }
+        if (r1 !== null && r2 !== null) {
+          if (totalElem) safeSet(`${team.toLowerCase()}-total`, formatTime(r1 + r2));
+        } else if (totalElem) safeSet(`${team.toLowerCase()}-total`, '--:--.-');
       });
     }
 
@@ -1096,14 +925,9 @@
       currentDiceTeamIndex++;
       if (currentDiceTeamIndex >= 3) {
         if (diceRound === 1) {
-          document.getElementById('dice-next-team-btn').classList.add('hidden');
-          document.getElementById('dice-start-round2-btn').classList.remove('hidden');
-          document.getElementById('dice-status').textContent = '第一輪完成';
-          diceRound1Complete = true;
+          document.getElementById('dice-next-team-btn').classList.add('hidden'); document.getElementById('dice-start-round2-btn').classList.remove('hidden'); document.getElementById('dice-status').textContent = '第一輪完成';
         } else {
-          document.getElementById('dice-next-team-btn').classList.add('hidden');
-          document.getElementById('dice-finalize-btn').classList.remove('hidden');
-          document.getElementById('dice-status').textContent = '第二輪完成';
+          document.getElementById('dice-next-team-btn').classList.add('hidden'); document.getElementById('dice-finalize-btn').classList.remove('hidden'); document.getElementById('dice-status').textContent = '第二輪完成';
           calculateDiceRanking();
         }
         return;
@@ -1114,47 +938,35 @@
     function startRound2() {
       if (userRole !== 'staff') return;
       diceRound = 2; currentDiceTeamIndex = 0;
-      document.getElementById('dice-start-round2-btn').classList.add('hidden');
-      document.getElementById('dice-next-team-btn').classList.remove('hidden');
-      document.getElementById('dice-status').textContent = '進行中';
+      document.getElementById('dice-start-round2-btn').classList.add('hidden'); document.getElementById('dice-next-team-btn').classList.remove('hidden'); document.getElementById('dice-status').textContent = '進行中';
       updateDiceUI();
     }
 
     function calculateDiceRanking() {
       if (finalizationState.diceFinalized) return;
-      
-      const times = ['A', 'B', 'C'].map(team => ({
-        team, time: (gameData.dice[team][0] || 0) + (gameData.dice[team][1] || 0)
-      })).filter(t => t.time > 0).sort((a, b) => a.time - b.time);
-
-      if(times.length > 0) {
+      const times = ['A', 'B', 'C'].map(team => ({ team, time: (gameData.dice[team][0] || 0) + (gameData.dice[team][1] || 0) })).filter(t => t.time > 0).sort((a, b) => a.time - b.time);
+      if(times.length > 0){
           const winner = times[0];
-          gameData.diceWinner = winner.team;
-          matchWinners.dice = winner.team;
-          championWins[winner.team] += 1;
+          gameData.diceWinner = winner.team; matchWinners.dice = winner.team; championWins[winner.team] += 1;
           winnerState.dice = { team: winner.team, time: winner.time };
-          
-          updateTeamTotalScores();
-          setActiveStep(2);
+          updateTeamTotalScores(); setActiveStep(2);
           showDiceWinnerAnnouncement(winner.team, winner.time);
-          
-          finalizationState.diceFinalized = true;
-          lockDiceInputs();
-          updateDiceFinalizeBtnStatus();
+          finalizationState.diceFinalized = true; lockDiceInputs(); updateDiceFinalizeBtnStatus();
           saveGameData();
       }
     }
 
     function showDiceWinnerAnnouncement(team, time) {
-      if (announcementVisible) return;
-      announcementVisible = true;
+      if (announcementVisible) return; announcementVisible = true;
       const announcement = document.createElement('div');
-      announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.5s ease-out;`;
+      announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.5s ease-out;`;
       announcement.innerHTML = `
         <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
-          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">趣味競賽冠軍</h1>
-          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">🏆 Team ${team} 🏆</div>
-          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" class="btn-primary">✅ 確認</button>
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">趣味競賽冠軍</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">Team ${team}</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">總時間: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${formatTime(time)}</span></div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">✅ 確認</button>
         </div>
       `;
       document.body.appendChild(announcement);
@@ -1164,18 +976,15 @@
     function initThreePointInputs() {
       ['A', 'B', 'C'].forEach(team => {
         const container = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`);
-        if (!container) return;
-        container.innerHTML = '';
+        if (!container) return; container.innerHTML = '';
         for (let i = 1; i <= 10; i++) {
           const input = document.createElement('input');
-          input.type = 'number'; input.className = 'threepoint-input input-base text-center'; input.placeholder = i;
-          input.min = '0';
+          input.type = 'number'; input.className = 'threepoint-input input-base text-center'; input.placeholder = i; input.min = '0';
           input.addEventListener('input', function() {
             const val = parseInt(this.value) || 0;
             if (!gameData.threePoint.round1[team]) gameData.threePoint.round1[team] = { players: Array(10).fill(0), total: 0 };
             gameData.threePoint.round1[team].players[i - 1] = val;
-            updateThreePointTotal(team);
-            saveGameData();
+            updateThreePointTotal(team); saveGameData();
           });
           container.appendChild(input);
         }
@@ -1194,26 +1003,26 @@
       const scores = ['A', 'B', 'C'].map(team => ({ team, score: gameData.threePoint.round1[team].total })).sort((a, b) => b.score - a.score);
       gameData.threePoint.finals.qualified = [scores[0].team, scores[1].team];
       
-      document.getElementById('threepoint-round1').classList.add('hidden');
-      document.getElementById('threepoint-finals').classList.remove('hidden');
+      ['A', 'B', 'C'].forEach(team => {
+        const container = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`).closest('div[class*="bg-"]');
+        if (scores[2].team === team) {
+          container.style.opacity = '0.4'; container.style.pointerEvents = 'none'; container.style.filter = 'grayscale(80%)';
+          container.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        } else { container.classList.add('qualified'); }
+      });
+      document.getElementById('threepoint-round1').classList.add('hidden'); document.getElementById('threepoint-finals').classList.remove('hidden');
       document.getElementById('threepoint-phase').textContent = '決賽（最終對決）';
-      document.getElementById('threepoint-round1-btn').classList.add('hidden');
-      document.getElementById('threepoint-finals-btn').classList.remove('hidden');
-      initFinalsInputs(scores[0].team, scores[1].team);
-      saveGameData();
+      document.getElementById('threepoint-round1-btn').classList.add('hidden'); document.getElementById('threepoint-finals-btn').classList.remove('hidden');
+      initFinalsInputs(scores[0].team, scores[1].team); saveGameData();
     }
 
     function initFinalsInputs(team1, team2) {
-      document.getElementById('finals-team1-name').textContent = team1;
-      document.getElementById('finals-team2-name').textContent = team2;
-      const container1 = document.getElementById('finals-team1-inputs');
-      const container2 = document.getElementById('finals-team2-inputs');
+      document.getElementById('finals-team1-name').textContent = team1; document.getElementById('finals-team2-name').textContent = team2;
+      const container1 = document.getElementById('finals-team1-inputs'); const container2 = document.getElementById('finals-team2-inputs');
       container1.innerHTML = ''; container2.innerHTML = '';
       for (let i = 1; i <= 10; i++) {
         const createInput = (team) => {
-          const input = document.createElement('input');
-          input.type = 'number'; input.className = 'threepoint-finals-input input-base text-center'; input.placeholder = i;
-          input.min = '0';
+          const input = document.createElement('input'); input.type = 'number'; input.className = 'threepoint-finals-input input-base text-center'; input.placeholder = i; input.min = '0';
           input.addEventListener('input', function() {
             const val = parseInt(this.value) || 0;
             if (!gameData.threePoint.finals.teams[team]) gameData.threePoint.finals.teams[team] = { players: Array(10).fill(0), total: 0 };
@@ -1225,62 +1034,52 @@
           });
           return input;
         };
-        container1.appendChild(createInput(team1));
-        container2.appendChild(createInput(team2));
+        container1.appendChild(createInput(team1)); container2.appendChild(createInput(team2));
       }
     }
 
     function finalizeFinals() {
       if (userRole !== 'staff' || finalizationState.threePointFinalized) return;
       const [team1, team2] = gameData.threePoint.finals.qualified;
-      const t1Score = gameData.threePoint.finals.teams[team1]?.total || 0;
-      const t2Score = gameData.threePoint.finals.teams[team2]?.total || 0;
+      const t1Score = gameData.threePoint.finals.teams[team1]?.total || 0; const t2Score = gameData.threePoint.finals.teams[team2]?.total || 0;
       const winner = t1Score >= t2Score ? team1 : team2;
       
       gameData.threePointWinner = winner; matchWinners.threePoint = winner; championWins[winner] += 1;
       winnerState.threePoint = { team: winner, score: Math.max(t1Score, t2Score) };
-      
       updateTeamTotalScores(); setActiveStep(3);
       showThreePointWinnerAnnouncement(winner, Math.max(t1Score, t2Score));
-      
-      finalizationState.threePointFinalized = true;
-      lockThreePointInputs(); updateThreePointFinalizeBtnStatus();
+      finalizationState.threePointFinalized = true; lockThreePointInputs(); updateThreePointFinalizeBtnStatus();
       saveGameData();
     }
 
     function showThreePointWinnerAnnouncement(team, score) {
-      if (announcementVisible) return;
-      announcementVisible = true;
+      if (announcementVisible) return; announcementVisible = true;
       const announcement = document.createElement('div');
-      announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.5s ease-out;`;
+      announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.5s ease-out;`;
       announcement.innerHTML = `
         <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
-          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">三分磚頭王冠軍</h1>
-          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">🏆 Team ${team} 🏆</div>
-          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" class="btn-primary">✅ 確認</button>
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🎯</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">三分磚頭王</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">Team ${team}</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">決賽得分: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${score}</span> 分</div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">✅ 確認</button>
         </div>
       `;
       document.body.appendChild(announcement);
     }
 
     // ============ 五五賽與計分邏輯 ============
-    function updateTeamTotalScores() {
-      updateDashboardScores();
-    }
-
+    function updateTeamTotalScores() { updateDashboardScores(); }
     function updateDashboardScores() {
-      safeSet('dash-a-score', championWins.A);
-      safeSet('dash-b-score', championWins.B);
-      safeSet('dash-c-score', championWins.C);
+      safeSet('dash-a-score', championWins.A); safeSet('dash-b-score', championWins.B); safeSet('dash-c-score', championWins.C);
     }
 
     function updateFiveVFiveUI() {
-      const matchups = { ab: { t1: 'A', t2: 'B' }, ac: { t1: 'A', t2: 'C' }, bc: { t1: 'B', t2: 'C' } };
+      const matchups = { ab: { team1: 'A', team2: 'B' }, ac: { team1: 'A', team2: 'C' }, bc: { team1: 'B', team2: 'C' } };
       const match = matchups[fiveVFiveState.currentMatchup];
-      fiveVFiveState.team1 = match.t1; fiveVFiveState.team2 = match.t2;
-      safeSet('fvf-team1-name', `Team ${match.t1}`); safeSet('fvf-team2-name', `Team ${match.t2}`);
+      fiveVFiveState.team1 = match.team1; fiveVFiveState.team2 = match.team2;
+      safeSet('fvf-team1-name', `Team ${fiveVFiveState.team1}`); safeSet('fvf-team2-name', `Team ${fiveVFiveState.team2}`);
       safeSet('fvf-team1-score', fiveVFiveState.team1Score); safeSet('fvf-team2-score', fiveVFiveState.team2Score);
-      
       const mins1 = Math.floor(fiveVFiveState.firstHalfTime / 60); const secs1 = fiveVFiveState.firstHalfTime % 60;
       const mins2 = Math.floor(fiveVFiveState.secondHalfTime / 60); const secs2 = fiveVFiveState.secondHalfTime % 60;
       safeSet('fvf-quarter', `上半場: ${String(mins1).padStart(2, '0')}:${String(secs1).padStart(2, '0')} | 下半場: ${String(mins2).padStart(2, '0')}:${String(secs2).padStart(2, '0')}`);
@@ -1294,179 +1093,348 @@
       updateFiveVFiveUI(); saveGameData();
     }
 
-    function updateFiveVFiveCumulativeDisplay() {
-      safeSet('fvf-cumulative-a', gameData.fiveVFive.A || 0);
-      safeSet('fvf-cumulative-b', gameData.fiveVFive.B || 0);
-      safeSet('fvf-cumulative-c', gameData.fiveVFive.C || 0);
-    }
-
     function finalizeMatch() {
       if (userRole !== 'staff' || finalizationState.fiveVFiveFinalized) return;
       gameData.fiveVFive[fiveVFiveState.team1] = (gameData.fiveVFive[fiveVFiveState.team1] || 0) + fiveVFiveState.team1Score;
       gameData.fiveVFive[fiveVFiveState.team2] = (gameData.fiveVFive[fiveVFiveState.team2] || 0) + fiveVFiveState.team2Score;
       saveGameData();
 
-      const matchOrder = ['ab', 'ac', 'bc'];
-      const currentIdx = matchOrder.indexOf(fiveVFiveState.currentMatchup);
+      const matchOrder = ['ab', 'ac', 'bc']; const currentIdx = matchOrder.indexOf(fiveVFiveState.currentMatchup);
       if (currentIdx < matchOrder.length - 1) {
-        const nextMatch = matchOrder[currentIdx + 1];
-        const nextBtn = document.querySelector(`.five-v-five-matchup[data-match="${nextMatch}"]`);
-        if (nextBtn) {
-          fiveVFiveState.team1Score = 0; fiveVFiveState.team2Score = 0;
-          nextBtn.click();
-        }
+        const nextMatch = matchOrder[currentIdx + 1]; const nextBtn = document.querySelector(`.five-v-five-matchup[data-match="${nextMatch}"]`);
+        if (nextBtn) { fiveVFiveState.team1Score = 0; fiveVFiveState.team2Score = 0; nextBtn.click(); }
       } else {
-        const fiveVFiveScores = [
-          { team: 'A', score: gameData.fiveVFive.A || 0 },
-          { team: 'B', score: gameData.fiveVFive.B || 0 },
-          { team: 'C', score: gameData.fiveVFive.C || 0 }
-        ].sort((a, b) => b.score - a.score);
-
+        const fiveVFiveScores = [{ team: 'A', score: gameData.fiveVFive.A || 0 }, { team: 'B', score: gameData.fiveVFive.B || 0 }, { team: 'C', score: gameData.fiveVFive.C || 0 }].sort((a, b) => b.score - a.score);
         const fiveVFiveWinner = fiveVFiveScores[0].team;
         championWins[fiveVFiveWinner] += 1; matchWinners.fiveVFive = fiveVFiveWinner;
-        finalizationState.fiveVFiveFinalized = true;
-        lockFiveVFiveInputs(); updateFiveVFiveFinalizeBtnStatus();
+        finalizationState.fiveVFiveFinalized = true; lockFiveVFiveInputs(); updateFiveVFiveFinalizeBtnStatus();
         setActiveStep(4); saveGameData();
         showFiveVFiveWinnerAnnouncement();
       }
     }
 
     function showFiveVFiveWinnerAnnouncement() {
-        if (announcementVisible) return;
-        announcementVisible = true;
-        const announcement = document.createElement('div');
-        announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.5s ease-out;`;
-        announcement.innerHTML = `
-          <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
-            <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">五五賽冠軍</h1>
-            <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" class="btn-primary mt-4">✅ 確認</button>
-          </div>
-        `;
-        document.body.appendChild(announcement);
+      if (announcementVisible) return; announcementVisible = true;
+      const teams = ['A', 'B', 'C'].map(t => ({ name: t, score: gameData.fiveVFive[t] || 0 })).sort((a, b) => b.score - a.score);
+      const winner = teams[0];
+      const announcement = document.createElement('div');
+      announcement.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.5s ease-out;`;
+      announcement.innerHTML = `
+        <div style="text-align: center; animation: slideInUp 0.8s ease-out;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">⚔️</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FFD700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);">五五賽冠軍</h1>
+          <div style="font-size: 2.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: bold;">Team ${winner.name}</div>
+          <div style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">全場累積: <span style="color: #FFD700; font-family: 'Courier New', monospace; font-weight: bold;">${winner.score}</span> 分</div>
+          <button onclick="this.parentElement.parentElement.remove(); announcementVisible = false;" style="margin-top: 2rem; padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #FFD700 0%, #ffc107 100%); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">✅ 確認</button>
+        </div>
+      `;
+      document.body.appendChild(announcement);
     }
 
     // ============ 安全鎖定與修正 ============
     function lockDiceInputs() {
-      document.querySelectorAll('#page-1 button:not(.correct-btn), #page-1 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
-      const correctBtn = document.getElementById('dice-correct-btn');
-      if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; }
+      document.querySelectorAll('#page-1 button:not(.btn-danger), #page-1 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
+      const correctBtn = document.getElementById('dice-correct-btn'); if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; correctBtn.style.pointerEvents = 'auto'; correctBtn.style.zIndex = '100'; }
     }
     function updateDiceFinalizeBtnStatus() {
       const btn = document.getElementById('dice-finalize-btn');
-      if (btn && finalizationState.diceFinalized) {
-        btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
-        addCorrectBtn('dice');
+      if (btn && finalizationState.diceFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; addDiceCorrectBtn(); }
+    }
+    function addDiceCorrectBtn() {
+      const existingBtn = document.getElementById('dice-correct-btn'); if (existingBtn) return;
+      const container = document.querySelector('#page-1 .flex.gap-2');
+      if (container) {
+        const correctBtn = document.createElement('button'); correctBtn.id = 'dice-correct-btn'; correctBtn.className = 'btn-danger btn-sm correct-btn'; correctBtn.textContent = '🔧 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.diceFinalized = false; championWins[matchWinners.dice]--;
+            document.querySelectorAll('#page-1 input, #page-1 button').forEach(el => { el.disabled = false; el.style.opacity = '1'; el.style.pointerEvents = 'auto'; });
+            updateDiceFinalizeBtnStatus(); alert('🔓 數據已解鎖'); saveGameData();
+          } else { alert('❌ 密碼錯誤'); }
+        };
+        container.appendChild(correctBtn);
       }
     }
-    
+
     function lockThreePointInputs() {
-      document.querySelectorAll('#page-2 button:not(.correct-btn), #page-2 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
-      const correctBtn = document.getElementById('threepoint-correct-btn');
-      if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; }
+      document.querySelectorAll('#page-2 button:not(.btn-danger), #page-2 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
+      const correctBtn = document.getElementById('threepoint-correct-btn'); if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; correctBtn.style.pointerEvents = 'auto'; correctBtn.style.zIndex = '100'; }
     }
     function updateThreePointFinalizeBtnStatus() {
       const btn = document.getElementById('threepoint-finals-btn');
-      if (btn && finalizationState.threePointFinalized) {
-        btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
-        addCorrectBtn('threepoint');
+      if (btn && finalizationState.threePointFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; addThreePointCorrectBtn(); }
+    }
+    function addThreePointCorrectBtn() {
+      const existingBtn = document.getElementById('threepoint-correct-btn'); if (existingBtn) return;
+      const container = document.querySelector('#page-2 .flex.items-center');
+      if (container) {
+        const correctBtn = document.createElement('button'); correctBtn.id = 'threepoint-correct-btn'; correctBtn.className = 'btn-danger btn-sm correct-btn'; correctBtn.textContent = '🔧 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.threePointFinalized = false; championWins[matchWinners.threePoint]--;
+            document.querySelectorAll('#page-2 input, #page-2 button').forEach(el => { el.disabled = false; el.style.opacity = '1'; el.style.pointerEvents = 'auto'; });
+            updateThreePointFinalizeBtnStatus(); alert('🔓 數據已解鎖'); saveGameData();
+          } else { alert('❌ 密碼錯誤'); }
+        };
+        container.appendChild(correctBtn);
       }
     }
 
     function lockFiveVFiveInputs() {
-      document.querySelectorAll('#page-3 button:not(.correct-btn)').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
-      const correctBtn = document.getElementById('fvf-correct-btn');
-      if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; }
+      document.querySelectorAll('#page-3 button:not(.btn-danger)').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; });
+      const correctBtn = document.getElementById('fvf-correct-btn'); if (correctBtn) { correctBtn.disabled = false; correctBtn.style.opacity = '1'; correctBtn.style.pointerEvents = 'auto'; correctBtn.style.zIndex = '100'; }
     }
     function updateFiveVFiveFinalizeBtnStatus() {
       const btn = document.getElementById('fvf-finalize-btn');
-      if (btn && finalizationState.fiveVFiveFinalized) {
-        btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
-        addCorrectBtn('fvf');
-      }
+      if (btn && finalizationState.fiveVFiveFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; addFiveVFiveCorrectBtn(); }
     }
-
-    function addCorrectBtn(type) {
-      let containerSelector, btnId;
-      if (type === 'dice') { containerSelector = '#page-1 .flex.gap-2'; btnId = 'dice-correct-btn'; }
-      if (type === 'threepoint') { containerSelector = '#page-2 .flex.items-center'; btnId = 'threepoint-correct-btn'; }
-      if (type === 'fvf') { containerSelector = '#page-3 button[id="fvf-finalize-btn"]'; btnId = 'fvf-correct-btn'; }
-      
-      const existingBtn = document.getElementById(btnId);
-      if (existingBtn) return;
-
-      const container = type === 'fvf' ? document.querySelector(containerSelector).parentElement : document.querySelector(containerSelector);
+    function addFiveVFiveCorrectBtn() {
+      const existingBtn = document.getElementById('fvf-correct-btn'); if (existingBtn) return;
+      const container = document.querySelector('#page-3 button[id="fvf-finalize-btn"]')?.parentElement;
       if (container) {
-        const btn = document.createElement('button');
-        btn.id = btnId; btn.className = 'btn-danger btn-sm correct-btn ml-2'; btn.textContent = '🔧 修正數據';
-        btn.onclick = () => {
-          const pwd = prompt('請輸入修正密碼：');
-          if (pwd === 'admin' || pwd === '2026') {
-            finalizationState[`${type}Finalized`] = false;
-            if(type==='dice') { championWins[matchWinners.dice]--; document.querySelectorAll('#page-1 button').forEach(el=>{el.disabled=false;el.style.opacity='1';}); }
-            if(type==='threepoint') { championWins[matchWinners.threePoint]--; document.querySelectorAll('#page-2 button, #page-2 input').forEach(el=>{el.disabled=false;el.style.opacity='1';}); }
-            if(type==='fvf') { championWins[matchWinners.fiveVFive]--; document.querySelectorAll('#page-3 button').forEach(el=>{el.disabled=false;el.style.opacity='1';}); }
-            alert('🔓 數據已解鎖');
-            saveGameData();
-          } else alert('❌ 密碼錯誤');
+        const correctBtn = document.createElement('button'); correctBtn.id = 'fvf-correct-btn'; correctBtn.className = 'btn-danger btn-sm correct-btn'; correctBtn.textContent = '🔧 修正數據';
+        correctBtn.onclick = () => {
+          const password = prompt('請輸入修正密碼：');
+          if (password === 'admin' || password === '2026') {
+            finalizationState.fiveVFiveFinalized = false; championWins[matchWinners.fiveVFive]--;
+            document.querySelectorAll('#page-3 button').forEach(el => { el.disabled = false; el.style.opacity = '1'; el.style.pointerEvents = 'auto'; });
+            updateFiveVFiveFinalizeBtnStatus(); alert('🔓 數據已解鎖'); saveGameData();
+          } else { alert('❌ 密碼錯誤'); }
         };
-        container.appendChild(btn);
+        container.appendChild(correctBtn);
       }
     }
 
-    // ============ 球員視角更新 ============
+    // ============ 頒獎台與平手驟死賽 (還原 Canva AI) ============
+    function updatePodium() {
+      const maxWins = Math.max(championWins.A, championWins.B, championWins.C);
+      const winCounts = [championWins.A, championWins.B, championWins.C];
+      const uniqueWins = new Set(winCounts).size;
+
+      if (uniqueWins < 3 && maxWins >= 1 && winCounts.filter(w => w === maxWins).length > 1) {
+        showSuddenDeathScreen();
+        return;
+      }
+
+      const teams = ['A', 'B', 'C'].map(t => ({ name: `Team ${t}`, wins: championWins[t] })).sort((a, b) => b.wins - a.wins);
+      const podium1st = document.querySelector('.podium-box.first');
+      if (podium1st) { podium1st.style.visibility = 'hidden'; podium1st.style.opacity = '0'; }
+
+      document.getElementById('podium-2nd-name').textContent = teams[1].name; document.getElementById('podium-2nd-score').textContent = `${teams[1].wins} 局`;
+      document.getElementById('podium-3rd-name').textContent = teams[2].name; document.getElementById('podium-3rd-score').textContent = `${teams[2].wins} 局`;
+
+      const existingBtn = document.querySelector('.reveal-champion-btn'); if (existingBtn) existingBtn.remove();
+      const podiumContainer = document.getElementById('podium-container');
+      if (podiumContainer && podiumContainer.parentElement) {
+        const revealBtn = document.createElement('button');
+        revealBtn.className = 'reveal-champion-btn btn-primary';
+        revealBtn.style.cssText = `margin-top: 3rem; animation: pulse-glow 2s ease-in-out infinite; width: 100%; max-width: 500px; padding: 1.5rem 3rem; font-size: 1.5rem; font-weight: 900; border-radius: 16px; cursor: pointer; display: block; margin-left: auto; margin-right: auto; transition: all 0.3s ease;`;
+        revealBtn.textContent = '🎉 揭曉冠軍 🎉';
+        revealBtn.onmouseover = function() { this.style.transform = 'scale(1.05)'; }; revealBtn.onmouseout = function() { this.style.transform = 'scale(1)'; };
+        revealBtn.onclick = () => revealChampion(teams[0], revealBtn);
+        podiumContainer.parentElement.appendChild(revealBtn);
+      }
+    }
+
+    function showSuddenDeathScreen() {
+      const podiumContainer = document.getElementById('podium-container');
+      if (!podiumContainer) return;
+      podiumContainer.innerHTML = `
+        <div style="text-align: center; animation: slideInUp 0.8s ease-out; width: 100%; padding: 3rem 2rem;">
+          <div style="font-size: 5rem; margin-bottom: 1rem; animation: blink 1s ease-in-out infinite;">🚨</div>
+          <h1 style="font-size: 3.5rem; font-weight: 900; color: #FF4444; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255, 68, 68, 0.8); animation: pulse-glow 1.5s ease-in-out infinite;">🚨 吃分驟死賽 🚨</h1>
+          <div style="font-size: 1.5rem; color: #FFD700; margin-bottom: 2rem; font-weight: 600;">積分相同！進入最後對決！</div>
+          <div id="sudden-death-btns" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('A')">🏆 Team A 獲勝</button>
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('B')">🏆 Team B 獲勝</button>
+            <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;" onclick="selectChampion('C')">🏆 Team C 獲勝</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectChampion(team) {
+      if (userRole !== 'staff') return;
+      championWins[team] += 1;
+      const teams = ['A', 'B', 'C'].map(t => ({ name: `Team ${t}`, wins: championWins[t] })).sort((a, b) => b.wins - a.wins);
+      const podiumContainer = document.getElementById('podium-container');
+      podiumContainer.innerHTML = `
+        <div class="podium-column"><div class="podium-box second animate-podium-rise" style="animation-delay: 0.2s"><div class="podium-rank">🥈</div><div class="podium-name">${teams[1].name}</div><div class="podium-score">${teams[1].wins} 局</div></div></div>
+        <div class="podium-column"><div class="podium-box first" style="visibility: visible; opacity: 1; animation: slideInUp 0.8s ease-out;"><div class="podium-rank">🥇</div><div class="podium-name">${teams[0].name}</div><div class="podium-score">${teams[0].wins} 局</div></div></div>
+        <div class="podium-column"><div class="podium-box third animate-podium-rise" style="animation-delay: 0.4s"><div class="podium-rank">🥉</div><div class="podium-name">${teams[2].name}</div><div class="podium-score">${teams[2].wins} 局</div></div></div>
+      `;
+      createConfetti(); updatePlayerViewDisplay(); saveGameData();
+    }
+
+    function revealChampion(champion, btn) {
+      if (btn) btn.style.display = 'none';
+      const podium1st = document.querySelector('.podium-box.first');
+      if (podium1st) {
+        podium1st.style.visibility = 'visible'; podium1st.style.opacity = '1';
+        podium1st.style.transition = 'all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        podium1st.style.animation = 'slideInUp 0.8s ease-out';
+      }
+      document.getElementById('podium-1st-name').textContent = champion.name;
+      document.getElementById('podium-1st-score').textContent = `${champion.wins} 局`;
+      setTimeout(() => createConfetti(), 300); updatePlayerViewDisplay();
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div'); confetti.className = 'confetti animate-confetti-fall';
+        confetti.style.left = Math.random() * 100 + '%'; confetti.style.backgroundColor = ['#FFD700', '#FFA500', '#FF69B4'][Math.floor(Math.random() * 3)];
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        document.body.appendChild(confetti); setTimeout(() => confetti.remove(), 3500);
+      }
+    }
+
+    // ============ 球員視角切換與動態更新 (還原 Canva AI) ============
+    function updateUIForRole() {
+      const badge = document.getElementById('readonly-badge');
+      const roleIcon = document.getElementById('role-icon'); const roleLabel = document.getElementById('role-label');
+      const nav = document.querySelector('nav'); const mainContent = document.querySelector('main');
+      const playerViewOverlay = document.getElementById('player-view-overlay');
+
+      if (userRole === 'staff') {
+        document.body.classList.remove('player-mode'); document.body.classList.add('staff-mode');
+        badge.classList.add('hidden'); roleIcon.textContent = '👨‍💻'; roleLabel.textContent = '工作人員';
+        if (nav) nav.style.display = '';
+        if (playerViewOverlay) { playerViewOverlay.classList.add('hidden'); playerViewOverlay.style.display = 'none'; }
+        if (mainContent) mainContent.style.display = '';
+        const playerInfoIcon = document.querySelector('.player-info-icon'); if (playerInfoIcon) playerInfoIcon.remove();
+        document.querySelectorAll('input, button').forEach(el => { el.disabled = false; });
+      } else {
+        document.body.classList.remove('staff-mode'); document.body.classList.add('player-mode');
+        badge.classList.remove('hidden'); roleIcon.textContent = '🏀'; roleLabel.textContent = '球員';
+        if (nav) nav.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'none';
+        if (playerViewOverlay) { playerViewOverlay.classList.remove('hidden'); playerViewOverlay.style.display = 'flex'; }
+        addPlayerInfoIcon();
+        updatePlayerViewDisplay();
+      }
+    }
+
+    function addPlayerInfoIcon() {
+      if (document.querySelector('.player-info-icon')) return;
+      const iconContainer = document.createElement('div'); iconContainer.className = 'player-info-icon'; iconContainer.textContent = '❓'; iconContainer.setAttribute('data-tooltip', 'false');
+      let tooltipElement = null;
+      iconContainer.addEventListener('click', (e) => {
+        e.stopPropagation(); const showTooltip = iconContainer.getAttribute('data-tooltip') === 'false';
+        if (showTooltip && !tooltipElement) {
+          tooltipElement = document.createElement('div'); tooltipElement.className = 'player-info-tooltip';
+          tooltipElement.innerHTML = `👀 觀賽模式\n📡 數據實時雲端同步\n🔒 唯讀檢視 - 無法編輯\n📊 實時監看三大賽事進度`;
+          document.body.appendChild(tooltipElement); iconContainer.setAttribute('data-tooltip', 'true');
+        } else if (tooltipElement) { tooltipElement.remove(); tooltipElement = null; iconContainer.setAttribute('data-tooltip', 'false'); }
+      });
+      document.addEventListener('click', (e) => {
+        if (!iconContainer.contains(e.target) && tooltipElement) { tooltipElement.remove(); tooltipElement = null; iconContainer.setAttribute('data-tooltip', 'false'); }
+      });
+      document.body.appendChild(iconContainer);
+    }
+
     function updatePlayerViewDisplay() {
-      // 確保將球員端的所有資料刷新
       safeSet('player-dash-a-score', championWins.A);
       safeSet('player-dash-b-score', championWins.B);
       safeSet('player-dash-c-score', championWins.C);
-      
-      // 更新五五賽實時比分
+
       const matchups = { ab: ['A', 'B'], ac: ['A', 'C'], bc: ['B', 'C'] };
       const [t1, t2] = matchups[fiveVFiveState.currentMatchup];
       safeSet('player-fvf-team1-score', fiveVFiveState.team1Score);
       safeSet('player-fvf-team2-score', fiveVFiveState.team2Score);
-      safeSet('player-fvf-cumulative-a', gameData.fiveVFive.A || 0);
-      safeSet('player-fvf-cumulative-b', gameData.fiveVFive.B || 0);
-      safeSet('player-fvf-cumulative-c', gameData.fiveVFive.C || 0);
 
-      // 同步頒獎台
-      const teams = ['A', 'B', 'C'].map(t => ({ name: `Team ${t}`, wins: championWins[t] })).sort((a, b) => b.wins - a.wins);
-      safeSet('player-podium-1st-name', teams[0].name); safeSet('player-podium-1st-score', `${teams[0].wins} 局`);
-      safeSet('player-podium-2nd-name', teams[1].name); safeSet('player-podium-2nd-score', `${teams[1].wins} 局`);
-      safeSet('player-podium-3rd-name', teams[2].name); safeSet('player-podium-3rd-score', `${teams[2].wins} 局`);
-      
-      const podium1st = document.querySelector('#player-podium-container .podium-box.first');
-      if (podium1st && finalizationState.fiveVFiveFinalized) {
-          podium1st.style.visibility = 'visible'; podium1st.style.opacity = '1';
+      if (activeStep === 4 && finalizationState.fiveVFiveFinalized) {
+        updatePlayerPodiumDisplay();
+      }
+      updatePlayerDetailsDisplay();
+    }
+
+    function updatePlayerPodiumDisplay() {
+      const maxWins = Math.max(championWins.A, championWins.B, championWins.C);
+      const winCounts = [championWins.A, championWins.B, championWins.C];
+      const uniqueWins = new Set(winCounts).size;
+
+      if (uniqueWins < 3 && maxWins >= 1 && winCounts.filter(w => w === maxWins).length > 1) {
+        const winnerSection = document.getElementById('player-winner-section');
+        if (winnerSection) {
+          winnerSection.style.borderColor = '#FF4444'; winnerSection.style.background = 'linear-gradient(135deg, rgba(255, 68, 68, 0.2) 0%, rgba(255, 68, 68, 0.05) 100%)';
+          winnerSection.innerHTML = `<div style="font-size: 3rem; margin-bottom: 1rem; animation: blink 1s ease-in-out infinite;">🚨</div><div style="font-size: 2rem; font-weight: 900; color: #FF4444; text-shadow: 0 0 20px rgba(255, 68, 68, 0.8);">🚨 吃分驟死賽 🚨</div><div style="font-size: 1.2rem; color: #FFD700; margin-top: 1rem;">各隊積分相同！進入最後對決！</div>`;
+        }
+      } else {
+        const teams = ['A', 'B', 'C'].map(t => ({ name: t, wins: championWins[t] })).sort((a, b) => b.wins - a.wins);
+        const winnerSection = document.getElementById('player-winner-section');
+        if (winnerSection) {
+          winnerSection.style.borderColor = '#FFD700'; winnerSection.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%)';
+          winnerSection.innerHTML = `<div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div><div style="font-size: 2.5rem; font-weight: 900; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); margin-bottom: 1rem;">最終排名</div><div style="font-size: 1.5rem; color: #FFD700; margin-bottom: 0.5rem;">🥇 Team ${teams[0].name} - ${teams[0].wins} 局</div><div style="font-size: 1.3rem; color: rgba(255, 215, 0, 0.8); margin-bottom: 0.5rem;">🥈 Team ${teams[1].name} - ${teams[1].wins} 局</div><div style="font-size: 1.3rem; color: rgba(255, 215, 0, 0.8);">🥉 Team ${teams[2].name} - ${teams[2].wins} 局</div>`;
+        }
       }
     }
 
-    // ============ 初始化 ============
-    document.addEventListener('DOMContentLoaded', () => {
-      // 啟動 Firebase 實時同步
-      initRealtimeSync();
+    function updatePlayerDetailsDisplay() {
+      const detailsSection = document.getElementById('player-details-section'); const detailsContent = document.getElementById('player-details-content');
+      if (!detailsContent) return;
+      let html = '';
 
-      // 身分選擇按鈕綁定 (強制通關)
+      // 趣味競賽成績表
+      if (activeStep >= 1) {
+        detailsSection.style.display = 'block';
+        html += `<div style="margin-bottom: 1.5rem;"><div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem;">🎲 趣味競賽成績</div><table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;"><tr style="background: rgba(255, 215, 0, 0.1); border-bottom: 1px solid rgba(255, 215, 0, 0.2);"><th style="padding: 0.75rem; text-align: left; color: #FFD700;">隊伍</th><th style="padding: 0.75rem; text-align: center; color: #FFD700;">第一輪</th><th style="padding: 0.75rem; text-align: center; color: #FFD700;">第二輪</th><th style="padding: 0.75rem; text-align: center; color: #FFD700;">總時間</th></tr>${['A', 'B', 'C'].map(team => { const r1 = gameData.dice[team][0]; const r2 = gameData.dice[team][1]; const total = (r1 || 0) + (r2 || 0); return `<tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);"><td style="padding: 0.75rem; color: rgba(255,255,255,0.8);">Team ${team}</td><td style="padding: 0.75rem; text-align: center; color: #FFD700; font-family: 'Space Grotesk', monospace;">${r1 !== null ? formatTime(r1) : '--:--.-'}</td><td style="padding: 0.75rem; text-align: center; color: #FFD700; font-family: 'Space Grotesk', monospace;">${r2 !== null ? formatTime(r2) : '--:--.-'}</td><td style="padding: 0.75rem; text-align: center; color: #22c55e; font-weight: 700; font-family: 'Space Grotesk', monospace;">${total > 0 ? formatTime(total) : '--:--.-'}</td></tr>`; }).join('')}</table></div>`;
+      }
+
+      // 三分磚頭王成績表
+      if (activeStep >= 2) {
+        html += `<div style="margin-bottom: 1.5rem;"><div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem;">🧱 三分磚頭王成績</div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); padding: 1rem; border-radius: 8px;"><div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.5rem;">小組賽</div>${['A', 'B', 'C'].map(team => `<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;"><span style="color: rgba(255,255,255,0.7);">Team ${team}</span><span style="color: #FFD700; font-weight: 600; font-family: 'Space Grotesk', monospace;">${gameData.threePoint.round1[team].total || 0} 分</span></div>`).join('')}</div>${gameData.threePointWinner ? `<div style="background: rgba(255, 215, 0, 0.1); border: 2px solid #FFD700; padding: 1rem; border-radius: 8px;"><div style="font-weight: 600; color: #FFD700; margin-bottom: 0.5rem;">決賽冠軍</div><div style="font-size: 1.2rem; color: #FFD700; font-weight: 900; margin-bottom: 0.5rem;">🏆 Team ${gameData.threePointWinner}</div><div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">得分: <span style="color: #FFD700; font-weight: 600; font-family: 'Space Grotesk', monospace;">${gameData.threePoint.finals.teams[gameData.threePointWinner]?.total || 0} 分</span></div></div>` : ''}</div></div>`;
+      }
+
+      // 五五賽全場累積
+      if (activeStep >= 3) {
+        html += `<div><div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem;">⚔️ 五五賽全場累積</div><div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;"><div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.75rem;">Team A</div><div style="font-size: 2.5rem; color: #3b82f6; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.A || 0}</div></div><div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #ef4444; margin-bottom: 0.75rem;">Team B</div><div style="font-size: 2.5rem; color: #ef4444; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.B || 0}</div></div><div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #22c55e; margin-bottom: 0.75rem;">Team C</div><div style="font-size: 2.5rem; color: #22c55e; font-weight: 900; font-family: 'Space Grotesk', monospace;">${gameData.fiveVFive.C || 0}</div></div></div></div>`;
+      }
+
+      if (html) { detailsContent.innerHTML = html; detailsSection.style.display = 'block'; }
+    }
+
+    // ============ 初始化與綁定 ============
+    document.addEventListener('DOMContentLoaded', () => {
+      
       const staffBtn = document.getElementById('role-staff');
       const playerBtn = document.getElementById('role-player');
-      if (staffBtn) staffBtn.onclick = (e) => { e.preventDefault(); forceEnterSystem('staff'); };
-      if (playerBtn) playerBtn.onclick = (e) => { e.preventDefault(); forceEnterSystem('player'); };
+      
+      if (staffBtn) {
+        staffBtn.addEventListener('click', function(e) {
+          e.preventDefault(); e.stopPropagation();
+          userRole = 'staff';
+          forceHideRoleOverlay();
+          updateUIForRole();
+          setTimeout(() => { const firstTab = document.querySelector('.nav-tab[data-page="0"]'); if (firstTab) firstTab.click(); }, 100);
+        });
+      }
 
-      // 其他事件綁定
-      document.getElementById('role-toggle').addEventListener('click', () => {
-        forceEnterSystem(userRole === 'staff' ? 'player' : 'staff');
+      if (playerBtn) {
+        playerBtn.addEventListener('click', function(e) {
+          e.preventDefault(); e.stopPropagation();
+          userRole = 'player';
+          forceHideRoleOverlay();
+          updateUIForRole();
+          setTimeout(() => { const firstTab = document.querySelector('.player-nav-tab[data-page="0"]'); if (firstTab) firstTab.click(); }, 100);
+        });
+      }
+
+      document.getElementById('role-toggle')?.addEventListener('click', () => {
+        userRole = userRole === 'staff' ? 'player' : 'staff'; updateUIForRole();
       });
-      document.getElementById('player-switch-to-staff').addEventListener('click', () => {
-        forceEnterSystem('staff');
+      document.getElementById('player-switch-to-staff')?.addEventListener('click', () => {
+        userRole = 'staff'; updateUIForRole();
       });
 
-      // 導覽列綁定
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => {
           if (userRole === 'player') return;
           const page = parseInt(tab.dataset.page);
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active');
           document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page')); document.getElementById(`page-${page}`).classList.remove('hidden-page');
+          if (page === 4) updatePodium();
         });
       });
 
@@ -1479,29 +1447,33 @@
         });
       });
 
-      // 賽事操作按鈕綁定
-      document.getElementById('dice-start-btn').addEventListener('click', startTimer);
-      document.getElementById('dice-stop-btn').addEventListener('click', stopTimer);
-      document.getElementById('dice-roll-btn').addEventListener('click', rollDice);
-      document.getElementById('dice-next-team-btn').addEventListener('click', nextDiceTeam);
-      document.getElementById('dice-start-round2-btn').addEventListener('click', startRound2);
-      document.getElementById('dice-finalize-btn').addEventListener('click', calculateDiceRanking);
+      // 賽事綁定
+      document.getElementById('dice-start-btn')?.addEventListener('click', startTimer);
+      document.getElementById('dice-stop-btn')?.addEventListener('click', stopTimer);
+      document.getElementById('dice-roll-btn')?.addEventListener('click', rollDice);
+      document.getElementById('dice-next-team-btn')?.addEventListener('click', nextDiceTeam);
+      document.getElementById('dice-start-round2-btn')?.addEventListener('click', startRound2);
+      document.getElementById('dice-finalize-btn')?.addEventListener('click', calculateDiceRanking);
 
-      document.getElementById('threepoint-round1-btn').addEventListener('click', finalizeRound1);
-      document.getElementById('threepoint-finals-btn').addEventListener('click', finalizeFinals);
+      document.getElementById('threepoint-round1-btn')?.addEventListener('click', finalizeRound1);
+      document.getElementById('threepoint-finals-btn')?.addEventListener('click', finalizeFinals);
 
       document.querySelectorAll('.five-v-five-matchup').forEach(btn => {
         btn.addEventListener('click', () => {
+          if (userRole !== 'staff') return;
           document.querySelectorAll('.five-v-five-matchup').forEach(b => b.classList.remove('active')); btn.classList.add('active');
           fiveVFiveState.currentMatchup = btn.dataset.match;
           updateFiveVFiveUI(); saveGameData();
         });
       });
+      
       document.querySelectorAll('.fvf-btn').forEach(btn => {
         btn.addEventListener('click', () => addFiveVFiveScore(btn.dataset.team, btn.dataset.points));
       });
-      document.getElementById('fvf-finalize-btn').addEventListener('click', finalizeMatch);
+      document.getElementById('fvf-finalize-btn')?.addEventListener('click', finalizeMatch);
 
+      // 啟動 Firebase
+      setupFirebaseListener();
       initThreePointInputs();
     });
   </script>
