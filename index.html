@@ -668,58 +668,47 @@
       if (el) el.textContent = text;
     }
 
-    // ============ 強制隱藏遮罩層函數 ============
     function forceHideRoleOverlay() {
       const overlay = document.getElementById('role-overlay');
       if (overlay) {
         overlay.style.setProperty('display', 'none', 'important');
-        overlay.style.setProperty('opacity', '0', 'important');
-        overlay.style.setProperty('pointer-events', 'none', 'important');
         overlay.style.setProperty('visibility', 'hidden', 'important');
       }
     }
 
-    // ============ 狀態宣告 ============
+    // ============ 全域狀態與 Firebase ============
     let userRole = 'player';
+    let activeStep = 0;
+    const diceTeams = ['A', 'B', 'C'];
+    let currentDiceTeamIndex = 0;
+    let diceRound = 1;
+    let isTimerRunning = false;
     let timerInterval = null;
     let timerStartTime = 0;
     let timerElapsedMs = 0;
-    let isTimerRunning = false;
-    let currentDiceTeamIndex = 0;
-    let diceRound = 1;
-    const diceTeams = ['A', 'B', 'C'];
-    let diceRound1Complete = false;
-    let activeStep = 0;
-    let winnerState = { dice: null, threePoint: null, fiveVFive: null };
-    let announcementVisible = false;
-    let matchWinners = { dice: null, threePoint: null, fiveVFive: null };
-    let championWins = { A: 0, B: 0, C: 0 };
     
-    // 五五賽進階狀態
-    let fiveVFiveState = {
-      currentMatchup: 'ab', team1: 'A', team2: 'B', team1Score: 0, team2Score: 0, 
-      half: 1, timerRunning: false, timerInterval: null,
-      firstHalfTime: 600, secondHalfTime: 600 // 預設 10 分鐘 (600秒)
-    };
-
+    let championWins = { A: 0, B: 0, C: 0 };
+    let matchWinners = { dice: null, threePoint: null, fiveVFive: null };
     let finalizationState = { diceFinalized: false, threePointFinalized: false, fiveVFiveFinalized: false };
-    const teamStatus = { A: '準備就緒', B: '準備就緒', C: '準備就緒' };
+
+    // ? 五五賽獨立狀態包 (徹底解決計時器干擾問題)
+    let fiveVFiveMatches = {
+      ab: { team1Score: 0, team2Score: 0, half: 1, firstHalfTime: 600, secondHalfTime: 600 },
+      ac: { team1Score: 0, team2Score: 0, half: 1, firstHalfTime: 600, secondHalfTime: 600 },
+      bc: { team1Score: 0, team2Score: 0, half: 1, firstHalfTime: 600, secondHalfTime: 600 }
+    };
+    let fvfCurrentMatch = 'ab';
+    let fvfTimerInterval = null;
+    let isFvfTimerRunning = false;
 
     const gameData = {
-      teams: { A: { score: 0 }, B: { score: 0 }, C: { score: 0 } },
-      dice: { A: [null, null], B: [null, null], C: [null, null], details: { A: [], B: [], C: [] } },
-      diceWinner: null,
-      threePoint: { 
-        round1: { A: {players: Array(10).fill(0), total: 0}, B: {players: Array(10).fill(0), total: 0}, C: {players: Array(10).fill(0), total: 0} },
-        finals: { qualified: [], teams: {} }
-      },
-      threePointWinner: null,
+      dice: { A: [null, null], B: [null, null], C: [null, null] },
+      threePoint: { round1: { A: {total: 0}, B: {total: 0}, C: {total: 0} }, finals: { qualified: [], teams: {} } },
       fiveVFive: { A: 0, B: 0, C: 0 }
     };
 
     const diceActions = { 1: '右手上籃', 2: '左手上籃', 3: '三分出手', 4: '騎馬射箭', 5: '轉五圈投籃', 6: '波比跳' };
 
-    // ============ Firebase 實時同步 ============
     const firebaseConfig = {
       apiKey: "AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",
       authDomain: "basketball-2026.firebaseapp.com",
@@ -732,67 +721,58 @@
 
     let firebaseReady = false;
     try {
-      if (firebase && firebase.apps && firebase.apps.length === 0) {
+      if (firebase && firebase.apps.length === 0) {
         firebase.initializeApp(firebaseConfig);
         firebaseReady = true;
       }
-    } catch (err) { console.warn('Firebase 錯誤', err); }
+    } catch (err) { console.warn('Firebase 錯誤'); }
 
     function syncToFirebase() {
       if (!firebaseReady || userRole !== 'staff') return;
-      try {
-        const db = firebase.database();
-        const syncData = { gameData, activeStep, championWins, matchWinners, fiveVFiveState, winnerState, finalizationState, teamStatus };
-        db.ref('yingmei2026').set(syncData);
-      } catch (err) {}
+      const db = firebase.database();
+      const syncData = { gameData, activeStep, championWins, matchWinners, fiveVFiveMatches, fvfCurrentMatch, finalizationState };
+      db.ref('yingmei2026').set(syncData).catch(()=>{});
     }
 
     function setupFirebaseListener() {
       if (!firebaseReady) return;
-      try {
-        const db = firebase.database();
-        db.ref('yingmei2026').on('value', (snapshot) => {
-          const remoteData = snapshot.val();
-          if (remoteData) {
-            if (remoteData.gameData) Object.assign(gameData, remoteData.gameData);
-            if (remoteData.activeStep !== undefined) activeStep = remoteData.activeStep;
-            if (remoteData.championWins) Object.assign(championWins, remoteData.championWins);
-            if (remoteData.matchWinners) Object.assign(matchWinners, remoteData.matchWinners);
-            if (remoteData.fiveVFiveState) Object.assign(fiveVFiveState, remoteData.fiveVFiveState);
-            if (remoteData.finalizationState) Object.assign(finalizationState, remoteData.finalizationState);
+      firebase.database().ref('yingmei2026').on('value', (snapshot) => {
+        const remoteData = snapshot.val();
+        if (remoteData) {
+          Object.assign(gameData, remoteData.gameData || {});
+          activeStep = remoteData.activeStep || 0;
+          Object.assign(championWins, remoteData.championWins || {});
+          Object.assign(matchWinners, remoteData.matchWinners || {});
+          Object.assign(fiveVFiveMatches, remoteData.fiveVFiveMatches || fiveVFiveMatches);
+          fvfCurrentMatch = remoteData.fvfCurrentMatch || 'ab';
+          Object.assign(finalizationState, remoteData.finalizationState || {});
 
-            updateProgressIndicators();
-            updateDashboardScores();
-            updateDiceRecords(); // 確保紀錄更新
-            
-            if (userRole === 'player') {
-              updatePlayerViewDisplay();
-              updatePlayerDetailsDisplay();
-            } else {
-              updateFiveVFiveUI();
-            }
-
-            if (finalizationState.diceFinalized) lockDiceInputs();
-            if (finalizationState.threePointFinalized) lockThreePointInputs();
-            if (finalizationState.fiveVFiveFinalized) lockFiveVFiveInputs();
+          updateProgressIndicators();
+          updateDashboardScores();
+          updateDiceRecords();
+          
+          if (userRole === 'player') {
+            updatePlayerViewDisplay();
+          } else {
+            updateFiveVFiveUI(); // 確保工作人員畫面也更新
           }
-        });
-      } catch (err) {}
+        }
+      });
     }
 
     function saveGameData() {
       if (userRole !== 'staff') return;
-      localStorage.setItem('basketballGameData', JSON.stringify(gameData));
       syncToFirebase();
     }
 
-    // ============ UI & Format ============
-    function formatTime(milliseconds) {
-      const totalSeconds = Math.floor(milliseconds / 1000);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      const ms = Math.floor((milliseconds % 1000) / 100);
-      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${ms}`;
+    // ============ 工具與格式化 ============
+    function formatTime(ms) {
+      if (ms === null || ms === undefined) return '--:--.-';
+      const totalSeconds = Math.floor(ms / 1000);
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      const milli = Math.floor((ms % 1000) / 100);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${milli}`;
     }
 
     function setActiveStep(step) {
@@ -800,112 +780,115 @@
     }
 
     function updateProgressIndicators() {
+      // 保持原有邏輯
       document.querySelectorAll('.dashboard-item').forEach((item, idx) => {
         const badge = item.querySelector('.status-badge');
         if (!badge) return;
-        badge.className = 'status-badge mt-2 mx-auto w-fit';
         item.classList.remove('active', 'completed');
-        if (idx < activeStep) { badge.classList.add('status-completed'); badge.innerHTML = '✅ 已完成'; item.classList.add('completed'); } 
-        else if (idx === activeStep && activeStep > 0) { badge.classList.add('status-active'); badge.innerHTML = '🔥 進行中'; item.classList.add('active'); } 
+        badge.className = 'status-badge mt-2 mx-auto w-fit';
+        if (idx < activeStep) { badge.classList.add('status-completed'); badge.innerHTML = '✅ 已完成'; }
+        else if (idx === activeStep && activeStep > 0) { badge.classList.add('status-active'); badge.innerHTML = '🔥 進行中'; }
         else { badge.classList.add('status-pending'); badge.innerHTML = '未開始'; }
       });
     }
 
-    // ============ 🎲 趣味競賽邏輯 (已修復雙端同步) ============
+    function updateDashboardScores() {
+      safeSet('dash-a-score', championWins.A); safeSet('dash-b-score', championWins.B); safeSet('dash-c-score', championWins.C);
+    }
+
+    // ============ 🎲 趣味競賽邏輯 (已強化防呆) ============
     function startTimer() {
       if (userRole !== 'staff' || isTimerRunning) return;
       setActiveStep(1); isTimerRunning = true; timerStartTime = Date.now() - timerElapsedMs;
       document.getElementById('dice-start-btn').disabled = true; document.getElementById('dice-stop-btn').disabled = false;
       timerInterval = setInterval(() => {
         timerElapsedMs = Date.now() - timerStartTime;
-        document.getElementById('dice-timer').textContent = formatTime(timerElapsedMs);
+        safeSet('dice-timer', formatTime(timerElapsedMs));
       }, 50);
     }
 
     function stopTimer() {
       if (userRole !== 'staff' || !isTimerRunning) return;
       isTimerRunning = false; clearInterval(timerInterval);
-      const currentTeam = diceTeams[currentDiceTeamIndex];
-      gameData.dice[currentTeam][diceRound - 1] = timerElapsedMs;
-      
+      const team = diceTeams[currentDiceTeamIndex];
+      gameData.dice[team][diceRound - 1] = timerElapsedMs;
       document.getElementById('dice-start-btn').disabled = false; document.getElementById('dice-stop-btn').disabled = true;
       updateDiceRecords(); saveGameData();
     }
 
-    function resetTimer() {
-      isTimerRunning = false; clearInterval(timerInterval); timerElapsedMs = 0;
-      safeSet('dice-timer', '00:00.0');
-      document.getElementById('dice-start-btn').disabled = false; document.getElementById('dice-stop-btn').disabled = true;
-    }
-
     function rollDice() {
       if (userRole !== 'staff') return;
-      const result = Math.floor(Math.random() * 6) + 1;
-      const diceDisplay = document.getElementById('dice-display');
-      diceDisplay.classList.remove('animate-dice-roll'); void diceDisplay.offsetWidth; diceDisplay.classList.add('animate-dice-roll');
-      setTimeout(() => { diceDisplay.textContent = result; safeSet('dice-action', `🎯 ${diceActions[result]}`); }, 600);
+      const res = Math.floor(Math.random() * 6) + 1;
+      const display = document.getElementById('dice-display');
+      display.classList.remove('animate-dice-roll'); void display.offsetWidth; display.classList.add('animate-dice-roll');
+      setTimeout(() => { display.textContent = res; safeSet('dice-action', `🎯 ${diceActions[res]}`); }, 600);
     }
 
     function updateDiceRecords() {
       ['A', 'B', 'C'].forEach(team => {
         const r1 = gameData.dice[team][0]; const r2 = gameData.dice[team][1];
+        const total = (r1 !== null && r2 !== null) ? r1 + r2 : null;
         const t = team.toLowerCase();
-        const total = (r1 !== null && r2 !== null) ? (r1 + r2) : null;
-        
-        // 工作人員端
-        safeSet(`${t}-r1`, r1 !== null ? formatTime(r1) : '--:--.-');
-        safeSet(`${t}-r2`, r2 !== null ? formatTime(r2) : '--:--.-');
-        safeSet(`${t}-total`, total !== null ? formatTime(total) : '--:--.-');
-        
-        // 球員端 (精準修復無法同步顯示的問題)
-        safeSet(`player-${t}-r1`, r1 !== null ? formatTime(r1) : '--:--.-');
-        safeSet(`player-${t}-r2`, r2 !== null ? formatTime(r2) : '--:--.-');
-        safeSet(`player-${t}-total`, total !== null ? formatTime(total) : '--:--.-');
+        safeSet(`${t}-r1`, formatTime(r1)); safeSet(`${t}-r2`, formatTime(r2)); safeSet(`${t}-total`, formatTime(total));
+        safeSet(`player-${t}-r1`, formatTime(r1)); safeSet(`player-${t}-r2`, formatTime(r2)); safeSet(`player-${t}-total`, formatTime(total));
       });
     }
 
-    function updateDiceUI() {
-      const currentTeam = diceTeams[currentDiceTeamIndex];
-      safeSet('dice-team', currentTeam); safeSet('dice-round-label', `第${diceRound}輪：${currentTeam}`); safeSet('dice-team-progress', `${currentDiceTeamIndex + 1}/3`);
-      resetTimer();
-    }
-
     function nextDiceTeam() {
-      if (userRole !== 'staff') return;
       if (isTimerRunning) stopTimer();
       currentDiceTeamIndex++;
       if (currentDiceTeamIndex >= 3) {
         if (diceRound === 1) {
-          document.getElementById('dice-next-team-btn').classList.add('hidden'); document.getElementById('dice-start-round2-btn').classList.remove('hidden'); safeSet('dice-status', '第一輪完成');
+          document.getElementById('dice-next-team-btn').classList.add('hidden');
+          document.getElementById('dice-start-round2-btn').classList.remove('hidden');
+          safeSet('dice-status', '第一輪完成');
         } else {
-          document.getElementById('dice-next-team-btn').classList.add('hidden'); document.getElementById('dice-finalize-btn').classList.remove('hidden'); safeSet('dice-status', '第二輪完成');
-          calculateDiceRanking();
+          document.getElementById('dice-next-team-btn').classList.add('hidden');
+          document.getElementById('dice-finalize-btn').classList.remove('hidden');
+          safeSet('dice-status', '第二輪完成');
         }
         return;
       }
       updateDiceUI();
     }
 
+    function updateDiceUI() {
+      timerElapsedMs = 0; safeSet('dice-timer', '00:00.0');
+      safeSet('dice-team', diceTeams[currentDiceTeamIndex]);
+      safeSet('dice-round-label', `第${diceRound}輪：${diceTeams[currentDiceTeamIndex]}`);
+    }
+
     function startRound2() {
-      if (userRole !== 'staff') return;
-      diceRound = 2; currentDiceTeamIndex = 0;
-      document.getElementById('dice-start-round2-btn').classList.add('hidden'); document.getElementById('dice-next-team-btn').classList.remove('hidden'); safeSet('dice-status', '進行中');
-      updateDiceUI();
+      diceRound = 2; currentDiceTeamIndex = 0; updateDiceUI();
+      document.getElementById('dice-start-round2-btn').classList.add('hidden');
+      document.getElementById('dice-next-team-btn').classList.remove('hidden');
+      safeSet('dice-status', '進行中');
     }
 
     function calculateDiceRanking() {
       if (finalizationState.diceFinalized) return;
-      const times = ['A', 'B', 'C'].map(team => ({ team, time: (gameData.dice[team][0] || 0) + (gameData.dice[team][1] || 0) })).filter(t => t.time > 0).sort((a, b) => a.time - b.time);
-      if(times.length > 0){
-          const winner = times[0];
-          gameData.diceWinner = winner.team; matchWinners.dice = winner.team; championWins[winner.team] += 1;
-          updateDashboardScores(); setActiveStep(2);
-          finalizationState.diceFinalized = true; lockDiceInputs(); updateDiceFinalizeBtnStatus();
-          saveGameData(); alert(`趣味競賽結束！冠軍：Team ${winner.team}`);
+      // 防呆：確認是否三隊都有總成績
+      const times = ['A', 'B', 'C'].map(team => {
+        const r1 = gameData.dice[team][0]; const r2 = gameData.dice[team][1];
+        return { team, time: (r1 !== null && r2 !== null) ? r1 + r2 : 0 };
+      }).filter(t => t.time > 0).sort((a, b) => a.time - b.time);
+
+      if (times.length < 3) {
+        alert('⚠️ 錯誤：有隊伍尚未完成兩輪計時，無法結算！'); return;
+      }
+      
+      if (confirm('確定要結算趣味競賽成績嗎？結算後將無法修改。')) {
+        const winner = times[0];
+        matchWinners.dice = winner.team; championWins[winner.team] += 1;
+        finalizationState.diceFinalized = true;
+        setActiveStep(2); saveGameData();
+        alert(`🏆 趣味競賽結算成功！冠軍：Team ${winner.team}`);
+        document.getElementById('dice-finalize-btn').textContent = '🔒 已結算';
+        document.getElementById('dice-finalize-btn').disabled = true;
       }
     }
 
-    // ============ 🧱 三分球邏輯 (已修復報錯死機) ============
+    // ============ 🧱 三分球邏輯 (修復結算死機) ============
     function initThreePointInputs() {
       ['A', 'B', 'C'].forEach(team => {
         const container = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`);
@@ -914,280 +897,249 @@
           const input = document.createElement('input');
           input.type = 'number'; input.className = 'threepoint-input input-base text-center'; input.placeholder = i; input.min = '0';
           input.addEventListener('input', function() {
-            const val = parseInt(this.value) || 0;
-            if (!gameData.threePoint.round1[team]) gameData.threePoint.round1[team] = { players: Array(10).fill(0), total: 0 };
-            gameData.threePoint.round1[team].players[i - 1] = val;
-            updateThreePointTotal(team); saveGameData();
+            if (!gameData.threePoint.round1[team]) gameData.threePoint.round1[team] = { players: [], total: 0 };
+            gameData.threePoint.round1[team].players[i-1] = parseInt(this.value) || 0;
+            const total = gameData.threePoint.round1[team].players.reduce((a,b)=>a+b, 0);
+            gameData.threePoint.round1[team].total = total;
+            safeSet(`threepoint-${team.toLowerCase()}-total`, total);
+            saveGameData();
           });
           container.appendChild(input);
         }
       });
     }
 
-    function updateThreePointTotal(team) {
-      const total = gameData.threePoint.round1[team].players.reduce((sum, val) => sum + (val || 0), 0);
-      gameData.threePoint.round1[team].total = total;
-      safeSet(`threepoint-${team.toLowerCase()}-total`, total);
-    }
-
     function finalizeRound1() {
       if (userRole !== 'staff') return;
-      ['A', 'B', 'C'].forEach(team => updateThreePointTotal(team));
-      const scores = ['A', 'B', 'C'].map(team => ({ team, score: gameData.threePoint.round1[team].total })).sort((a, b) => b.score - a.score);
+      if (!confirm('確定結算小組賽進入決賽嗎？')) return;
+
+      const scores = ['A', 'B', 'C'].map(team => ({ team, score: gameData.threePoint.round1[team]?.total || 0 })).sort((a, b) => b.score - a.score);
       gameData.threePoint.finals.qualified = [scores[0].team, scores[1].team];
       
-      // 修復：安全的 DOM 尋找法，防止 Tailwind class 更改導致報錯
-      ['A', 'B', 'C'].forEach(team => {
-        const inputContainer = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`);
-        if (inputContainer && inputContainer.parentElement) {
-            const card = inputContainer.parentElement;
+      // 極度安全的視覺切換
+      try {
+        ['A', 'B', 'C'].forEach(team => {
+          const el = document.getElementById(`threepoint-${team.toLowerCase()}-inputs`);
+          if (el && el.parentElement) {
             if (scores[2].team === team) {
-              card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; card.style.filter = 'grayscale(80%)';
-            } else { 
-              card.classList.add('qualified'); 
+              el.parentElement.style.opacity = '0.3';
+              el.parentElement.style.pointerEvents = 'none';
             }
-        }
-      });
-      
-      document.getElementById('threepoint-round1').classList.add('hidden'); document.getElementById('threepoint-finals').classList.remove('hidden');
-      safeSet('threepoint-phase', '決賽（最終對決）');
-      document.getElementById('threepoint-round1-btn').classList.add('hidden'); document.getElementById('threepoint-finals-btn').classList.remove('hidden');
-      initFinalsInputs(scores[0].team, scores[1].team); saveGameData();
+          }
+        });
+        document.getElementById('threepoint-round1').classList.add('hidden');
+        document.getElementById('threepoint-finals').classList.remove('hidden');
+        document.getElementById('threepoint-round1-btn').classList.add('hidden');
+        document.getElementById('threepoint-finals-btn').classList.remove('hidden');
+        
+        initFinalsInputs(scores[0].team, scores[1].team);
+        saveGameData();
+      } catch (e) {
+        console.error('UI 切換失敗，但數據已儲存', e);
+      }
     }
 
     function initFinalsInputs(team1, team2) {
       safeSet('finals-team1-name', `Team ${team1}`); safeSet('finals-team2-name', `Team ${team2}`);
-      const container1 = document.getElementById('finals-team1-inputs'); const container2 = document.getElementById('finals-team2-inputs');
-      if(container1) container1.innerHTML = ''; if(container2) container2.innerHTML = '';
+      const c1 = document.getElementById('finals-team1-inputs'); const c2 = document.getElementById('finals-team2-inputs');
+      if (c1) c1.innerHTML = ''; if (c2) c2.innerHTML = '';
+      
       for (let i = 1; i <= 10; i++) {
-        const createInput = (team) => {
-          const input = document.createElement('input'); input.type = 'number'; input.className = 'threepoint-finals-input input-base text-center'; input.placeholder = i; input.min = '0';
-          input.addEventListener('input', function() {
-            const val = parseInt(this.value) || 0;
-            if (!gameData.threePoint.finals.teams[team]) gameData.threePoint.finals.teams[team] = { players: Array(10).fill(0), total: 0 };
-            gameData.threePoint.finals.teams[team].players[i - 1] = val;
-            const total = gameData.threePoint.finals.teams[team].players.reduce((sum, v) => sum + (v || 0), 0);
-            gameData.threePoint.finals.teams[team].total = total;
-            safeSet(`finals-team${team === team1 ? '1' : '2'}-total`, total);
+        const createInp = (t) => {
+          const inp = document.createElement('input'); inp.type = 'number'; inp.className = 'input-base text-center'; inp.placeholder = i; inp.min = '0';
+          inp.addEventListener('input', function() {
+            if (!gameData.threePoint.finals.teams[t]) gameData.threePoint.finals.teams[t] = { players: [], total: 0 };
+            gameData.threePoint.finals.teams[t].players[i-1] = parseInt(this.value) || 0;
+            const total = gameData.threePoint.finals.teams[t].players.reduce((a,b)=>a+b, 0);
+            gameData.threePoint.finals.teams[t].total = total;
+            safeSet(`finals-team${t===team1?'1':'2'}-total`, total);
             saveGameData();
           });
-          return input;
+          return inp;
         };
-        if(container1) container1.appendChild(createInput(team1)); if(container2) container2.appendChild(createInput(team2));
+        if(c1) c1.appendChild(createInp(team1)); if(c2) c2.appendChild(createInp(team2));
       }
     }
 
     function finalizeFinals() {
-      if (userRole !== 'staff' || finalizationState.threePointFinalized) return;
+      if (finalizationState.threePointFinalized) return;
+      if (!confirm('確定結算三分磚頭王決賽嗎？')) return;
+
       const [team1, team2] = gameData.threePoint.finals.qualified;
-      const t1Score = gameData.threePoint.finals.teams[team1]?.total || 0; const t2Score = gameData.threePoint.finals.teams[team2]?.total || 0;
-      const winner = t1Score >= t2Score ? team1 : team2;
+      const s1 = gameData.threePoint.finals.teams[team1]?.total || 0;
+      const s2 = gameData.threePoint.finals.teams[team2]?.total || 0;
+      const winner = s1 >= s2 ? team1 : team2;
       
-      gameData.threePointWinner = winner; matchWinners.threePoint = winner; championWins[winner] += 1;
-      updateDashboardScores(); setActiveStep(3);
-      finalizationState.threePointFinalized = true; lockThreePointInputs(); updateThreePointFinalizeBtnStatus();
-      saveGameData(); alert(`三分球大賽結束！冠軍：Team ${winner}`);
+      matchWinners.threePoint = winner; championWins[winner] += 1;
+      finalizationState.threePointFinalized = true;
+      updateDashboardScores(); setActiveStep(3); saveGameData();
+      
+      document.getElementById('threepoint-finals-btn').textContent = '🔒 已結算';
+      document.getElementById('threepoint-finals-btn').disabled = true;
+      alert(`🏆 三分球決賽結束！冠軍：Team ${winner}`);
     }
 
-    // ============ ⚔️ 五五賽邏輯 (已修復計時器與切換半場) ============
-    function updateDashboardScores() {
-      safeSet('dash-a-score', championWins.A); safeSet('dash-b-score', championWins.B); safeSet('dash-c-score', championWins.C);
-    }
-
+    // ============ ⚔️ 五五賽獨立計時邏輯 (徹底重構) ============
     function updateFiveVFiveUI() {
-      const matchups = { ab: { t: ['A', 'B'] }, ac: { t: ['A', 'C'] }, bc: { t: ['B', 'C'] } };
-      const [t1, t2] = matchups[fiveVFiveState.currentMatchup].t;
-      fiveVFiveState.team1 = t1; fiveVFiveState.team2 = t2;
-      safeSet('fvf-team1-name', `Team ${t1}`); safeSet('fvf-team2-name', `Team ${t2}`);
-      safeSet('fvf-team1-score', fiveVFiveState.team1Score); safeSet('fvf-team2-score', fiveVFiveState.team2Score);
+      const match = fiveVFiveMatches[fvfCurrentMatch];
+      if (!match) return;
+      const teams = fvfCurrentMatch.split('');
+      const t1 = teams[0].toUpperCase(); const t2 = teams[1].toUpperCase();
       
-      // 處理計時器顯示
-      const currentTime = fiveVFiveState.half === 1 ? fiveVFiveState.firstHalfTime : fiveVFiveState.secondHalfTime;
-      const mins = Math.floor(currentTime / 60); const secs = currentTime % 60;
-      safeSet('fvf-timer', `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
-      safeSet('fvf-quarter', fiveVFiveState.half === 1 ? '上半場 (Q1)' : '下半場 (Q2)');
+      safeSet('fvf-team1-name', `Team ${t1}`); safeSet('fvf-team2-name', `Team ${t2}`);
+      safeSet('fvf-team1-score', match.team1Score); safeSet('fvf-team2-score', match.team2Score);
+      
+      const cTime = match.half === 1 ? match.firstHalfTime : match.secondHalfTime;
+      const m = Math.floor(cTime / 60); const s = cTime % 60;
+      safeSet('fvf-timer', `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+      safeSet('fvf-quarter', match.half === 1 ? '上半場 (Q1)' : '下半場 (Q2)');
+      
+      // 更新按鈕狀態
+      const btn = document.getElementById('fvf-timer-btn');
+      if (btn) {
+          if (isFvfTimerRunning) {
+              btn.textContent = '⏹️ 暫停計時';
+          } else {
+              if (cTime === 0 && match.half === 2) btn.textContent = '⏱️ 比賽結束';
+              else btn.textContent = '▶️ 開始 / 繼續';
+          }
+      }
+
+      // 同步下方全場累積
+      safeSet('fvf-cumulative-a', gameData.fiveVFive.A || 0);
+      safeSet('fvf-cumulative-b', gameData.fiveVFive.B || 0);
+      safeSet('fvf-cumulative-c', gameData.fiveVFive.C || 0);
     }
 
     function toggleFiveVFiveTimer() {
       if (userRole !== 'staff') return;
-      const btn = document.getElementById('fvf-timer-btn');
-      if (fiveVFiveState.timerRunning) {
-          // 暫停
-          clearInterval(fiveVFiveState.timerInterval);
-          fiveVFiveState.timerRunning = false;
-          btn.textContent = fiveVFiveState.half === 1 ? '▶️ 繼續上半場' : '▶️ 繼續下半場';
+      const match = fiveVFiveMatches[fvfCurrentMatch];
+      
+      if (isFvfTimerRunning) {
+        clearInterval(fvfTimerInterval); isFvfTimerRunning = false;
+        updateFiveVFiveUI(); syncToFirebase();
       } else {
-          // 開始
-          fiveVFiveState.timerRunning = true;
-          btn.textContent = '⏹️ 暫停計時';
-          fiveVFiveState.timerInterval = setInterval(() => {
-              if (fiveVFiveState.half === 1) {
-                  fiveVFiveState.firstHalfTime = Math.max(0, fiveVFiveState.firstHalfTime - 1);
-                  if (fiveVFiveState.firstHalfTime === 0) {
-                      clearInterval(fiveVFiveState.timerInterval);
-                      fiveVFiveState.timerRunning = false;
-                      fiveVFiveState.half = 2; // 自動切換下半場
-                      btn.textContent = '▶️ 開始下半場';
-                      alert('🏀 上半場結束，請球員休息！');
-                  }
-              } else {
-                  fiveVFiveState.secondHalfTime = Math.max(0, fiveVFiveState.secondHalfTime - 1);
-                  if (fiveVFiveState.secondHalfTime === 0) {
-                      clearInterval(fiveVFiveState.timerInterval);
-                      fiveVFiveState.timerRunning = false;
-                      btn.textContent = '⏱️ 比賽結束';
-                      btn.disabled = true;
-                      alert('🏀 下半場結束，請結算成績！');
-                  }
-              }
-              updateFiveVFiveUI();
-              syncToFirebase(); // 每秒推播給球員手機
-          }, 1000);
+        if (match.half === 2 && match.secondHalfTime === 0) return; // 已結束
+        isFvfTimerRunning = true;
+        fvfTimerInterval = setInterval(() => {
+          if (match.half === 1) {
+            match.firstHalfTime = Math.max(0, match.firstHalfTime - 1);
+            if (match.firstHalfTime === 0) {
+              clearInterval(fvfTimerInterval); isFvfTimerRunning = false; match.half = 2;
+              alert('🏀 上半場結束，請球員休息！');
+            }
+          } else {
+            match.secondHalfTime = Math.max(0, match.secondHalfTime - 1);
+            if (match.secondHalfTime === 0) {
+              clearInterval(fvfTimerInterval); isFvfTimerRunning = false;
+              alert('🏀 下半場結束，請結算成績！');
+            }
+          }
+          updateFiveVFiveUI(); syncToFirebase();
+        }, 1000);
+        updateFiveVFiveUI();
       }
     }
 
-    function addFiveVFiveScore(team, points) {
+    function addFiveVFiveScore(teamIndex, points) {
       if (userRole !== 'staff') return;
+      const match = fiveVFiveMatches[fvfCurrentMatch];
       const pt = parseInt(points);
-      if (team === '1') fiveVFiveState.team1Score = Math.max(0, fiveVFiveState.team1Score + pt);
-      else fiveVFiveState.team2Score = Math.max(0, fiveVFiveState.team2Score + pt);
+      if (teamIndex === '1') match.team1Score = Math.max(0, match.team1Score + pt);
+      else match.team2Score = Math.max(0, match.team2Score + pt);
       updateFiveVFiveUI(); saveGameData();
-    }
-
-    function resetFiveVFiveScore() {
-      if (userRole !== 'staff') return;
-      if (confirm('⚠️ 確定要將目前的比賽分數歸零嗎？')) {
-          fiveVFiveState.team1Score = 0; fiveVFiveState.team2Score = 0;
-          updateFiveVFiveUI(); saveGameData();
-      }
     }
 
     function finalizeMatch() {
       if (userRole !== 'staff' || finalizationState.fiveVFiveFinalized) return;
-      gameData.fiveVFive[fiveVFiveState.team1] = (gameData.fiveVFive[fiveVFiveState.team1] || 0) + fiveVFiveState.team1Score;
-      gameData.fiveVFive[fiveVFiveState.team2] = (gameData.fiveVFive[fiveVFiveState.team2] || 0) + fiveVFiveState.team2Score;
-      saveGameData();
+      const matchOrder = ['ab', 'ac', 'bc'];
+      const currentIdx = matchOrder.indexOf(fvfCurrentMatch);
+      const match = fiveVFiveMatches[fvfCurrentMatch];
+      const teams = fvfCurrentMatch.split('');
+      const t1 = teams[0].toUpperCase(); const t2 = teams[1].toUpperCase();
 
-      const matchOrder = ['ab', 'ac', 'bc']; const currentIdx = matchOrder.indexOf(fiveVFiveState.currentMatchup);
-      if (currentIdx < matchOrder.length - 1) {
-        const nextMatch = matchOrder[currentIdx + 1]; const nextBtn = document.querySelector(`.five-v-five-matchup[data-match="${nextMatch}"]`);
-        if (nextBtn) { 
-            fiveVFiveState.team1Score = 0; fiveVFiveState.team2Score = 0; 
-            fiveVFiveState.half = 1; fiveVFiveState.firstHalfTime = 600; fiveVFiveState.secondHalfTime = 600;
-            document.getElementById('fvf-timer-btn').disabled = false; document.getElementById('fvf-timer-btn').textContent = '▶️ 開始';
-            nextBtn.click(); 
+      if (!confirm(`確定結算 ${t1} vs ${t2} 的成績嗎？結算後將進入下一場。`)) return;
+
+      // 累積到全域總分
+      gameData.fiveVFive[t1] = (gameData.fiveVFive[t1] || 0) + match.team1Score;
+      gameData.fiveVFive[t2] = (gameData.fiveVFive[t2] || 0) + match.team2Score;
+      
+      // 停止並重置目前計時器狀態
+      if (isFvfTimerRunning) { clearInterval(fvfTimerInterval); isFvfTimerRunning = false; }
+
+      if (currentIdx < 2) {
+        // 跳轉下一場
+        const nextMatch = matchOrder[currentIdx + 1];
+        const nextBtn = document.querySelector(`.five-v-five-matchup[data-match="${nextMatch}"]`);
+        if (nextBtn) {
+          document.querySelectorAll('.five-v-five-matchup').forEach(b => b.classList.remove('active'));
+          nextBtn.classList.add('active');
+          fvfCurrentMatch = nextMatch;
+          updateFiveVFiveUI(); saveGameData();
         }
       } else {
+        // 三場皆結束，結算總冠軍
         const scores = ['A', 'B', 'C'].map(t => ({ t, s: gameData.fiveVFive[t] || 0 })).sort((a, b) => b.s - a.s);
-        championWins[scores[0].t] += 1; matchWinners.fiveVFive = scores[0].t;
-        finalizationState.fiveVFiveFinalized = true; lockFiveVFiveInputs(); updateFiveVFiveFinalizeBtnStatus();
-        setActiveStep(4); saveGameData(); alert(`五五對抗賽全數結束！冠軍：Team ${scores[0].t}`);
+        matchWinners.fiveVFive = scores[0].t; championWins[scores[0].t] += 1;
+        finalizationState.fiveVFiveFinalized = true; setActiveStep(4); saveGameData();
+        alert(`🏆 五五對抗賽全數結束！冠軍：Team ${scores[0].t}`);
+        document.getElementById('fvf-finalize-btn').textContent = '🔒 已全數結算';
+        document.getElementById('fvf-finalize-btn').disabled = true;
       }
     }
 
-    // ============ 安全鎖定與修正 ============
-    function lockDiceInputs() { document.querySelectorAll('#page-1 button:not(.btn-danger), #page-1 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; }); }
-    function updateDiceFinalizeBtnStatus() { const btn = document.getElementById('dice-finalize-btn'); if (btn && finalizationState.diceFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; } }
-    
-    function lockThreePointInputs() { document.querySelectorAll('#page-2 button:not(.btn-danger), #page-2 input').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; }); }
-    function updateThreePointFinalizeBtnStatus() { const btn = document.getElementById('threepoint-finals-btn'); if (btn && finalizationState.threePointFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; } }
-
-    function lockFiveVFiveInputs() { document.querySelectorAll('#page-3 button:not(.btn-danger)').forEach(el => { el.disabled = true; el.style.opacity = '0.5'; }); }
-    function updateFiveVFiveFinalizeBtnStatus() { const btn = document.getElementById('fvf-finalize-btn'); if (btn && finalizationState.fiveVFiveFinalized) { btn.textContent = '🔒 已結算'; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; } }
-
-    // ============ 球員視角切換與動態更新 ============
+    // ============ 介面切換與初始化 ============
     function updateUIForRole() {
-      const badge = document.getElementById('readonly-badge');
-      const roleIcon = document.getElementById('role-icon'); const roleLabel = document.getElementById('role-label');
-      const nav = document.querySelector('nav'); const mainContent = document.querySelector('main');
-      const playerViewOverlay = document.getElementById('player-view-overlay');
-
-      if (userRole === 'staff') {
-        document.body.classList.remove('player-mode'); document.body.classList.add('staff-mode');
-        badge.classList.add('hidden'); roleIcon.textContent = '👨‍💻'; roleLabel.textContent = '工作人員';
-        if (nav) nav.style.display = '';
-        if (playerViewOverlay) { playerViewOverlay.classList.add('hidden'); playerViewOverlay.style.display = 'none'; }
-        if (mainContent) mainContent.style.display = '';
-      } else {
-        document.body.classList.remove('staff-mode'); document.body.classList.add('player-mode');
-        badge.classList.remove('hidden'); roleIcon.textContent = '🏀'; roleLabel.textContent = '球員';
-        if (nav) nav.style.display = 'none';
-        if (mainContent) mainContent.style.display = 'none';
-        if (playerViewOverlay) { playerViewOverlay.classList.remove('hidden'); playerViewOverlay.style.display = 'flex'; }
-        updatePlayerViewDisplay(); updatePlayerDetailsDisplay();
+      const isStaff = userRole === 'staff';
+      document.body.classList.toggle('staff-mode', isStaff);
+      document.body.classList.toggle('player-mode', !isStaff);
+      
+      document.getElementById('readonly-badge').classList.toggle('hidden', isStaff);
+      document.getElementById('role-icon').textContent = isStaff ? '👨‍💻' : '🏀';
+      document.getElementById('role-label').textContent = isStaff ? '工作人員' : '球員';
+      
+      document.querySelector('nav').style.display = isStaff ? '' : 'none';
+      document.querySelector('main').style.display = isStaff ? '' : 'none';
+      
+      const playerOverlay = document.getElementById('player-view-overlay');
+      if (playerOverlay) {
+        playerOverlay.classList.toggle('hidden', isStaff);
+        playerOverlay.style.display = isStaff ? 'none' : 'flex';
       }
+
+      if (!isStaff) updatePlayerViewDisplay();
     }
 
     function updatePlayerViewDisplay() {
       safeSet('player-dash-a-score', championWins.A); safeSet('player-dash-b-score', championWins.B); safeSet('player-dash-c-score', championWins.C);
       
-      // 同步球員端三分球畫面
-      ['A', 'B', 'C'].forEach(team => {
-         safeSet(`player-threepoint-${team.toLowerCase()}-total`, gameData.threePoint.round1[team]?.total || 0);
-      });
+      ['A', 'B', 'C'].forEach(t => safeSet(`player-threepoint-${t.toLowerCase()}-total`, gameData.threePoint.round1[t]?.total || 0));
       if (gameData.threePoint.finals.qualified.length === 2) {
          const [t1, t2] = gameData.threePoint.finals.qualified;
          safeSet('player-finals-team1-name', `Team ${t1}`); safeSet('player-finals-team1-total', gameData.threePoint.finals.teams[t1]?.total || 0);
          safeSet('player-finals-team2-name', `Team ${t2}`); safeSet('player-finals-team2-total', gameData.threePoint.finals.teams[t2]?.total || 0);
       }
 
-      // 同步五五賽實時畫面
-      const matchups = { ab: ['A', 'B'], ac: ['A', 'C'], bc: ['B', 'C'] };
-      const [t1, t2] = matchups[fiveVFiveState.currentMatchup];
-      safeSet('player-fvf-team1-score', fiveVFiveState.team1Score); safeSet('player-fvf-team2-score', fiveVFiveState.team2Score);
-      
-      // 更新球員頒獎台
-      if (activeStep === 4 && finalizationState.fiveVFiveFinalized) {
-        const teams = ['A', 'B', 'C'].map(t => ({ name: t, wins: championWins[t] })).sort((a, b) => b.wins - a.wins);
-        safeSet('player-podium-1st-name', `Team ${teams[0].name}`); safeSet('player-podium-1st-score', `${teams[0].wins} 局`);
-        safeSet('player-podium-2nd-name', `Team ${teams[1].name}`); safeSet('player-podium-2nd-score', `${teams[1].wins} 局`);
-        safeSet('player-podium-3rd-name', `Team ${teams[2].name}`); safeSet('player-podium-3rd-score', `${teams[2].wins} 局`);
-        const podium1st = document.querySelector('#player-podium-container .podium-box.first');
-        if (podium1st) { podium1st.style.visibility = 'visible'; podium1st.style.opacity = '1'; }
+      const match = fiveVFiveMatches[fvfCurrentMatch];
+      if (match) {
+        safeSet('player-fvf-team1-score', match.team1Score); safeSet('player-fvf-team2-score', match.team2Score);
       }
     }
 
-    function updatePlayerDetailsDisplay() {
-      const detailsSection = document.getElementById('player-details-section'); const detailsContent = document.getElementById('player-details-content');
-      if (!detailsContent) return;
-      let html = '';
-      if (activeStep >= 3) {
-        html += `<div><div style="font-size: 1.1rem; font-weight: 700; color: #FFD700; margin-bottom: 1rem;">⚔️ 五五賽全場累積</div><div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;"><div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.75rem;">Team A</div><div style="font-size: 2.5rem; color: #3b82f6; font-weight: 900;">${gameData.fiveVFive.A || 0}</div></div><div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #ef4444; margin-bottom: 0.75rem;">Team B</div><div style="font-size: 2.5rem; color: #ef4444; font-weight: 900;">${gameData.fiveVFive.B || 0}</div></div><div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.3); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-weight: 600; color: #22c55e; margin-bottom: 0.75rem;">Team C</div><div style="font-size: 2.5rem; color: #22c55e; font-weight: 900;">${gameData.fiveVFive.C || 0}</div></div></div></div>`;
-      }
-      if (html) { detailsContent.innerHTML = html; detailsSection.style.display = 'block'; }
-    }
-
-    // ============ 初始化與綁定 ============
     document.addEventListener('DOMContentLoaded', () => {
-      
-      const staffBtn = document.getElementById('role-staff');
-      const playerBtn = document.getElementById('role-player');
-      
-      if (staffBtn) { staffBtn.addEventListener('click', function(e) { e.preventDefault(); userRole = 'staff'; forceHideRoleOverlay(); updateUIForRole(); }); }
-      if (playerBtn) { playerBtn.addEventListener('click', function(e) { e.preventDefault(); userRole = 'player'; forceHideRoleOverlay(); updateUIForRole(); }); }
-
-      document.getElementById('role-toggle')?.addEventListener('click', () => { userRole = userRole === 'staff' ? 'player' : 'staff'; updateUIForRole(); });
-      document.getElementById('player-switch-to-staff')?.addEventListener('click', () => { userRole = 'staff'; updateUIForRole(); });
+      document.getElementById('role-staff')?.addEventListener('click', (e) => { e.preventDefault(); userRole='staff'; forceHideRoleOverlay(); updateUIForRole(); });
+      document.getElementById('role-player')?.addEventListener('click', (e) => { e.preventDefault(); userRole='player'; forceHideRoleOverlay(); updateUIForRole(); });
+      document.getElementById('role-toggle')?.addEventListener('click', () => { userRole = userRole==='staff'?'player':'staff'; updateUIForRole(); });
+      document.getElementById('player-switch-to-staff')?.addEventListener('click', () => { userRole='staff'; updateUIForRole(); });
 
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => {
           if (userRole === 'player') return;
-          const page = parseInt(tab.dataset.page);
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active');
-          document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page')); document.getElementById(`page-${page}`).classList.remove('hidden-page');
+          document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-page')); document.getElementById(`page-${tab.dataset.page}`).classList.remove('hidden-page');
         });
       });
 
-      document.querySelectorAll('.player-nav-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          if (userRole !== 'player') return;
-          const page = parseInt(tab.dataset.page);
-          document.querySelectorAll('.player-nav-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active');
-          document.querySelectorAll('.player-page').forEach(p => p.classList.add('hidden-page')); document.getElementById(`player-page-${page}`).classList.remove('hidden-page');
-        });
-      });
-
-      // 🎲 趣味競賽綁定
       document.getElementById('dice-start-btn')?.addEventListener('click', startTimer);
       document.getElementById('dice-stop-btn')?.addEventListener('click', stopTimer);
       document.getElementById('dice-roll-btn')?.addEventListener('click', rollDice);
@@ -1195,34 +1147,39 @@
       document.getElementById('dice-start-round2-btn')?.addEventListener('click', startRound2);
       document.getElementById('dice-finalize-btn')?.addEventListener('click', calculateDiceRanking);
 
-      // 🧱 三分球綁定
       document.getElementById('threepoint-round1-btn')?.addEventListener('click', finalizeRound1);
       document.getElementById('threepoint-finals-btn')?.addEventListener('click', finalizeFinals);
 
-      // ⚔️ 五五賽綁定
       document.querySelectorAll('.five-v-five-matchup').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (userRole !== 'staff') return;
+          if (userRole !== 'staff' || isFvfTimerRunning) {
+             if (isFvfTimerRunning) alert('⚠️ 請先暫停目前比賽的計時器再切換！');
+             return;
+          }
           document.querySelectorAll('.five-v-five-matchup').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-          fiveVFiveState.currentMatchup = btn.dataset.match;
+          fvfCurrentMatch = btn.dataset.match;
           updateFiveVFiveUI(); saveGameData();
         });
       });
+
       document.querySelectorAll('.fvf-btn').forEach(btn => {
         btn.addEventListener('click', () => addFiveVFiveScore(btn.dataset.team, btn.dataset.points));
       });
-      
-      // ✅ 新增漏掉的按鈕綁定
       document.getElementById('fvf-timer-btn')?.addEventListener('click', toggleFiveVFiveTimer);
-      document.getElementById('fvf-reset-btn')?.addEventListener('click', resetFiveVFiveScore);
+      document.getElementById('fvf-reset-btn')?.addEventListener('click', () => {
+          if (confirm('確定重置此場分數？')) {
+              fiveVFiveMatches[fvfCurrentMatch].team1Score = 0; fiveVFiveMatches[fvfCurrentMatch].team2Score = 0;
+              updateFiveVFiveUI(); saveGameData();
+          }
+      });
       document.getElementById('fvf-finalize-btn')?.addEventListener('click', finalizeMatch);
 
-      // 啟動資料
       setupFirebaseListener();
       initThreePointInputs();
-      updateFiveVFiveUI(); // 確保初始五五賽介面載入
+      updateFiveVFiveUI();
     });
   </script>
  </body>
 </html>
+
 
