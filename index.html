@@ -126,4 +126,197 @@
          <button id="f-toggle" class="btn-primary w-full mb-6">▶️ 啟動/暫停計時</button>
          
          <div class="flex justify-between items-center">
-             <div class="flex-1"><div id="f-t1" class="text-2xl text-blue-
+             <div class="flex-1"><div id="f-t1" class="text-2xl text-blue-400 font-bold mb-2">Team A</div><div id="f-s1" class="text-6xl text-blue-400 font-bold mb-4">0</div>
+                 <div class="flex flex-wrap justify-center gap-1"><button class="btn-primary p-2" onclick="addF(1,1)">+1</button><button class="btn-primary p-2" onclick="addF(1,2)">+2</button><button class="btn-primary p-2 bg-orange-500" onclick="addF(1,3)">+3</button><button class="btn-secondary p-2" onclick="addF(1,-1)">-1</button></div>
+             </div>
+             <div class="px-4 text-3xl font-black text-gray-500">VS<br><button class="text-sm btn-secondary mt-4" onclick="resF()">歸零</button></div>
+             <div class="flex-1"><div id="f-t2" class="text-2xl text-red-400 font-bold mb-2">Team B</div><div id="f-s2" class="text-6xl text-red-400 font-bold mb-4">0</div>
+                 <div class="flex flex-wrap justify-center gap-1"><button class="btn-primary p-2" onclick="addF(2,1)">+1</button><button class="btn-primary p-2" onclick="addF(2,2)">+2</button><button class="btn-primary p-2 bg-orange-500" onclick="addF(2,3)">+3</button><button class="btn-secondary p-2" onclick="addF(2,-1)">-1</button></div>
+             </div>
+         </div>
+      </div>
+      <button id="f-fin" class="btn-success w-full">✅ 結算此場並累加</button>
+     </section>
+
+     <section id="page-4" class="page hidden-page text-center">
+        <div id="pod-lock" class="py-20 cursor-pointer" onclick="forceUnlock()">
+            <div class="text-6xl mb-4">🔒</div><div class="text-2xl text-red-400">賽事未全數結算</div><div class="text-gray-400">(點擊強制解鎖)</div>
+        </div>
+        <div id="pod-show" class="hidden glass-card p-8">
+            <div class="text-6xl mb-4">🥇</div><div id="p1" class="text-3xl text-yellow-400 font-bold"></div><div id="p1s" class="text-xl mb-8"></div>
+            <div class="flex justify-around text-xl"><div id="p2"></div><div id="p3"></div></div>
+        </div>
+     </section>
+  </main>
+
+  <div id="player-view" class="player-only w-full h-full flex-col fixed inset-0 z-[1000] bg-slate-50 overflow-y-auto text-slate-800">
+    <header class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center shadow-md sticky top-0 z-50 shrink-0">
+       <div class="font-bold">🏀 球員觀賽 <span class="text-[10px] bg-green-400 text-black px-2 rounded-full animate-pulse">實時同步</span></div>
+       <button id="p-back" class="text-xs bg-white/20 px-3 py-1 rounded">👨‍💻 返回</button>
+    </header>
+    <nav class="bg-white border-b px-2 py-3 flex gap-2 overflow-x-auto shadow-sm shrink-0" id="player-nav">
+        <button class="nav-tab active !text-indigo-600 border-indigo-200" data-page="0">首頁</button> 
+        <button class="nav-tab !text-slate-600 border-gray-200" data-page="1">趣味</button> 
+        <button class="nav-tab !text-slate-600 border-gray-200" data-page="2">三分</button> 
+        <button class="nav-tab !text-slate-600 border-gray-200" data-page="3">五五</button> 
+        <button class="nav-tab !text-slate-600 border-gray-200" data-page="4">頒獎</button>
+    </nav>
+    <main class="p-4" id="p-content"></main>
+  </div>
+
+  <script>
+    // ============ 核心變數 ============
+    let r='staff', step=0, logs=[];
+    let dSt={r:1, i:0}, tInt=null, tMs=0, tRun=false;
+    let w={A:0, B:0, C:0}, m={d:null, p3:null, f:null}, fSt={d:false, p3:false, f:false, u:false};
+    let fM={
+      ab:{s1:0,s2:0,h:1,t1:600,t2:600}, ac:{s1:0,s2:0,h:1,t1:600,t2:600}, bc:{s1:0,s2:0,h:1,t1:600,t2:600}
+    };
+    let fC='ab', fInt=null, fRun=false;
+    let gd={
+      d:{A:[0,0],B:[0,0],C:[0,0]},
+      p3:{r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}}, f:{q:[],t:{}}},
+      f:{A:0,B:0,C:0}
+    };
+    const tm=['A','B','C']; let pTab=0;
+
+    // 工具
+    const $=(id)=>document.getElementById(id);
+    const set=(id,v)=>{if($(id))$(id).textContent=v;};
+    const fmt=(ms)=>{if(!ms)return'--:--.-';let m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),ml=Math.floor((ms%1000)/100);return`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ml}`;};
+    
+    // 日誌
+    function log(m){ if(r!=='staff')return; let d=new Date(); logs.unshift(`[${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}] ${m}`); if(logs.length>30)logs.pop(); renderLogs(); sync(); }
+    function renderLogs(){ if($('sys-logs'))$('sys-logs').innerHTML=logs.map(x=>`<div>${x}</div>`).join('')||'無紀錄'; }
+    function clearLog(){ if(confirm('清空日誌？')){logs=[];renderLogs();sync();} }
+
+    // Firebase
+    const fbC = { apiKey: "AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw", authDomain: "basketball-2026.firebaseapp.com", databaseURL: "https://basketball-2026-default-rtdb.firebaseio.com", projectId: "basketball-2026" };
+    let fbR=false; try{if(firebase.apps.length===0){firebase.initializeApp(fbC);fbR=true;}}catch(e){}
+    function sync(){ if(fbR&&r==='staff') firebase.database().ref('yingmei').set({gd,step,w,m,fM,fC,fSt,logs,dSt}); }
+    
+    if(fbR){
+      firebase.database().ref('yingmei').on('value',s=>{
+        let d=s.val(); if(d){
+          Object.assign(gd,d.gd||gd); step=d.step||0; Object.assign(w,d.w||w); Object.assign(m,d.m||m);
+          Object.assign(fM,d.fM||fM); fC=d.fC||'ab'; Object.assign(fSt,d.fSt||fSt); Object.assign(dSt,d.dSt||dSt); logs=d.logs||logs;
+          updateUI();
+        }
+      });
+    }
+
+    // 重置
+    function resetData(ty){
+      if(prompt('輸入 0000 清除數據')!=='0000')return;
+      if(ty==='dice'){ gd.d={A:[0,0],B:[0,0],C:[0,0]}; dSt={r:1,i:0}; if(fSt.d)w[m.d]=Math.max(0,w[m.d]-1); fSt.d=false; tMs=0; isTimerRunning=false; clearInterval(tInt); $('d-r2').classList.add('hidden'); $('d-fin').classList.add('hidden'); $('d-next').classList.remove('hidden'); $('d-fin').disabled=false; log('清除趣味競賽'); }
+      if(ty==='3pt'){ gd.p3={r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}}; if(fSt.p3)w[m.p3]=Math.max(0,w[m.p3]-1); fSt.p3=false; $('pt-r1').classList.remove('hidden'); $('pt-fin').classList.add('hidden'); $('pt-f-fin').disabled=false; build3Pt(); log('清除三分球'); }
+      if(ty==='5v5'){ fM={ab:{s1:0,s2:0,h:1,t1:600,t2:600},ac:{s1:0,s2:0,h:1,t1:600,t2:600},bc:{s1:0,s2:0,h:1,t1:600,t2:600}}; gd.f={A:0,B:0,C:0}; if(fSt.f)w[m.f]=Math.max(0,w[m.f]-1); fSt.f=false; fC='ab'; fRun=false; clearInterval(fInt); document.querySelectorAll('.f-match').forEach(b=>b.classList.remove('active')); document.querySelector('[data-m="ab"]').classList.add('active'); $('f-fin').disabled=false; log('清除五五賽'); }
+      sync(); updateUI();
+    }
+
+    // 視角切換
+    $('role-staff').onclick=()=>{r='staff';$('role-overlay').style.display='none';updateUI();};
+    $('role-player').onclick=()=>{r='player';$('role-overlay').style.display='none';updateUI();};
+    $('p-back').onclick=()=>{r='staff';updateUI();};
+
+    document.querySelectorAll('#staff-nav .nav-tab').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('#staff-nav .nav-tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+      document.querySelectorAll('#staff-main .page').forEach(x=>x.classList.add('hidden-page')); $(`page-${b.dataset.page}`).classList.remove('hidden-page');
+    });
+    document.querySelectorAll('#player-nav .nav-tab').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('#player-nav .nav-tab').forEach(x=>x.classList.remove('!text-indigo-600','border-indigo-200')); b.classList.add('!text-indigo-600','border-indigo-200');
+      pTab=parseInt(b.dataset.page); renderPlayer();
+    });
+
+    // ============ 主邏輯 ============
+    function updateUI(){
+      document.body.className = r==='staff'?'staff-mode h-full w-full':'player-mode h-full w-full';
+      if(r==='player') renderPlayer(); else renderStaff();
+    }
+
+    function renderStaff(){
+      set('dash-a',w.A); set('dash-b',w.B); set('dash-c',w.C); renderLogs();
+      
+      // 趣味
+      let ct=tm[dSt.i]; set('dice-team', `Team ${ct} (第${dSt.r}輪)`); if(!tRun&&tMs===0)set('dice-timer','00:00.0');
+      let dH=''; tm.forEach(t=>{let r1=gd.d[t][0],r2=gd.d[t][1]; dH+=`<div class="glass-card p-4"><b>Team ${t}</b><br>R1: ${fmt(r1)}<br>R2: ${fmt(r2)}<br>Total: ${(r1>0&&r2>0)?fmt(r1+r2):'--'}</div>`;}); $('dice-scores').innerHTML=dH;
+      if(fSt.d){$('d-fin').textContent='🔒 已結算';$('d-fin').disabled=true;}
+
+      // 三分
+      if(gd.p3.f.q.length===2){ $('pt-r1').classList.add('hidden'); $('pt-fin').classList.remove('hidden'); }
+      if(fSt.p3){$('pt-f-fin').textContent='🔒 已結算';$('pt-f-fin').disabled=true;}
+
+      // 五五
+      let mC=fM[fC]; set('f-t1','Team '+fC[0].toUpperCase()); set('f-t2','Team '+fC[1].toUpperCase());
+      set('f-s1',mC.s1); set('f-s2',mC.s2); set('f-half',mC.h===1?'上半場':'下半場');
+      let cT=mC.h===1?mC.t1:mC.t2; set('f-time',`${String(Math.floor(cT/60)).padStart(2,'0')}:${String(cT%60).padStart(2,'0')}`);
+      $('f-toggle').textContent = fRun?'⏹️ 暫停計時':(cT===0&&mC.h===2?'⏱️ 結束':'▶️ 啟動計時');
+      if(fSt.f){$('f-fin').textContent='🔒 已結算';$('f-fin').disabled=true;}
+
+      // 頒獎
+      if(!fSt.u && (!fSt.d || !fSt.p3 || !fSt.f)){ $('pod-lock').classList.remove('hidden');$('pod-show').classList.add('hidden'); }
+      else{ $('pod-lock').classList.add('hidden');$('pod-show').classList.remove('hidden');
+        let sorted = tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s);
+        set('p1',`Team ${sorted[0].t}`); set('p1s',`${sorted[0].s}局`); set('p2',`🥈 Team ${sorted[1].t} (${sorted[1].s})`); set('p3',`🥉 Team ${sorted[2].t} (${sorted[2].s})`);
+      }
+    }
+
+    function renderPlayer(){
+      let h='';
+      if(pTab===0){
+        h=`<div class="bg-white rounded-xl shadow p-6 mb-4"><h3 class="font-bold text-lg mb-4">🏆 總積分</h3><div class="flex justify-between text-xl"><span>A: <b class="text-blue-600">${w.A}</b></span><span>B: <b class="text-red-600">${w.B}</b></span><span>C: <b class="text-green-600">${w.C}</b></span></div></div>`;
+      }else if(pTab===1){
+        h=`<div class="bg-white rounded-xl shadow p-6 mb-4 text-center"><h3 class="font-bold">🎲 趣味競賽 (Team ${tm[dSt.i]})</h3><div class="text-5xl font-mono text-orange-500 my-4">${fmt(tMs)}</div></div><div class="bg-white rounded-xl shadow p-4">`;
+        tm.forEach(t=>{let r1=gd.d[t][0],r2=gd.d[t][1]; h+=`<div class="flex justify-between border-b py-2"><span>Team ${t}</span><b>${(r1>0&&r2>0)?fmt(r1+r2):'--'}</b></div>`;}); h+='</div>';
+      }else if(pTab===2){
+        h=`<div class="bg-white rounded-xl shadow p-4 mb-4"><h3 class="font-bold mb-2">🧱 小組賽總分</h3><div class="flex justify-between"><b>A: ${gd.p3.r1.A.t}</b><b>B: ${gd.p3.r1.B.t}</b><b>C: ${gd.p3.r1.C.t}</b></div></div>`;
+        if(gd.p3.f.q.length===2) h+=`<div class="bg-indigo-100 rounded-xl shadow p-4"><h3 class="font-bold text-indigo-700 mb-2">🏆 決賽</h3><div class="flex justify-between"><b>${gd.p3.f.q[0]}: ${gd.p3.f.t[gd.p3.f.q[0]]?.t||0}</b><b>${gd.p3.f.q[1]}: ${gd.p3.f.t[gd.p3.f.q[1]]?.t||0}</b></div></div>`;
+      }else if(pTab===3){
+        let mC=fM[fC], cT=mC.h===1?mC.t1:mC.t2;
+        h=`<div class="bg-white rounded-xl shadow p-6 mb-4"><div class="flex justify-between text-gray-500 font-bold mb-4"><span>${mC.h===1?'上半場':'下半場'}</span><span class="text-indigo-600">${String(Math.floor(cT/60)).padStart(2,'0')}:${String(cT%60).padStart(2,'0')}</span></div><div class="flex justify-between text-center"><div class="flex-1"><div class="text-sm">Team ${fC[0].toUpperCase()}</div><div class="text-5xl font-black text-blue-600">${mC.s1}</div></div><div class="text-xl font-black text-gray-300 px-2">VS</div><div class="flex-1"><div class="text-sm">Team ${fC[1].toUpperCase()}</div><div class="text-5xl font-black text-red-600">${mC.s2}</div></div></div></div>`;
+      }else{
+        if(!fSt.u && (!fSt.d || !fSt.p3 || !fSt.f)) h=`<div class="text-center py-10"><div class="text-6xl mb-4">🔒</div><div class="font-bold text-gray-400">賽事鎖定中</div></div>`;
+        else{ let s=tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s); h=`<div class="bg-yellow-50 rounded-xl shadow p-8 text-center"><div class="text-5xl mb-4">🥇</div><div class="text-2xl font-bold">Team ${s[0].t}</div><div class="text-indigo-600 font-black mb-4">${s[0].s} 局</div><div class="flex justify-between text-sm text-gray-600 border-t pt-4"><span>🥈 Team ${s[1].t} (${s[1].s})</span><span>🥉 Team ${s[2].t} (${s[2].s})</span></div></div>`; }
+      }
+      $('p-content').innerHTML = h;
+    }
+
+    // 趣味事件
+    $('d-start').onclick=()=>{if(tRun)return;tRun=true;tStartTime=Date.now()-tMs;$('d-start').disabled=true;$('d-stop').disabled=false;log('開始計時');tInt=setInterval(()=>{tMs=Date.now()-tStartTime;set('dice-timer',fmt(tMs));},50);};
+    $('d-stop').onclick=()=>{if(!tRun)return;tRun=false;clearInterval(tInt);gd.d[tm[dSt.i]][dSt.r-1]=tMs;$('d-start').disabled=false;$('d-stop').disabled=true;log('停止計時');sync();updateUI();};
+    $('d-roll').onclick=()=>{let r=Math.floor(Math.random()*6)+1;$('dice-display').textContent=r;log('骰出 '+r);};
+    $('d-next').onclick=()=>{if(tRun)return;dSt.i++;if(dSt.i>=3){if(dSt.r===1){$('d-next').classList.add('hidden');$('d-r2').classList.remove('hidden');}else{$('d-next').classList.add('hidden');$('d-fin').classList.remove('hidden');}}tMs=0;sync();updateUI();};
+    $('d-r2').onclick=()=>{dSt.r=2;dSt.i=0;tMs=0;$('d-r2').classList.add('hidden');$('d-next').classList.remove('hidden');log('進R2');sync();updateUI();};
+    $('d-fin').onclick=()=>{if(!confirm('結算？'))return;let s=tm.map(t=>({t,s:gd.d[t][0]+gd.d[t][1]})).filter(x=>x.s>0).sort((a,b)=>a.s-b.s);if(s.length<3)return alert('未完成');w[s[0].t]++;fSt.d=true;log('趣味結算');sync();updateUI();};
+
+    // 三分事件
+    function build3Pt(){
+      let h=''; tm.forEach(t=>{ h+=`<div class="bg-gray-800/50 p-4 rounded text-center"><h4 class="font-bold text-${t==='A'?'blue':t==='B'?'red':'green'}-400 mb-2">Team ${t}</h4><div class="grid grid-cols-5 gap-1 mb-2">`;
+        for(let i=0;i<10;i++) h+=`<input type="number" class="input-base p-1 text-sm" value="${gd.p3.r1[t].p[i]||''}" oninput="gd.p3.r1['${t}'].p[${i}]=parseInt(this.value)||0;gd.p3.r1['${t}'].t=gd.p3.r1['${t}'].p.reduce((a,b)=>a+b,0);set('p3t-${t}',gd.p3.r1['${t}'].t);sync();">`;
+        h+=`</div><b id="p3t-${t}">${gd.p3.r1[t].t}</b> 分</div>`; }); $('pt-inputs').innerHTML=h;
+    } build3Pt();
+    $('pt-r1-fin').onclick=()=>{
+      let s=tm.map(t=>({t,s:gd.p3.r1[t].t})).sort((a,b)=>b.s-a.s);
+      if(s[1].s===s[2].s){
+        let m=document.createElement('div');m.className='modal-overlay';
+        m.innerHTML=`<div class="bg-gray-900 p-6 rounded-xl w-80 text-center"><h2 class="text-xl font-bold text-red-500 mb-4">平手！手動選2隊</h2>${s.map(x=>`<label class="block mb-2 text-left"><input type="checkbox" class="t-cb" value="${x.t}"> Team ${x.t} (${x.s})</label>`).join('')}<button class="btn-primary mt-4" onclick="let c=Array.from(document.querySelectorAll('.t-cb:checked')).map(x=>x.value);if(c.length!==2)return alert('選2隊');gd.p3.f.q=c;this.closest('.modal-overlay').remove();build3f();">確認</button></div>`; document.body.appendChild(m);
+      }else{gd.p3.f.q=[s[0].t,s[1].t];build3f();}
+    };
+    function build3f(){ $('pt-r1').classList.add('hidden');$('pt-fin').classList.remove('hidden'); let q=gd.p3.f.q;
+      let h=''; q.forEach(t=>{ h+=`<div class="bg-gray-800/50 p-4 rounded text-center"><h4 class="font-bold text-yellow-400 mb-2">Team ${t}</h4><div class="grid grid-cols-5 gap-1 mb-2">`;
+      for(let i=0;i<10;i++) h+=`<input type="number" class="input-base p-1 text-sm" value="${gd.p3.f.t[t]?.p[i]||''}" oninput="if(!gd.p3.f.t['${t}'])gd.p3.f.t['${t}']={p:[],t:0};gd.p3.f.t['${t}'].p[${i}]=parseInt(this.value)||0;gd.p3.f.t['${t}'].t=gd.p3.f.t['${t}'].p.reduce((a,b)=>a+b,0);set('p3ft-${t}',gd.p3.f.t['${t}'].t);sync();">`;
+      h+=`</div><b id="p3ft-${t}">${gd.p3.f.t[t]?.t||0}</b> 分</div>`; }); $('pt-f-inputs').innerHTML=h; sync(); }
+    $('pt-f-fin').onclick=()=>{if(!confirm('結算？'))return;let q=gd.p3.f.q,s1=gd.p3.f.t[q[0]]?.t||0,s2=gd.p3.f.t[q[1]]?.t||0;w[s1>=s2?q[0]:q[1]]++;fSt.p3=true;log('三分結算');sync();updateUI();};
+
+    // 五五事件
+    document.querySelectorAll('.f-match').forEach(b=>b.onclick=()=>{if(fRun)return alert('請先暫停');document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));b.classList.add('active');fC=b.dataset.m;updateUI();sync();});
+    $('f-toggle').onclick=()=>{if(fRun){fRun=false;clearInterval(fInt);log('暫停5v5');sync();updateUI();}else{let mC=fM[fC];if(mC.h===2&&mC.t2===0)return;fRun=true;log('開始5v5');fInt=setInterval(()=>{if(mC.h===1){mC.t1--;if(mC.t1<=0){fRun=false;clearInterval(fInt);mC.h=2;alert('上半場完');}}else{mC.t2--;if(mC.t2<=0){fRun=false;clearInterval(fInt);alert('全場完');}}sync();updateUI();},1000);updateUI();}};
+    function addF(i,p){let mC=fM[fC];if(i===1)mC.s1=Math.max(0,mC.s1+p);else mC.s2=Math.max(0,mC.s2+p);log(`5v5 T${i}加${p}`);sync();updateUI();}
+    function resF(){if(confirm('歸零？')){fM[fC].s1=0;fM[fC].s2=0;log('5v5歸零');sync();updateUI();}}
+    $('f-fin').onclick=()=>{if(!confirm('結算本場？'))return;let mC=fM[fC],t1=fC[0].toUpperCase(),t2=fC[1].toUpperCase();gd.f[t1]+=mC.s1;gd.f[t2]+=mC.s2;fRun=false;clearInterval(fInt);let o=['ab','ac','bc'],idx=o.indexOf(fC);if(idx<2){fC=o[idx+1];document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));document.querySelector(`[data-m="${fC}"]`).classList.add('active');}else{let s=tm.map(t=>({t,s:gd.f[t]})).sort((a,b)=>b.s-a.s);w[s[0].t]++;fSt.f=true;log('五五結算');}sync();updateUI();};
+    function forceUnlock(){if(prompt('密碼')==='admin'){fSt.u=true;log('解鎖頒獎');sync();updateUI();}}
+
+    setTimeout(()=>updateUI(),100);
+  </script>
+</body>
+</html>
