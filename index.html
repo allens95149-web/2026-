@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 英美回娘家籃球交流賽</title>
+
+  <!-- ══ PWA Meta Tags ══ -->
+  <meta name="theme-color" content="#001F3F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="英美籃球賽">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="英美籃球賽">
+  <!-- Apple touch icons (generated at runtime, replaced by JS) -->
+  <link id="apple-touch-icon" rel="apple-touch-icon" href="">
+  <link id="pwa-manifest" rel="manifest" href="">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -31,26 +42,9 @@
     /* Confetti layer */
     #confetti-canvas  { position:fixed; inset:0; pointer-events:none; z-index:9990; }
 
-    /* ── Cards — Enhanced Glassmorphism ── */
-    .glass-card {
-      background: rgba(255,255,255,0.07);
-      backdrop-filter: blur(14px) saturate(160%);
-      -webkit-backdrop-filter: blur(14px) saturate(160%);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-top: 1px solid rgba(255,255,255,0.26);
-      border-left: 1px solid rgba(255,255,255,0.20);
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.09);
-    }
-    .glass-card-lg {
-      background: rgba(10,15,31,0.55);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-top: 1px solid rgba(255,255,255,0.24);
-      border-radius: 20px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.10);
-    }
+    /* ── Cards ── */
+    .glass-card    { background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; }
+    .glass-card-lg { background:rgba(10,15,31,0.6);    backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:20px; }
 
     /* ── Buttons ── */
     .btn-primary   { background:linear-gradient(135deg,#FFD700 0%,#ffc107 100%); color:#000; font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; border:none; }
@@ -190,12 +184,11 @@
     /* ── Score Pop Animation (UX #5) ── */
     @keyframes scorePop {
       0%   { transform: scale(1); }
-      30%  { transform: scale(1.55); filter: drop-shadow(0 0 12px rgba(255,215,0,0.9)); color: #FFD700; }
-      60%  { transform: scale(0.88); }
-      80%  { transform: scale(1.08); }
-      100% { transform: scale(1); filter: none; }
+      40%  { transform: scale(1.45); color: #FFD700; }
+      70%  { transform: scale(0.9); }
+      100% { transform: scale(1); }
     }
-    .animate-pop { animation: scorePop 0.42s cubic-bezier(.36,.07,.19,.97) forwards; display:inline-block; }
+    .animate-pop { animation: scorePop 0.35s ease-out forwards; }
 
     /* ── 3PT Stepper Buttons (UX #3) ── */
     .stepper-wrap {
@@ -229,6 +222,76 @@
       padding: 1.25rem;
       margin-top: 1.5rem;
     }
+
+    /* ══════════════════════════════════════════
+       JUMBOTRON MODE
+    ══════════════════════════════════════════ */
+    @keyframes urgentPulse {
+      0%,100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0); }
+      50%      { box-shadow: inset 0 0 80px 20px rgba(239,68,68,0.35), 0 0 60px 10px rgba(239,68,68,0.2); }
+    }
+    @keyframes jScoreIn {
+      0%   { opacity:0; transform:scale(0.6) translateY(30px); }
+      60%  { transform:scale(1.06) translateY(-4px); }
+      100% { opacity:1; transform:scale(1) translateY(0); }
+    }
+    @keyframes jTimerTick {
+      0%,100% { opacity:1; } 48%,52% { opacity:0.7; }
+    }
+    #jumbotron-view {
+      display: none;
+      position: fixed; inset: 0; z-index: 20000;
+      background: #020810;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: box-shadow 0.5s ease;
+    }
+    #jumbotron-view.urgent { animation: urgentPulse 1.2s ease-in-out infinite; }
+    .jumb-team-name  { font-size: clamp(1.5rem, 5vw, 3.5rem); font-weight: 900; letter-spacing: .05em; opacity:.7; }
+    .jumb-score      { font-size: clamp(5rem, 22vw, 14rem); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .jumb-vs         { font-size: clamp(1.5rem,5vw,3rem); color:rgba(255,255,255,.2); font-weight:900; }
+    .jumb-timer      { font-size: clamp(2.5rem,10vw,6rem); font-weight:900; font-family:monospace; letter-spacing:.05em; animation: jTimerTick 1s step-start infinite; }
+    .jumb-half       { font-size: clamp(.9rem,3vw,1.6rem); opacity:.5; letter-spacing:.2em; text-transform:uppercase; }
+    .jumb-event-label{ font-size: clamp(.8rem,2.5vw,1.2rem); letter-spacing:.3em; text-transform:uppercase; opacity:.4; margin-bottom:1rem; }
+    .jumb-wins-bar   { display:flex; gap:2vw; margin-top:3vh; }
+    .jumb-win-chip   { display:flex; flex-direction:column; align-items:center; gap:.3rem; }
+    .jumb-win-label  { font-size:clamp(.6rem,2vw,1rem); opacity:.4; font-weight:700; letter-spacing:.15em; }
+    .jumb-win-count  { font-size:clamp(1.2rem,5vw,2.8rem); font-weight:900; }
+    .jumb-score-blue { color:#60a5fa; }
+    .jumb-score-red  { color:#f87171; }
+    .jumb-exit-btn   {
+      position:fixed; top:1.5rem; right:1.5rem; z-index:20001;
+      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
+      color:rgba(255,255,255,.5); border-radius:50%; width:44px; height:44px;
+      font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .2s;
+    }
+    .jumb-exit-btn:hover { background:rgba(255,255,255,.18); color:#fff; }
+
+    /* ══ PWA Install Banner ══ */
+    #pwa-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 99990;
+      background: linear-gradient(135deg, #001F3F, #003070);
+      border-top: 1px solid rgba(255,215,0,.3);
+      padding: 1rem 1.25rem;
+      display: none;
+      align-items: center; gap: 1rem;
+      box-shadow: 0 -8px 32px rgba(0,0,0,.5);
+      animation: slideInUp .4s ease forwards;
+    }
+    #pwa-banner .pwa-icon { font-size: 2.5rem; flex-shrink:0; }
+    #pwa-banner .pwa-text { flex:1; }
+    #pwa-banner .pwa-title { font-weight:800; color:#FFD700; font-size:1rem; }
+    #pwa-banner .pwa-sub   { font-size:.8rem; color:rgba(255,255,255,.6); margin-top:.15rem; }
+    #pwa-banner .pwa-install-btn {
+      background: linear-gradient(135deg,#FFD700,#ffa500);
+      color:#000; font-weight:800; border:none; border-radius:10px;
+      padding:.6rem 1.1rem; font-size:.9rem; cursor:pointer; flex-shrink:0;
+      white-space:nowrap;
+    }
+    #pwa-banner .pwa-dismiss { background:none; border:none; color:rgba(255,255,255,.4); font-size:1.3rem; cursor:pointer; flex-shrink:0; padding:.2rem; }
   </style>
 </head>
 <body class="h-full w-full">
@@ -247,6 +310,7 @@
     <div class="space-y-4">
       <button id="role-staff"  class="w-full btn-primary  py-4 text-xl">👨‍💻 工作人員 (寫入)</button>
       <button id="role-player" class="w-full btn-secondary py-4 text-xl">🏀 球員觀看 (唯讀)</button>
+      <button id="role-jumbotron" class="w-full py-4 text-xl font-bold" style="background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid rgba(129,140,248,.4);border-radius:12px;color:#a5b4fc;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(165,180,252,.8)'" onmouseout="this.style.borderColor='rgba(129,140,248,.4)'">🖥️ 大螢幕轉播</button>
     </div>
   </div>
 </div>
@@ -555,6 +619,68 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     JUMBOTRON VIEW — Full-screen broadcast mode
+══════════════════════════════════════════ -->
+<div id="jumbotron-view">
+  <button class="jumb-exit-btn" onclick="exitJumbotron()" title="退出轉播模式">✕</button>
+
+  <!-- Event label -->
+  <div class="jumb-event-label" id="j-event-label">五五賽</div>
+
+  <!-- Main scoreboard -->
+  <div id="j-scoreboard" style="width:100%;display:flex;align-items:center;justify-content:center;gap:4vw;padding:0 4vw;">
+    <!-- Team 1 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+      <div class="jumb-team-name jumb-score-blue" id="j-t1">Team A</div>
+      <div class="jumb-score jumb-score-blue" id="j-s1">0</div>
+    </div>
+    <!-- Center: VS + timer -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2vh;min-width:30vw;">
+      <div class="jumb-vs">VS</div>
+      <div class="jumb-timer" id="j-timer" style="color:#FFD700;">10:00</div>
+      <div class="jumb-half"  id="j-half">上半場</div>
+    </div>
+    <!-- Team 2 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+      <div class="jumb-team-name jumb-score-red" id="j-t2">Team B</div>
+      <div class="jumb-score jumb-score-red" id="j-s2">0</div>
+    </div>
+  </div>
+
+  <!-- Win totals bar -->
+  <div class="jumb-wins-bar" id="j-wins-bar">
+    <div class="jumb-win-chip">
+      <div class="jumb-win-label">Team A 總積分</div>
+      <div class="jumb-win-count jumb-score-blue" id="j-w-a">0</div>
+    </div>
+    <div style="width:2px;background:rgba(255,255,255,.1);border-radius:2px;"></div>
+    <div class="jumb-win-chip">
+      <div class="jumb-win-label">Team B 總積分</div>
+      <div class="jumb-win-count jumb-score-red"  id="j-w-b">0</div>
+    </div>
+    <div style="width:2px;background:rgba(255,255,255,.1);border-radius:2px;"></div>
+    <div class="jumb-win-chip">
+      <div class="jumb-win-label">Team C 總積分</div>
+      <div class="jumb-win-count" style="color:#4ade80" id="j-w-c">0</div>
+    </div>
+  </div>
+
+  <!-- Tap hint -->
+  <div style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.75rem;color:rgba(255,255,255,.18);letter-spacing:.15em;">按右上角 ✕ 退出轉播</div>
+</div>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner">
+  <div class="pwa-icon">🏀</div>
+  <div class="pwa-text">
+    <div class="pwa-title">加入主畫面</div>
+    <div class="pwa-sub">像 App 一樣全螢幕體驗，無網址列</div>
+  </div>
+  <button class="pwa-install-btn" id="pwa-install-btn">安裝</button>
+  <button class="pwa-dismiss" onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-dismissed','1')">✕</button>
+</div>
+
 <!-- Confetti canvas — FIX #6 -->
 <canvas id="confetti-canvas"></canvas>
 
@@ -570,8 +696,7 @@ let step = 0;
 let dSt = { r:1, i:0 };
 let tInt = null, tMs = 0, tRun = false, tStartTime = 0;
 
-// Wins — NOTE: w is now DERIVED STATE. Never mutate directly from finalize.
-// Use computeWins() and refreshWins() instead.
+// Wins
 let w = { A:0, B:0, C:0 };
 let m = { d:null, p3:null, f:null };
 let fSt = { d:false, p3:false, f:false, u:false };
@@ -585,6 +710,7 @@ let fM = {
   bc: { s1:0, s2:0, h:1, remMs:{ 1:600000, 2:600000 }, endMs:null }
 };
 let fC = 'ab', fInt = null, fRun = false;
+let fSettled = { ab:false, ac:false, bc:false }; // 防止每場重複累加
 
 let gd = {
   d:  { A:[0,0], B:[0,0], C:[0,0] },
@@ -623,86 +749,8 @@ function fmtMs(ms) {
 }
 
 // ════════════════════════════════════════════════════════
-// DERIVED STATE — computeWins
-// w is calculated entirely from m.d, m.p3, m.f.
-// Call refreshWins() after any finalize/reset to keep w in sync.
-// NEVER call w[team]++ from a finalize handler.
+// LOGGING
 // ════════════════════════════════════════════════════════
-function computeWins() {
-  const out = { A:0, B:0, C:0 };
-  if (m.d  && out[m.d]  !== undefined) out[m.d]++;
-  if (m.p3 && out[m.p3] !== undefined) out[m.p3]++;
-  if (m.f  && out[m.f]  !== undefined) out[m.f]++;
-  return out;
-}
-
-function refreshWins() {
-  w = computeWins();
-}
-
-// ════════════════════════════════════════════════════════
-// DOUBLE-CLICK MUTEX — prevent duplicate finalize calls
-// ════════════════════════════════════════════════════════
-const finalizing = { d:false, p3:false, f:false };
-
-// ════════════════════════════════════════════════════════
-// HAPTIC FEEDBACK
-// ════════════════════════════════════════════════════════
-function haptic(ms) {
-  try {
-    if (navigator.vibrate) navigator.vibrate(ms);
-  } catch(e) { /* iOS Safari will silently ignore */ }
-}
-
-// ════════════════════════════════════════════════════════
-// WEB AUDIO API — Synthesized Sound (Player View)
-// ════════════════════════════════════════════════════════
-let _audioCtx = null;
-function getAudioCtx() {
-  if (!_audioCtx) {
-    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch(e) { return null; }
-  }
-  return _audioCtx;
-}
-
-// type: 'pop' (score update) | 'ding' (finalize) | 'buzz' (decrement/warn)
-function playSound(type = 'pop') {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-
-  const now = ctx.currentTime;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  if (type === 'pop') {
-    // Quick bright pop: sine, 440→220 over 80ms
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(520, now);
-    osc.frequency.exponentialRampToValueAtTime(260, now + 0.08);
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-    osc.start(now); osc.stop(now + 0.12);
-  } else if (type === 'ding') {
-    // Rich metallic ding for finalize (triangle wave, sustained)
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(880, now);
-    gain.gain.setValueAtTime(0.22, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-    osc.start(now); osc.stop(now + 0.5);
-  } else if (type === 'buzz') {
-    // Subtle warning buzz for decrement
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(120, now);
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-    osc.start(now); osc.stop(now + 0.07);
-  }
-}
-
-
 function addLog(msg) {
   if (role !== 'staff') return;
   const d  = new Date();
@@ -745,7 +793,7 @@ const DB     = () => firebase.database().ref('yingmei2026');
 const DB_BKP = () => firebase.database().ref('yingmei2026_backup');
 
 // Granular writers — each only writes its own sub-tree
-function syncWins()          { if (!fbReady||role!=='staff') return; refreshWins(); DB().child('w').set(w); }
+function syncWins()          { if (!fbReady||role!=='staff') return; DB().child('w').set(w); }
 function syncFlags()         { if (!fbReady||role!=='staff') return; DB().child('fSt').set(fSt); }
 function syncMarkers()       { if (!fbReady||role!=='staff') return; DB().child('m').set(m); }
 function syncDice()          { if (!fbReady||role!=='staff') return; DB().child('gd/d').set(gd.d); DB().child('dSt').set(dSt); }
@@ -756,6 +804,7 @@ function syncFiveVFive(key)  {
   else     DB().child('fM').set(fM);
   DB().child('fC').set(fC);
   DB().child('gd/f').set(gd.f);
+  DB().child('fSettled').set(fSettled);
 }
 function syncLogs()          { if (!fbReady||role!=='staff') return; DB().child('logs').set(logs); }
 function syncAll()           { if (!fbReady||role!=='staff') return; DB().set({gd,step,w,m,fM,fC,fSt,logs,dSt}); }
@@ -876,58 +925,42 @@ if (fbReady) {
       if (data.gd.p3) {
         if (data.gd.p3.r1) {
           Object.assign(gd.p3.r1, data.gd.p3.r1);
-          // ── EDGE CASE #3 FIX: Firebase drops empty arrays; sanitize on ingest ──
           ['A','B','C'].forEach(t => {
-            const node = gd.p3.r1[t];
-            if (!node) {
-              gd.p3.r1[t] = { p: Array(10).fill(0), t: 0 };
-            } else if (!Array.isArray(node.p)) {
-              // Firebase serialized as object {0:v,1:v,...}; convert back to Array
-              node.p = Array.from({ length: 10 }, (_, i) => Number(node.p?.[i] ?? 0));
-              node.t = Number(node.t ?? 0);
-            } else {
-              // Ensure all values are Numbers (guard against string coercion)
-              node.p = node.p.map(v => Number(v ?? 0));
-              node.t = Number(node.t ?? 0);
-            }
+            const n = gd.p3.r1[t];
+            if (n && !Array.isArray(n.p)) n.p = Array.from({length:10},(_,i)=>Number(n.p?.[i]??0));
           });
         }
         if (data.gd.p3.f) {
           Object.assign(gd.p3.f, data.gd.p3.f);
-          // Sanitize finals team arrays too
-          if (gd.p3.f.t) {
-            Object.keys(gd.p3.f.t).forEach(t => {
-              const node = gd.p3.f.t[t];
-              if (node && !Array.isArray(node.p)) {
-                node.p = Array.from({ length: 10 }, (_, i) => Number(node.p?.[i] ?? 0));
-                node.t = Number(node.t ?? 0);
-              }
-            });
-          }
+          // Firebase 把 Array 存成 Object {0:'A',1:'B'}，必須還原
+          if (gd.p3.f.q && !Array.isArray(gd.p3.f.q)) gd.p3.f.q = Object.values(gd.p3.f.q);
+          if (gd.p3.f.t) Object.keys(gd.p3.f.t).forEach(t => {
+            const n = gd.p3.f.t[t];
+            if (n && !Array.isArray(n.p)) n.p = Array.from({length:10},(_,i)=>Number(n.p?.[i]??0));
+          });
         }
       }
       if (data.gd.f) Object.assign(gd.f, data.gd.f);
     }
     if (data.step  !== undefined) step = data.step;
-    // NOTE: w is derived — we read m markers then recompute
+    if (data.w)    Object.assign(w,   data.w);
     if (data.m)    Object.assign(m,   data.m);
     if (data.fM)   ['ab','ac','bc'].forEach(k => { if(data.fM[k]) Object.assign(fM[k], data.fM[k]); });
     if (data.fC)   fC = data.fC;
-    if (data.fSt)  Object.assign(fSt, data.fSt);
+    if (data.fSt)     Object.assign(fSt, data.fSt);
+    if (data.fSettled) Object.assign(fSettled, data.fSettled);
     if (data.dSt)  Object.assign(dSt, data.dSt);
     if (data.logs) logs = data.logs;
 
-    // Recompute derived wins from markers
-    refreshWins();
-
     // Flicker-free — safeSet handles all updates
-    if (role === 'staff') renderStaff();
-    else                  renderPlayer();
+    if (role === 'staff')       renderStaff();
+    else if (role === 'jumbotron') renderJumbotron();
+    else                        renderPlayer();
   });
 }
 
 // ════════════════════════════════════════════════════════
-// RESET — derived-state version: w recalculated from m markers, no subtraction
+// RESET  — fully fixed: step rollback, UI unlock, idempotent
 // ════════════════════════════════════════════════════════
 function resetData(type) {
   if (prompt('輸入 0000 清除數據') !== '0000') { showToast('密碼錯誤', 'error'); return; }
@@ -935,7 +968,13 @@ function resetData(type) {
   if (type === 'dice') {
     gd.d = { A:[0,0], B:[0,0], C:[0,0] };
     dSt  = { r:1, i:0 };
-    m.d = null; fSt.d = false; finalizing.d = false;
+    // Only deduct win if this game was actually finalized (idempotent guard)
+    if (fSt.d && m.d) {
+      w[m.d] = Math.max(0, w[m.d] - 1);
+    }
+    m.d = null;
+    fSt.d = false;
+    // Step rollback: dice is step-1 territory; roll back if we were past it
     if (step >= 1) step = 0;
     tMs=0; tRun=false; clearInterval(tInt);
     safeSet('dice-timer','00:00.0');
@@ -943,14 +982,22 @@ function resetData(type) {
     $('d-r2').classList.add('hidden');
     $('d-fin').classList.add('hidden');
     $('d-next').classList.remove('hidden');
-    $('d-fin').disabled=false; $('d-fin').textContent='🏆 結算成績';
+    // Explicitly reset finalize button text & state
+    $('d-fin').disabled=false;
+    $('d-fin').textContent='🏆 結算成績';
     addLog('清除趣味競賽');
-    refreshWins(); syncDice(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    syncDice(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
   if (type === '3pt') {
     gd.p3 = { r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}}, f:{q:[],t:{}} };
-    m.p3 = null; fSt.p3 = false; finalizing.p3 = false;
+    // Only deduct win if this game was actually finalized (idempotent guard)
+    if (fSt.p3 && m.p3) {
+      w[m.p3] = Math.max(0, w[m.p3] - 1);
+    }
+    m.p3 = null;
+    fSt.p3 = false;
+    // Step rollback
     if (step >= 2) step = 1;
     $('pt-r1').classList.remove('hidden');
     $('pt-fin').classList.add('hidden');
@@ -960,7 +1007,7 @@ function resetData(type) {
     if (r1fin) { r1fin.disabled=false; r1fin.textContent='✅ 結算小組賽 (取前兩名)'; }
     build3Pt();
     addLog('清除三分球');
-    refreshWins(); sync3pt(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    sync3pt(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
   if (type === '5v5') {
@@ -970,19 +1017,28 @@ function resetData(type) {
       bc:{ s1:0,s2:0,h:1, remMs:{1:600000,2:600000}, endMs:null }
     };
     gd.f={A:0,B:0,C:0};
-    m.f = null; fSt.f = false; finalizing.f = false;
+    // Only deduct win if this game was actually finalized (idempotent guard)
+    if (fSt.f && m.f) {
+      w[m.f] = Math.max(0, w[m.f] - 1);
+    }
+    m.f = null;
+    fSt.f = false;
+    // Step rollback
     if (step >= 3) step = 2;
     fC='ab'; fRun=false; clearInterval(fInt);
     document.querySelectorAll('.f-match').forEach(b=>b.classList.remove('active'));
     document.querySelector('[data-m="ab"]').classList.add('active');
+    // Explicitly reset finalize button text & state
     const ffin=$('f-fin');
     if (ffin) { ffin.disabled=false; ffin.textContent='✅ 結算此場並累加'; }
     addLog('清除五五賽');
-    refreshWins(); syncFiveVFive(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    syncFiveVFive(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
+  // Also reset podium forced-unlock when any game resets
   fSt.u = false;
   podiumShown = false;
+
   updateUI();
 }
 
@@ -990,13 +1046,14 @@ function resetData(type) {
 // ROLE SWITCHING — FIX #1
 // ════════════════════════════════════════════════════════
 $('role-staff').onclick = () => {
-  getAudioCtx(); // warm up audio context on first gesture
   role='staff'; $('role-overlay').style.display='none';
   updateUI(); addLog('工作人員登入'); syncLogs();
 };
 $('role-player').onclick = () => {
-  getAudioCtx();
   role='player'; $('role-overlay').style.display='none'; updateUI();
+};
+$('role-jumbotron').onclick = () => {
+  role='jumbotron'; $('role-overlay').style.display='none'; enterJumbotron();
 };
 $('p-back').onclick = () => { role='staff'; updateUI(); };
 $('switch-to-player').onclick = () => { role='player'; updateUI(); };
@@ -1033,10 +1090,16 @@ function updateUI() {
   if (role === 'staff') {
     document.body.className = 'staff-mode h-full w-full';
     $('player-view').style.display = 'none';
+    $('jumbotron-view').style.display = 'none';
     renderStaff();
+  } else if (role === 'jumbotron') {
+    document.body.className = 'h-full w-full';
+    $('player-view').style.display = 'none';
+    // jumbotron managed by enterJumbotron/renderJumbotron
   } else {
     document.body.className = 'player-mode h-full w-full';
     $('player-view').style.display = 'flex';
+    $('jumbotron-view').style.display = 'none';
     renderPlayer();
   }
 }
@@ -1079,13 +1142,8 @@ function renderStaff() {
   // 3pt
   if (gd.p3.f.q && gd.p3.f.q.length===2) { $('pt-r1').classList.add('hidden'); $('pt-fin').classList.remove('hidden'); }
   else { $('pt-r1').classList.remove('hidden'); $('pt-fin').classList.add('hidden'); }
-  if (fSt.p3) {
-    $('pt-f-fin').textContent='🔒 已結算'; $('pt-f-fin').disabled=true;
-  } else {
-    if ($('pt-f-fin').textContent==='🔒 已結算') {
-      $('pt-f-fin').textContent='🏆 結算決賽'; $('pt-f-fin').disabled=false;
-    }
-  }
+  const _ptfBtn = $('pt-f-fin');
+  if (_ptfBtn) { _ptfBtn.textContent = fSt.p3 ? '🔒 已結算' : '🏆 結算決賽'; _ptfBtn.disabled = !!fSt.p3; }
 
   // 5v5
   const mc    = fM[fC];
@@ -1101,13 +1159,9 @@ function renderStaff() {
   safeSet('f-score-ab', `${fM.ab.s1} - ${fM.ab.s2}`);
   safeSet('f-score-ac', `${fM.ac.s1} - ${fM.ac.s2}`);
   safeSet('f-score-bc', `${fM.bc.s1} - ${fM.bc.s2}`);
-  if (fSt.f) {
-    $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true;
-  } else {
-    if ($('f-fin').textContent==='🔒 已結算') {
-      $('f-fin').textContent='✅ 結算此場並累加'; $('f-fin').disabled=false;
-    }
-  }
+  // 無條件根據 fSt.f 設定（不做 textContent 比較）
+  if (fSt.f) { $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true; }
+  else        { $('f-fin').textContent='✅ 結算此場並累加'; $('f-fin').disabled=false; }
 
   // Podium
   const allDone = fSt.u || (fSt.d && fSt.p3 && fSt.f);
@@ -1317,25 +1371,12 @@ $('d-r2').onclick = () => {
 };
 
 $('d-fin').onclick = () => {
-  // ── MUTEX: prevent double-click race ──
-  if (finalizing.d) return;
   if (!confirm('確認結算趣味競賽？')) return;
-  finalizing.d = true;
-  $('d-fin').textContent='🔒 已結算'; $('d-fin').disabled=true;
-
-  const scores = tm.map(t=>({ t, s: Number(gd.d[t]?gd.d[t][0]:0) + Number(gd.d[t]?gd.d[t][1]:0) }))
+  const scores = tm.map(t=>({ t, s:(gd.d[t]?gd.d[t][0]:0)+(gd.d[t]?gd.d[t][1]:0) }))
                    .filter(x=>x.s>0).sort((a,b)=>a.s-b.s);
-  if (scores.length<3) {
-    showToast('數據不足，請完成所有計時', 'warn');
-    // roll back mutex + button state
-    finalizing.d=false; $('d-fin').textContent='🏆 結算成績'; $('d-fin').disabled=false;
-    return;
-  }
-  // ── DERIVED STATE: write marker, recompute ──
-  m.d = scores[0].t; fSt.d = true;
-  refreshWins();
-  haptic(30);
-  playSound('ding');
+  if (scores.length<3) { showToast('數據不足，請完成所有計時', 'warn'); return; }
+  w[scores[0].t]++; m.d=scores[0].t; fSt.d=true;
+  $('d-fin').textContent='🔒 已結算'; $('d-fin').disabled=true;
   addLog(`趣味競賽結算：冠軍 Team ${scores[0].t}`);
   syncWins(); syncFlags(); syncMarkers(); syncLogs(); renderStaff();
 };
@@ -1385,18 +1426,11 @@ function p3Step(stage, team, idx, delta) {
     if (valEl) valEl.textContent = obj.p[idx];
     if (totEl) totEl.textContent = obj.t;
   }
-  // Haptic: 8ms tap for +1, buzz for decrement
-  if (delta > 0) haptic(8);
-  else           haptic(4);
   sync3pt();
 }
 
 $('pt-r1-fin').onclick = () => {
-  // ── EDGE CASE #2 FIX: strict Number() cast on all scores ──
-  const scores = tm.map(t=>({ t, s: Number(gd.p3.r1[t]?.t ?? 0) })).sort((a,b)=>b.s-a.s);
-  // Length guard: we always have exactly 3 teams but be explicit
-  if (scores.length < 3) { showToast('數據異常，請重新整理', 'error'); return; }
-  // Tie: 2nd and 3rd are equal
+  const scores = tm.map(t=>({t,s:gd.p3.r1[t]?gd.p3.r1[t].t:0})).sort((a,b)=>b.s-a.s);
   if (scores[1].s === scores[2].s) {
     // FIX #5 — Updated tie-breaker modal copy
     const modal = document.createElement('div');
@@ -1446,23 +1480,16 @@ function build3f() {
 }
 
 $('pt-f-fin').onclick = () => {
-  // ── MUTEX ──
-  if (finalizing.p3) return;
   if (!confirm('確認結算三分球決賽？')) return;
-  const q=gd.p3.f.q; if(!q||q.length<2){showToast('晉級隊伍數據異常','error');return;}
-  finalizing.p3 = true;
-  $('pt-f-fin').textContent='🔒 已結算'; $('pt-f-fin').disabled=true;
-
-  // ── EDGE CASE #2: strict Number() cast ──
-  const s1 = Number(gd.p3.f.t[q[0]]?.t ?? 0);
-  const s2 = Number(gd.p3.f.t[q[1]]?.t ?? 0);
-  const winner = s1 >= s2 ? q[0] : q[1];
-  // ── DERIVED STATE ──
-  m.p3 = winner; fSt.p3 = true;
-  refreshWins();
-  haptic(30);
-  playSound('ding');
+  const q=gd.p3.f.q;
+  if (!q||q.length<2) { showToast('晉級隊伍數據異常','error'); return; }
+  const s1=(gd.p3.f.t&&gd.p3.f.t[q[0]])?(gd.p3.f.t[q[0]].t||0):0;
+  const s2=(gd.p3.f.t&&gd.p3.f.t[q[1]])?(gd.p3.f.t[q[1]].t||0):0;
+  const winner=s1>=s2?q[0]:q[1];
+  w[winner]++; m.p3=winner; fSt.p3=true;
+  const _b=$('pt-f-fin'); if(_b){_b.textContent='🔒 已結算';_b.disabled=true;}
   addLog(`三分球結算：冠軍 Team ${winner}`);
+  showToast(`🏆 三分球冠軍：Team ${winner}！`, 'success', 4000);
   syncWins(); syncFlags(); syncMarkers(); sync3pt(); syncLogs(); renderStaff();
 };
 
@@ -1523,9 +1550,6 @@ function addF(side, pts) {
   const mc=fM[fC];
   if (side===1) mc.s1=Math.max(0,mc.s1+pts);
   else          mc.s2=Math.max(0,mc.s2+pts);
-  // Haptic: short for +1, medium for +2/+3, buzz for decrement
-  if (pts > 0) { haptic(pts === 1 ? 10 : 20); playSound('pop'); }
-  else         { haptic(6); playSound('buzz'); }
   addLog(`五五賽 ${fC.toUpperCase()} T${side} ${pts>0?'+':''}${pts}`);
   syncFiveVFive(fC); syncLogs(); renderStaff(); renderPlayer();
 }
@@ -1539,11 +1563,9 @@ function resF() {
 }
 
 $('f-fin').onclick = () => {
-  // ── MUTEX ──
-  if (finalizing.f) return;
+  if (fSettled[fC]) { showToast('此場已結算', 'warn'); return; }
   if (!confirm('確認結算此場並累加積分？')) return;
-  finalizing.f = true;
-
+  fSettled[fC] = true; // 立即鎖定防止重複
   const mc=fM[fC], t1=fC[0].toUpperCase(), t2=fC[1].toUpperCase();
   gd.f[t1]=(gd.f[t1]||0)+mc.s1; gd.f[t2]=(gd.f[t2]||0)+mc.s2;
   fRun=false; clearInterval(fInt); mc.endMs=null;
@@ -1551,22 +1573,18 @@ $('f-fin').onclick = () => {
 
   const order=['ab','ac','bc'], idx=order.indexOf(fC);
   if (idx<2) {
-    // Not the final match — advance to next, release mutex for f-fin reuse
-    finalizing.f = false;
+    const winner = mc.s1>=mc.s2?t1:t2;
     fC=order[idx+1];
     document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));
     document.querySelector(`[data-m="${fC}"]`).classList.add('active');
     addLog(`自動切換至 ${fC.toUpperCase()}`);
-    haptic(10);
+    showToast(`✅ 本場 Team ${winner} 勝！切換至下一場`, 'success', 3000);
   } else {
-    // All 3 matches done — compute winner via derived state
-    const sorted=tm.map(t=>({t,s:Number(gd.f[t]||0)})).sort((a,b)=>b.s-a.s);
-    m.f=sorted[0].t; fSt.f=true;
-    refreshWins();
+    const sorted=tm.map(t=>({t,s:gd.f[t]||0})).sort((a,b)=>b.s-a.s);
+    w[sorted[0].t]++; m.f=sorted[0].t; fSt.f=true;
     $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true;
-    haptic(40);
-    playSound('ding');
     addLog(`五五賽全部結算：積分王 Team ${sorted[0].t}`);
+    showToast(`🏆 五五賽冠軍：Team ${sorted[0].t}！`, 'success', 5000);
     syncWins(); syncFlags(); syncMarkers();
   }
   syncFiveVFive(); syncLogs(); renderStaff(); renderPlayer();
@@ -1684,6 +1702,243 @@ function showGuide() {
 
   document.body.appendChild(overlay);
 }
+
+// ════════════════════════════════════════════════════════
+// JUMBOTRON MODE — Full-screen broadcast
+// ════════════════════════════════════════════════════════
+let _jInt = null;
+
+function enterJumbotron() {
+  const jv = $('jumbotron-view');
+  jv.style.display = 'flex';
+  // Request fullscreen if supported
+  try {
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+  } catch(e) {}
+
+  renderJumbotron();
+
+  // Realtime tick for timer
+  _jInt = setInterval(renderJumbotron, 250);
+}
+
+function exitJumbotron() {
+  clearInterval(_jInt); _jInt = null;
+  $('jumbotron-view').style.display = 'none';
+  $('jumbotron-view').classList.remove('urgent');
+  try { if (document.exitFullscreen) document.exitFullscreen(); } catch(e) {}
+  role = 'staff';
+  $('role-overlay').style.display = 'flex';
+}
+
+function renderJumbotron() {
+  const jv = $('jumbotron-view');
+  if (!jv || jv.style.display === 'none') return;
+
+  // Update win totals
+  safeSet('j-w-a', w.A); safeSet('j-w-b', w.B); safeSet('j-w-c', w.C);
+
+  // Detect which event is currently most active
+  // Priority: running 5v5 > 5v5 not finished > 3pt final > 3pt group > dice
+  if (!fSt.f) {
+    // 5v5 active or in progress
+    _renderJumb5v5();
+  } else if (!fSt.p3) {
+    _renderJumb3pt();
+  } else if (!fSt.d) {
+    _renderJumbDice();
+  } else {
+    // All done — show final standings
+    _renderJumbPodium();
+  }
+}
+
+function _renderJumb5v5() {
+  const mc    = fM[fC];
+  const half  = mc.h;
+  const remMs = fRun ? Math.max(0, mc.endMs - Date.now()) : mc.remMs[half];
+  const t1    = fC[0].toUpperCase(), t2 = fC[1].toUpperCase();
+  const isUrgent = remMs < 60000 && remMs > 0;
+
+  safeSet('j-event-label', `五五賽 · ${fC.toUpperCase()}`);
+  safeSet('j-t1', `Team ${t1}`); safeSet('j-t2', `Team ${t2}`);
+  safeSet('j-s1', mc.s1);        safeSet('j-s2', mc.s2);
+  safeSet('j-timer', fRun || remMs > 0 ? fmtMs(remMs) : '結束');
+  safeSet('j-half',  half === 1 ? '上半場' : '下半場');
+
+  const jv = $('jumbotron-view');
+  if (isUrgent) jv.classList.add('urgent');
+  else          jv.classList.remove('urgent');
+
+  // Timer color
+  const timerEl = $('j-timer');
+  if (timerEl) timerEl.style.color = isUrgent ? '#ef4444' : remMs < 180000 ? '#f59e0b' : '#FFD700';
+}
+
+function _renderJumb3pt() {
+  safeSet('j-event-label', '三分球大賽');
+  $('jumbotron-view').classList.remove('urgent');
+
+  if (gd.p3.f.q && gd.p3.f.q.length === 2) {
+    // Final round
+    const q  = gd.p3.f.q;
+    const s1 = gd.p3.f.t[q[0]] ? gd.p3.f.t[q[0]].t : 0;
+    const s2 = gd.p3.f.t[q[1]] ? gd.p3.f.t[q[1]].t : 0;
+    safeSet('j-t1', `Team ${q[0]}`); safeSet('j-t2', `Team ${q[1]}`);
+    safeSet('j-s1', s1);              safeSet('j-s2', s2);
+    safeSet('j-timer', '決賽');       safeSet('j-half', '三分球');
+  } else {
+    // Group stage — show totals
+    const scores = tm.map(t => ({ t, s: gd.p3.r1[t] ? gd.p3.r1[t].t : 0 })).sort((a,b) => b.s-a.s);
+    safeSet('j-t1', `Team ${scores[0].t}`); safeSet('j-t2', `Team ${scores[1].t}`);
+    safeSet('j-s1', scores[0].s);            safeSet('j-s2', scores[1].s);
+    safeSet('j-timer', `${scores[2].t}: ${scores[2].s}`); safeSet('j-half', '小組賽進行中');
+  }
+  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#FFD700';
+}
+
+function _renderJumbDice() {
+  safeSet('j-event-label', '趣味競賽');
+  $('jumbotron-view').classList.remove('urgent');
+  const curTeam = dSt.i < tm.length ? `Team ${tm[dSt.i]}` : '計時結束';
+  safeSet('j-t1', curTeam); safeSet('j-t2', '');
+  safeSet('j-s1', ''); safeSet('j-s2', '');
+  safeSet('j-timer', tRun ? fmt(tMs) : (tMs > 0 ? fmt(tMs) : '--:--.-'));
+  safeSet('j-half', `第 ${dSt.r} 輪`);
+  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#FFD700';
+}
+
+function _renderJumbPodium() {
+  $('jumbotron-view').classList.remove('urgent');
+  safeSet('j-event-label', '最終頒獎');
+  const sorted = tm.map(t => ({ t, s: w[t] })).sort((a,b) => b.s-a.s);
+  safeSet('j-t1', `🥇 Team ${sorted[0].t}`); safeSet('j-t2', `🥈 Team ${sorted[1].t}`);
+  safeSet('j-s1', `${sorted[0].s} 局`);       safeSet('j-s2', `${sorted[1].s} 局`);
+  safeSet('j-timer', `🥉 Team ${sorted[2].t}`);
+  safeSet('j-half',  `${sorted[2].s} 局`);
+  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#a5b4fc';
+}
+
+// ════════════════════════════════════════════════════════
+// PWA — Manifest + Icon + Install Prompt
+// ════════════════════════════════════════════════════════
+(function initPWA() {
+  // 1. Generate app icon via canvas (basketball design)
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Background gradient
+  const bg = ctx.createRadialGradient(256,220,20,256,256,280);
+  bg.addColorStop(0, '#003070'); bg.addColorStop(1, '#000d1f');
+  ctx.fillStyle = bg; ctx.beginPath();
+  ctx.roundRect(0,0,512,512,80); ctx.fill();
+
+  // Basketball circle
+  const ball = ctx.createRadialGradient(256,230,30,256,256,160);
+  ball.addColorStop(0,'#f97316'); ball.addColorStop(0.6,'#ea580c'); ball.addColorStop(1,'#9a3412');
+  ctx.fillStyle = ball;
+  ctx.beginPath(); ctx.arc(256,256,155,0,Math.PI*2); ctx.fill();
+
+  // Ball lines
+  ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=8; ctx.lineCap='round';
+  // Vertical line
+  ctx.beginPath(); ctx.moveTo(256,101); ctx.lineTo(256,411); ctx.stroke();
+  // Horizontal line
+  ctx.beginPath(); ctx.moveTo(101,256); ctx.lineTo(411,256); ctx.stroke();
+  // Curves
+  ctx.beginPath(); ctx.arc(256,256,100,0,Math.PI,false); ctx.stroke();
+  ctx.beginPath(); ctx.arc(256,256,100,Math.PI,Math.PI*2,false); ctx.stroke();
+
+  // Gold ring around ball
+  ctx.strokeStyle='rgba(255,215,0,.6)'; ctx.lineWidth=6;
+  ctx.beginPath(); ctx.arc(256,256,160,0,Math.PI*2); ctx.stroke();
+
+  // Text
+  ctx.fillStyle='#FFD700';
+  ctx.font='bold 52px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(0,0,0,.8)'; ctx.shadowBlur=12;
+  ctx.fillText('英美', 256, 430);
+
+  const iconUrl = canvas.toDataURL('image/png');
+
+  // Set apple-touch-icon
+  const touchIcon = document.getElementById('apple-touch-icon');
+  if (touchIcon) touchIcon.href = iconUrl;
+
+  // 2. Build and inject manifest as blob URL
+  const manifest = {
+    name: '2026 英美回娘家籃球交流賽',
+    short_name: '英美籃球賽',
+    description: '英美籃球交流賽即時計分系統',
+    start_url: window.location.href,
+    display: 'standalone',
+    background_color: '#000d1f',
+    theme_color: '#001F3F',
+    orientation: 'any',
+    icons: [
+      { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const manifestUrl  = URL.createObjectURL(manifestBlob);
+  const manifestLink = document.getElementById('pwa-manifest');
+  if (manifestLink) manifestLink.href = manifestUrl;
+
+  // 3. PWA Install prompt (Android Chrome)
+  let _deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    // Only show if not dismissed before
+    if (!localStorage.getItem('pwa-dismissed')) {
+      setTimeout(() => {
+        const banner = $('pwa-banner');
+        if (banner) banner.style.display = 'flex';
+      }, 3000);
+    }
+  });
+
+  const installBtn = $('pwa-install-btn');
+  if (installBtn) {
+    installBtn.onclick = async () => {
+      if (_deferredPrompt) {
+        _deferredPrompt.prompt();
+        const { outcome } = await _deferredPrompt.userChoice;
+        _deferredPrompt = null;
+        const banner = $('pwa-banner');
+        if (banner) banner.style.display = 'none';
+        if (outcome === 'accepted') showToast('已加入主畫面！🎉', 'success', 3000);
+      } else {
+        // iOS / fallback: show instructions
+        showToast('請點選瀏覽器分享鍵 → 加入主畫面', 'info', 5000);
+        const banner = $('pwa-banner');
+        if (banner) banner.style.display = 'none';
+      }
+    };
+  }
+
+  // iOS detection — show banner with instructions after delay
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone;
+  if (isIOS && !localStorage.getItem('pwa-dismissed')) {
+    setTimeout(() => {
+      const banner = $('pwa-banner');
+      if (banner) {
+        banner.style.display = 'flex';
+        const btn = $('pwa-install-btn');
+        if (btn) btn.textContent = '如何安裝？';
+      }
+    }, 4000);
+  }
+
+  // Already installed (standalone mode) — hide banner
+  if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+    const banner = $('pwa-banner');
+    if (banner) banner.style.display = 'none';
+  }
+})();
 
 // ════════════════════════════════════════════════════════
 // INIT
