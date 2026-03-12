@@ -31,9 +31,26 @@
     /* Confetti layer */
     #confetti-canvas  { position:fixed; inset:0; pointer-events:none; z-index:9990; }
 
-    /* ── Cards ── */
-    .glass-card    { background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; }
-    .glass-card-lg { background:rgba(10,15,31,0.6);    backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:20px; }
+    /* ── Cards — Enhanced Glassmorphism ── */
+    .glass-card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-top: 1px solid rgba(255,255,255,0.26);
+      border-left: 1px solid rgba(255,255,255,0.20);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.09);
+    }
+    .glass-card-lg {
+      background: rgba(10,15,31,0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-top: 1px solid rgba(255,255,255,0.24);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
 
     /* ── Buttons ── */
     .btn-primary   { background:linear-gradient(135deg,#FFD700 0%,#ffc107 100%); color:#000; font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; border:none; }
@@ -173,11 +190,12 @@
     /* ── Score Pop Animation (UX #5) ── */
     @keyframes scorePop {
       0%   { transform: scale(1); }
-      40%  { transform: scale(1.45); color: #FFD700; }
-      70%  { transform: scale(0.9); }
-      100% { transform: scale(1); }
+      30%  { transform: scale(1.55); filter: drop-shadow(0 0 12px rgba(255,215,0,0.9)); color: #FFD700; }
+      60%  { transform: scale(0.88); }
+      80%  { transform: scale(1.08); }
+      100% { transform: scale(1); filter: none; }
     }
-    .animate-pop { animation: scorePop 0.35s ease-out forwards; }
+    .animate-pop { animation: scorePop 0.42s cubic-bezier(.36,.07,.19,.97) forwards; display:inline-block; }
 
     /* ── 3PT Stepper Buttons (UX #3) ── */
     .stepper-wrap {
@@ -552,7 +570,8 @@ let step = 0;
 let dSt = { r:1, i:0 };
 let tInt = null, tMs = 0, tRun = false, tStartTime = 0;
 
-// Wins
+// Wins — NOTE: w is now DERIVED STATE. Never mutate directly from finalize.
+// Use computeWins() and refreshWins() instead.
 let w = { A:0, B:0, C:0 };
 let m = { d:null, p3:null, f:null };
 let fSt = { d:false, p3:false, f:false, u:false };
@@ -604,8 +623,86 @@ function fmtMs(ms) {
 }
 
 // ════════════════════════════════════════════════════════
-// LOGGING
+// DERIVED STATE — computeWins
+// w is calculated entirely from m.d, m.p3, m.f.
+// Call refreshWins() after any finalize/reset to keep w in sync.
+// NEVER call w[team]++ from a finalize handler.
 // ════════════════════════════════════════════════════════
+function computeWins() {
+  const out = { A:0, B:0, C:0 };
+  if (m.d  && out[m.d]  !== undefined) out[m.d]++;
+  if (m.p3 && out[m.p3] !== undefined) out[m.p3]++;
+  if (m.f  && out[m.f]  !== undefined) out[m.f]++;
+  return out;
+}
+
+function refreshWins() {
+  w = computeWins();
+}
+
+// ════════════════════════════════════════════════════════
+// DOUBLE-CLICK MUTEX — prevent duplicate finalize calls
+// ════════════════════════════════════════════════════════
+const finalizing = { d:false, p3:false, f:false };
+
+// ════════════════════════════════════════════════════════
+// HAPTIC FEEDBACK
+// ════════════════════════════════════════════════════════
+function haptic(ms) {
+  try {
+    if (navigator.vibrate) navigator.vibrate(ms);
+  } catch(e) { /* iOS Safari will silently ignore */ }
+}
+
+// ════════════════════════════════════════════════════════
+// WEB AUDIO API — Synthesized Sound (Player View)
+// ════════════════════════════════════════════════════════
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) {
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  return _audioCtx;
+}
+
+// type: 'pop' (score update) | 'ding' (finalize) | 'buzz' (decrement/warn)
+function playSound(type = 'pop') {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  if (type === 'pop') {
+    // Quick bright pop: sine, 440→220 over 80ms
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(260, now + 0.08);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.start(now); osc.stop(now + 0.12);
+  } else if (type === 'ding') {
+    // Rich metallic ding for finalize (triangle wave, sustained)
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(880, now);
+    gain.gain.setValueAtTime(0.22, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc.start(now); osc.stop(now + 0.5);
+  } else if (type === 'buzz') {
+    // Subtle warning buzz for decrement
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(120, now);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+    osc.start(now); osc.stop(now + 0.07);
+  }
+}
+
+
 function addLog(msg) {
   if (role !== 'staff') return;
   const d  = new Date();
@@ -648,7 +745,7 @@ const DB     = () => firebase.database().ref('yingmei2026');
 const DB_BKP = () => firebase.database().ref('yingmei2026_backup');
 
 // Granular writers — each only writes its own sub-tree
-function syncWins()          { if (!fbReady||role!=='staff') return; DB().child('w').set(w); }
+function syncWins()          { if (!fbReady||role!=='staff') return; refreshWins(); DB().child('w').set(w); }
 function syncFlags()         { if (!fbReady||role!=='staff') return; DB().child('fSt').set(fSt); }
 function syncMarkers()       { if (!fbReady||role!=='staff') return; DB().child('m').set(m); }
 function syncDice()          { if (!fbReady||role!=='staff') return; DB().child('gd/d').set(gd.d); DB().child('dSt').set(dSt); }
@@ -777,19 +874,51 @@ if (fbReady) {
     if (data.gd) {
       if (data.gd.d)  Object.assign(gd.d, data.gd.d);
       if (data.gd.p3) {
-        if (data.gd.p3.r1) Object.assign(gd.p3.r1, data.gd.p3.r1);
-        if (data.gd.p3.f)  Object.assign(gd.p3.f,  data.gd.p3.f);
+        if (data.gd.p3.r1) {
+          Object.assign(gd.p3.r1, data.gd.p3.r1);
+          // ── EDGE CASE #3 FIX: Firebase drops empty arrays; sanitize on ingest ──
+          ['A','B','C'].forEach(t => {
+            const node = gd.p3.r1[t];
+            if (!node) {
+              gd.p3.r1[t] = { p: Array(10).fill(0), t: 0 };
+            } else if (!Array.isArray(node.p)) {
+              // Firebase serialized as object {0:v,1:v,...}; convert back to Array
+              node.p = Array.from({ length: 10 }, (_, i) => Number(node.p?.[i] ?? 0));
+              node.t = Number(node.t ?? 0);
+            } else {
+              // Ensure all values are Numbers (guard against string coercion)
+              node.p = node.p.map(v => Number(v ?? 0));
+              node.t = Number(node.t ?? 0);
+            }
+          });
+        }
+        if (data.gd.p3.f) {
+          Object.assign(gd.p3.f, data.gd.p3.f);
+          // Sanitize finals team arrays too
+          if (gd.p3.f.t) {
+            Object.keys(gd.p3.f.t).forEach(t => {
+              const node = gd.p3.f.t[t];
+              if (node && !Array.isArray(node.p)) {
+                node.p = Array.from({ length: 10 }, (_, i) => Number(node.p?.[i] ?? 0));
+                node.t = Number(node.t ?? 0);
+              }
+            });
+          }
+        }
       }
       if (data.gd.f) Object.assign(gd.f, data.gd.f);
     }
     if (data.step  !== undefined) step = data.step;
-    if (data.w)    Object.assign(w,   data.w);
+    // NOTE: w is derived — we read m markers then recompute
     if (data.m)    Object.assign(m,   data.m);
     if (data.fM)   ['ab','ac','bc'].forEach(k => { if(data.fM[k]) Object.assign(fM[k], data.fM[k]); });
     if (data.fC)   fC = data.fC;
     if (data.fSt)  Object.assign(fSt, data.fSt);
     if (data.dSt)  Object.assign(dSt, data.dSt);
     if (data.logs) logs = data.logs;
+
+    // Recompute derived wins from markers
+    refreshWins();
 
     // Flicker-free — safeSet handles all updates
     if (role === 'staff') renderStaff();
@@ -798,7 +927,7 @@ if (fbReady) {
 }
 
 // ════════════════════════════════════════════════════════
-// RESET  — fully fixed: step rollback, UI unlock, idempotent
+// RESET — derived-state version: w recalculated from m markers, no subtraction
 // ════════════════════════════════════════════════════════
 function resetData(type) {
   if (prompt('輸入 0000 清除數據') !== '0000') { showToast('密碼錯誤', 'error'); return; }
@@ -806,13 +935,7 @@ function resetData(type) {
   if (type === 'dice') {
     gd.d = { A:[0,0], B:[0,0], C:[0,0] };
     dSt  = { r:1, i:0 };
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.d && m.d) {
-      w[m.d] = Math.max(0, w[m.d] - 1);
-    }
-    m.d = null;
-    fSt.d = false;
-    // Step rollback: dice is step-1 territory; roll back if we were past it
+    m.d = null; fSt.d = false; finalizing.d = false;
     if (step >= 1) step = 0;
     tMs=0; tRun=false; clearInterval(tInt);
     safeSet('dice-timer','00:00.0');
@@ -820,22 +943,14 @@ function resetData(type) {
     $('d-r2').classList.add('hidden');
     $('d-fin').classList.add('hidden');
     $('d-next').classList.remove('hidden');
-    // Explicitly reset finalize button text & state
-    $('d-fin').disabled=false;
-    $('d-fin').textContent='🏆 結算成績';
+    $('d-fin').disabled=false; $('d-fin').textContent='🏆 結算成績';
     addLog('清除趣味競賽');
-    syncDice(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    refreshWins(); syncDice(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
   if (type === '3pt') {
     gd.p3 = { r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}}, f:{q:[],t:{}} };
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.p3 && m.p3) {
-      w[m.p3] = Math.max(0, w[m.p3] - 1);
-    }
-    m.p3 = null;
-    fSt.p3 = false;
-    // Step rollback
+    m.p3 = null; fSt.p3 = false; finalizing.p3 = false;
     if (step >= 2) step = 1;
     $('pt-r1').classList.remove('hidden');
     $('pt-fin').classList.add('hidden');
@@ -845,7 +960,7 @@ function resetData(type) {
     if (r1fin) { r1fin.disabled=false; r1fin.textContent='✅ 結算小組賽 (取前兩名)'; }
     build3Pt();
     addLog('清除三分球');
-    sync3pt(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    refreshWins(); sync3pt(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
   if (type === '5v5') {
@@ -855,28 +970,19 @@ function resetData(type) {
       bc:{ s1:0,s2:0,h:1, remMs:{1:600000,2:600000}, endMs:null }
     };
     gd.f={A:0,B:0,C:0};
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.f && m.f) {
-      w[m.f] = Math.max(0, w[m.f] - 1);
-    }
-    m.f = null;
-    fSt.f = false;
-    // Step rollback
+    m.f = null; fSt.f = false; finalizing.f = false;
     if (step >= 3) step = 2;
     fC='ab'; fRun=false; clearInterval(fInt);
     document.querySelectorAll('.f-match').forEach(b=>b.classList.remove('active'));
     document.querySelector('[data-m="ab"]').classList.add('active');
-    // Explicitly reset finalize button text & state
     const ffin=$('f-fin');
     if (ffin) { ffin.disabled=false; ffin.textContent='✅ 結算此場並累加'; }
     addLog('清除五五賽');
-    syncFiveVFive(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+    refreshWins(); syncFiveVFive(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
   }
 
-  // Also reset podium forced-unlock when any game resets
   fSt.u = false;
   podiumShown = false;
-
   updateUI();
 }
 
@@ -884,10 +990,12 @@ function resetData(type) {
 // ROLE SWITCHING — FIX #1
 // ════════════════════════════════════════════════════════
 $('role-staff').onclick = () => {
+  getAudioCtx(); // warm up audio context on first gesture
   role='staff'; $('role-overlay').style.display='none';
   updateUI(); addLog('工作人員登入'); syncLogs();
 };
 $('role-player').onclick = () => {
+  getAudioCtx();
   role='player'; $('role-overlay').style.display='none'; updateUI();
 };
 $('p-back').onclick = () => { role='staff'; updateUI(); };
@@ -1209,12 +1317,25 @@ $('d-r2').onclick = () => {
 };
 
 $('d-fin').onclick = () => {
+  // ── MUTEX: prevent double-click race ──
+  if (finalizing.d) return;
   if (!confirm('確認結算趣味競賽？')) return;
-  const scores = tm.map(t=>({ t, s:(gd.d[t]?gd.d[t][0]:0)+(gd.d[t]?gd.d[t][1]:0) }))
-                   .filter(x=>x.s>0).sort((a,b)=>a.s-b.s);
-  if (scores.length<3) { showToast('數據不足，請完成所有計時', 'warn'); return; }
-  w[scores[0].t]++; m.d=scores[0].t; fSt.d=true;
+  finalizing.d = true;
   $('d-fin').textContent='🔒 已結算'; $('d-fin').disabled=true;
+
+  const scores = tm.map(t=>({ t, s: Number(gd.d[t]?gd.d[t][0]:0) + Number(gd.d[t]?gd.d[t][1]:0) }))
+                   .filter(x=>x.s>0).sort((a,b)=>a.s-b.s);
+  if (scores.length<3) {
+    showToast('數據不足，請完成所有計時', 'warn');
+    // roll back mutex + button state
+    finalizing.d=false; $('d-fin').textContent='🏆 結算成績'; $('d-fin').disabled=false;
+    return;
+  }
+  // ── DERIVED STATE: write marker, recompute ──
+  m.d = scores[0].t; fSt.d = true;
+  refreshWins();
+  haptic(30);
+  playSound('ding');
   addLog(`趣味競賽結算：冠軍 Team ${scores[0].t}`);
   syncWins(); syncFlags(); syncMarkers(); syncLogs(); renderStaff();
 };
@@ -1264,11 +1385,18 @@ function p3Step(stage, team, idx, delta) {
     if (valEl) valEl.textContent = obj.p[idx];
     if (totEl) totEl.textContent = obj.t;
   }
+  // Haptic: 8ms tap for +1, buzz for decrement
+  if (delta > 0) haptic(8);
+  else           haptic(4);
   sync3pt();
 }
 
 $('pt-r1-fin').onclick = () => {
-  const scores = tm.map(t=>({t,s:gd.p3.r1[t]?gd.p3.r1[t].t:0})).sort((a,b)=>b.s-a.s);
+  // ── EDGE CASE #2 FIX: strict Number() cast on all scores ──
+  const scores = tm.map(t=>({ t, s: Number(gd.p3.r1[t]?.t ?? 0) })).sort((a,b)=>b.s-a.s);
+  // Length guard: we always have exactly 3 teams but be explicit
+  if (scores.length < 3) { showToast('數據異常，請重新整理', 'error'); return; }
+  // Tie: 2nd and 3rd are equal
   if (scores[1].s === scores[2].s) {
     // FIX #5 — Updated tie-breaker modal copy
     const modal = document.createElement('div');
@@ -1318,13 +1446,22 @@ function build3f() {
 }
 
 $('pt-f-fin').onclick = () => {
+  // ── MUTEX ──
+  if (finalizing.p3) return;
   if (!confirm('確認結算三分球決賽？')) return;
   const q=gd.p3.f.q; if(!q||q.length<2){showToast('晉級隊伍數據異常','error');return;}
-  const s1=gd.p3.f.t[q[0]]?gd.p3.f.t[q[0]].t:0;
-  const s2=gd.p3.f.t[q[1]]?gd.p3.f.t[q[1]].t:0;
-  const winner=s1>=s2?q[0]:q[1];
-  w[winner]++; m.p3=winner; fSt.p3=true;
+  finalizing.p3 = true;
   $('pt-f-fin').textContent='🔒 已結算'; $('pt-f-fin').disabled=true;
+
+  // ── EDGE CASE #2: strict Number() cast ──
+  const s1 = Number(gd.p3.f.t[q[0]]?.t ?? 0);
+  const s2 = Number(gd.p3.f.t[q[1]]?.t ?? 0);
+  const winner = s1 >= s2 ? q[0] : q[1];
+  // ── DERIVED STATE ──
+  m.p3 = winner; fSt.p3 = true;
+  refreshWins();
+  haptic(30);
+  playSound('ding');
   addLog(`三分球結算：冠軍 Team ${winner}`);
   syncWins(); syncFlags(); syncMarkers(); sync3pt(); syncLogs(); renderStaff();
 };
@@ -1386,6 +1523,9 @@ function addF(side, pts) {
   const mc=fM[fC];
   if (side===1) mc.s1=Math.max(0,mc.s1+pts);
   else          mc.s2=Math.max(0,mc.s2+pts);
+  // Haptic: short for +1, medium for +2/+3, buzz for decrement
+  if (pts > 0) { haptic(pts === 1 ? 10 : 20); playSound('pop'); }
+  else         { haptic(6); playSound('buzz'); }
   addLog(`五五賽 ${fC.toUpperCase()} T${side} ${pts>0?'+':''}${pts}`);
   syncFiveVFive(fC); syncLogs(); renderStaff(); renderPlayer();
 }
@@ -1399,7 +1539,11 @@ function resF() {
 }
 
 $('f-fin').onclick = () => {
+  // ── MUTEX ──
+  if (finalizing.f) return;
   if (!confirm('確認結算此場並累加積分？')) return;
+  finalizing.f = true;
+
   const mc=fM[fC], t1=fC[0].toUpperCase(), t2=fC[1].toUpperCase();
   gd.f[t1]=(gd.f[t1]||0)+mc.s1; gd.f[t2]=(gd.f[t2]||0)+mc.s2;
   fRun=false; clearInterval(fInt); mc.endMs=null;
@@ -1407,14 +1551,21 @@ $('f-fin').onclick = () => {
 
   const order=['ab','ac','bc'], idx=order.indexOf(fC);
   if (idx<2) {
+    // Not the final match — advance to next, release mutex for f-fin reuse
+    finalizing.f = false;
     fC=order[idx+1];
     document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));
     document.querySelector(`[data-m="${fC}"]`).classList.add('active');
     addLog(`自動切換至 ${fC.toUpperCase()}`);
+    haptic(10);
   } else {
-    const sorted=tm.map(t=>({t,s:gd.f[t]||0})).sort((a,b)=>b.s-a.s);
-    w[sorted[0].t]++; m.f=sorted[0].t; fSt.f=true;
+    // All 3 matches done — compute winner via derived state
+    const sorted=tm.map(t=>({t,s:Number(gd.f[t]||0)})).sort((a,b)=>b.s-a.s);
+    m.f=sorted[0].t; fSt.f=true;
+    refreshWins();
     $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true;
+    haptic(40);
+    playSound('ding');
     addLog(`五五賽全部結算：積分王 Team ${sorted[0].t}`);
     syncWins(); syncFlags(); syncMarkers();
   }
