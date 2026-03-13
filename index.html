@@ -4,305 +4,111 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 英美回娘家籃球交流賽</title>
-
-  <!-- ══ PWA Meta Tags ══ -->
-  <meta name="theme-color" content="#001F3F">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="英美籃球賽">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="英美籃球賽">
-  <!-- Apple touch icons (generated at runtime, replaced by JS) -->
-  <link id="apple-touch-icon" rel="apple-touch-icon" href="">
-  <link id="pwa-manifest" rel="manifest" href="">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    html, body { height: 100%; width: 100%; }
-    body { font-family: sans-serif; overflow: hidden; background: linear-gradient(135deg, #050812 0%, #001F3F 100%); color: #fff; }
+    *{box-sizing:border-box}
+    html,body{height:100%;width:100%}
+    body{font-family:'Noto Sans TC',sans-serif;overflow:hidden;background:linear-gradient(135deg,#050812 0%,#001F3F 100%);color:#fff}
 
-    /* ── Animations ── */
-    @keyframes slideInUp   { from { opacity:0; transform:translateY(50px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes blink       { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
-    @keyframes riseUp      { from { opacity:0; transform:translateY(80px) scale(0.8); } to { opacity:1; transform:translateY(0) scale(1); } }
-    @keyframes crownBounce { 0%,100%{transform:translateY(0) rotate(-4deg);} 50%{transform:translateY(-14px) rotate(4deg);} }
-    @keyframes shimmerGold { 0%,100%{text-shadow:0 0 8px rgba(255,215,0,.5);} 50%{text-shadow:0 0 24px rgba(255,215,0,1), 0 0 40px rgba(255,180,0,.6);} }
+    @keyframes slideInUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+    @keyframes riseUp{from{opacity:0;transform:translateY(80px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes crownBounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+    @keyframes shimmerGold{0%,100%{text-shadow:0 0 8px rgba(255,215,0,.5)}50%{text-shadow:0 0 24px rgba(255,215,0,1),0 0 40px rgba(255,180,0,.6)}}
+    @keyframes scorePop{0%{transform:scale(1)}40%{transform:scale(1.45);color:#FFD700}70%{transform:scale(.9)}100%{transform:scale(1)}}
+    @keyframes goldPulse{0%,100%{box-shadow:0 0 28px 5px rgba(251,191,36,.45),0 0 60px 12px rgba(245,158,11,.18)}50%{box-shadow:0 0 55px 18px rgba(251,191,36,.9),0 0 110px 38px rgba(245,158,11,.42)}}
 
-    .animate-slideInUp { animation: slideInUp 0.6s ease forwards; }
-    .animate-blink     { animation: blink 1.5s ease-in-out infinite; }
+    /* 智慧按鈕閃爍系統 */
+    @keyframes pulseYellow{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.8)}60%{box-shadow:0 0 0 12px rgba(255,215,0,0)}}
+    @keyframes pulseGreen {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.8)} 60%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
+    @keyframes pulseRed   {0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.8)} 60%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+    .pulse-y{animation:pulseYellow 1.5s infinite!important;outline:3px solid #FFD700!important;outline-offset:2px}
+    .pulse-g{animation:pulseGreen  1.5s infinite!important;outline:3px solid #22c55e!important;outline-offset:2px}
+    .pulse-r{animation:pulseRed    1.5s infinite!important;outline:3px solid #ef4444!important;outline-offset:2px}
 
-    /* Podium */
-    .pod-place        { opacity:0; }
-    .pod-place.risen  { animation: riseUp 0.7s cubic-bezier(.22,.68,0,1.6) forwards; }
-    .pod-trophy       { display:inline-block; animation: crownBounce 2.2s ease-in-out infinite; }
-    .pod-name         { animation: shimmerGold 2.5s ease-in-out infinite; }
+    .animate-slideInUp{animation:slideInUp .6s ease forwards}
+    .animate-blink{animation:blink 1.5s ease-in-out infinite}
+    .animate-pop{animation:scorePop .35s ease-out forwards;display:inline-block}
+    .pod-place{opacity:0}
+    .pod-place.risen{animation:riseUp .7s cubic-bezier(.22,.68,0,1.6) forwards}
+    .pod-trophy{display:inline-block;animation:crownBounce 2.2s ease-in-out infinite}
+    .pod-name{animation:shimmerGold 2.5s ease-in-out infinite}
 
-    /* Confetti layer */
-    #confetti-canvas  { position:fixed; inset:0; pointer-events:none; z-index:9990; }
+    #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9990}
 
-    /* ── Cards ── */
-    .glass-card    { background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; }
-    .glass-card-lg { background:rgba(10,15,31,0.6);    backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:20px; }
+    .glass-card{background:rgba(255,255,255,.07);backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,.13);border-top:1px solid rgba(255,255,255,.22);box-shadow:0 4px 24px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);border-radius:16px}
+    .glass-card-lg{background:rgba(10,15,31,.55);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.14);border-top:1px solid rgba(255,255,255,.24);box-shadow:0 8px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1);border-radius:20px}
 
-    /* ── Buttons ── */
-    .btn-primary   { background:linear-gradient(135deg,#FFD700 0%,#ffc107 100%); color:#000; font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; border:none; }
-    .btn-primary:hover:not(:disabled)   { filter:brightness(1.1); transform:translateY(-1px); }
-    .btn-secondary { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; }
-    .btn-secondary:hover:not(:disabled) { background:rgba(255,255,255,.18); }
-    .btn-danger    { background:#ef4444; color:#fff; font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; border:none; }
-    .btn-danger:hover:not(:disabled)    { background:#dc2626; }
-    .btn-success   { background:#22c55e; color:#000; font-weight:600; padding:.75rem 1.5rem; border-radius:12px; cursor:pointer; transition:all .3s; border:none; }
-    .btn-success:hover:not(:disabled)   { background:#16a34a; }
-    button:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-primary{background:linear-gradient(135deg,#FFD700 0%,#ffc107 100%);color:#000;font-weight:700;padding:.75rem 1.5rem;border-radius:12px;cursor:pointer;transition:all .2s;border:none;box-shadow:0 2px 12px rgba(255,215,0,.25)}
+    .btn-primary:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px)}
+    .btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);font-weight:700;padding:.75rem 1.5rem;border-radius:12px;cursor:pointer;transition:all .2s}
+    .btn-secondary:hover:not(:disabled){background:rgba(255,255,255,.18);transform:translateY(-1px)}
+    .btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;padding:.75rem 1.5rem;border-radius:12px;cursor:pointer;transition:all .2s;border:none}
+    .btn-danger:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:700;padding:.75rem 1.5rem;border-radius:12px;cursor:pointer;transition:all .2s;border:none}
+    .btn-success:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+    button:disabled{opacity:.45;cursor:not-allowed}
 
-    /* ── Inputs ── */
-    .input-base { background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.2); color:#fff; padding:.75rem; border-radius:8px; width:100%; text-align:center; font-size:1.2rem; font-weight:bold; outline:none; }
-    .input-base:focus { border-color:#FFD700; }
+    .score-display{font-size:2.5rem;font-weight:900;color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,.5)}
+    nav{display:flex;overflow-x:auto;padding-bottom:5px}
+    nav::-webkit-scrollbar{display:none}
+    .nav-tab{white-space:nowrap;padding:.75rem 1.5rem;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;font-weight:600;cursor:pointer;transition:all .2s}
+    .nav-tab.active{background:#FFD700;color:#000;box-shadow:0 2px 12px rgba(255,215,0,.3)}
 
-    .score-display { font-size:2.5rem; font-weight:900; color:#FFD700; text-shadow:0 0 10px rgba(255,215,0,.5); }
+    .hidden-page{display:none!important}
+    .staff-only{display:none!important}
+    .player-only{display:none!important}
+    body.staff-mode .staff-only{display:flex!important}
+    body.staff-mode main.staff-only{display:block!important}
+    body.staff-mode header.staff-only{display:flex!important}
+    body.staff-mode{display:flex;flex-direction:column}
+    #staff-main{display:none}
+    body.staff-mode #staff-main{display:block}
 
-    /* ── Nav ── */
-    nav { display:flex; overflow-x:auto; padding-bottom:5px; }
-    nav::-webkit-scrollbar { display:none; }
-    .nav-tab { white-space:nowrap; padding:.75rem 1.5rem; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#fff; font-weight:600; cursor:pointer; transition:all .2s; }
-    .nav-tab.active { background:#FFD700; color:#000; }
-    .nav-tab:hover:not(.active) { background:rgba(255,255,255,.12); }
+    body.player-mode{background:linear-gradient(135deg,#e2e8f0 0%,#f8fafc 100%)!important;color:#0f172a;overflow:hidden}
+    body.player-mode .player-only{display:flex!important}
+    body.player-mode main.player-only{display:block!important}
+    .p-page{display:none}
+    .p-page.active{display:block}
+    #player-nav .nav-tab{background:#fff;color:#475569;border-color:#e2e8f0}
+    #player-nav .nav-tab.active{background:#4f46e5;color:#fff;border-color:#4f46e5}
 
-    .hidden-page { display:none !important; }
+    .stepper-wrap{display:flex;align-items:center;justify-content:center;gap:0;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);border-radius:10px;overflow:hidden}
+    .stepper-btn{background:rgba(255,255,255,.08);color:#fff;border:none;cursor:pointer;width:32px;height:36px;font-size:1.1rem;font-weight:800;transition:background .15s;flex-shrink:0}
+    .stepper-btn:active{background:rgba(255,215,0,.3)}
+    .stepper-val{min-width:28px;text-align:center;font-size:1rem;font-weight:700;color:#FFD700}
 
-    /* ── Role isolation ── */
-    .staff-only  { display:none !important; }
-    .player-only { display:none !important; }
+    .match-step{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 16px;border-radius:12px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;transition:all .2s;font-weight:700;font-size:.85rem}
+    .match-step.active{border-color:#FFD700;background:rgba(255,215,0,.15);color:#FFD700}
+    .match-step.done{border-color:#22c55e;background:rgba(34,197,94,.12);color:#22c55e}
+    .match-step-icon{font-size:1.2rem}
 
-    body.staff-mode .staff-only       { display:flex  !important; }
-    body.staff-mode main.staff-only   { display:block !important; }
-    body.staff-mode header.staff-only { display:flex  !important; }
-    body.staff-mode { display:flex; flex-direction:column; }
-    #staff-main { display:none; }
-    body.staff-mode #staff-main { display:block; }
+    #celeb-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .4s ease}
+    #celeb-overlay.open{opacity:1;pointer-events:all}
+    .celeb-card{background:linear-gradient(145deg,#fef9c3 0%,#fde68a 50%,#f59e0b 100%);border:3px solid rgba(251,191,36,.85);border-radius:28px;padding:2.5rem 2rem 2rem;max-width:360px;width:calc(100% - 2rem);text-align:center;transform:scale(.8);transition:transform .4s cubic-bezier(.22,.68,0,1.35)}
+    #celeb-overlay.open .celeb-card{transform:scale(1);animation:goldPulse 2s ease-in-out infinite}
 
-    body.player-mode { background:#f8fafc !important; color:#0f172a; overflow:hidden; }
-    body.player-mode .player-only     { display:flex  !important; }
-    body.player-mode main.player-only { display:block !important; }
+    #log-modal{position:fixed;inset:0;z-index:99990;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(5px)}
+    #log-modal.open{display:flex}
 
-    /* Player pages toggle */
-    .p-page       { display:none; }
-    .p-page.active{ display:block; }
-
-    /* Player nav */
-    #player-nav .nav-tab        { background:#fff; color:#475569; border-color:#e2e8f0; }
-    #player-nav .nav-tab.active { background:#4f46e5; color:#fff; border-color:#4f46e5; }
-
-    #player-view { overflow-y:auto; }
-
-    /* Modal */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.9); z-index:10000; display:flex; align-items:center; justify-content:center; }
-
-    /* Guide Modal */
-    .guide-modal-box {
-      background: linear-gradient(145deg, #0d1b35 0%, #0a2040 100%);
-      border: 1px solid rgba(255, 215, 0, 0.3);
-      border-radius: 24px;
-      padding: 2rem;
-      max-width: 480px;
-      width: calc(100% - 2rem);
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 0 60px rgba(255, 215, 0, 0.08), 0 25px 50px rgba(0,0,0,0.6);
-      position: relative;
+    /* 💬 實時彈幕系統 (Danmaku) CSS */
+    #danmaku-container { position: fixed; top: 12%; bottom: 25%; left: 0; right: 0; pointer-events: none; z-index: 99995; overflow: hidden; }
+    .danmaku-item {
+      position: absolute; white-space: nowrap; font-size: clamp(1.4rem, 5vw, 2.8rem); font-weight: 900;
+      color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      animation: floatLeft linear forwards;
     }
-    .guide-modal-box::-webkit-scrollbar { width: 4px; }
-    .guide-modal-box::-webkit-scrollbar-track { background: transparent; }
-    .guide-modal-box::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 4px; }
-    .guide-icon-ring {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,193,7,0.1));
-      border: 2px solid rgba(255,215,0,0.4);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
-      font-size: 2rem;
-    }
-    .guide-step {
-      display: flex; gap: 0.75rem; align-items: flex-start;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 0.6rem;
-    }
-    .guide-step-num {
-      background: rgba(255,215,0,0.2);
-      color: #FFD700;
-      font-weight: 800;
-      font-size: 0.8rem;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .guide-step-text { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; }
-    .guide-close-btn {
-      position: absolute; top: 1rem; right: 1rem;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff; border-radius: 50%;
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1rem; transition: all 0.2s;
-    }
-    .guide-close-btn:hover { background: rgba(255,255,255,0.2); }
-
-    /* ── Toast Notifications (UX #4) ── */
-    #toast-container {
-      position: fixed; top: 1rem; right: 1rem;
-      z-index: 99999; display: flex; flex-direction: column; gap: 0.5rem;
-      pointer-events: none;
-    }
-    .toast {
-      background: rgba(15,23,42,0.95);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-left: 4px solid #22c55e;
-      color: #fff; border-radius: 12px;
-      padding: 0.75rem 1.25rem;
-      font-size: 0.9rem; font-weight: 600;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      opacity: 0; transform: translateX(110%);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      pointer-events: auto;
-      max-width: 300px;
-    }
-    .toast.show { opacity: 1; transform: translateX(0); }
-    .toast.toast-warn  { border-left-color: #f59e0b; }
-    .toast.toast-error { border-left-color: #ef4444; }
-    .toast.toast-info  { border-left-color: #60a5fa; }
-
-    /* ── Score Pop Animation (UX #5) ── */
-    @keyframes scorePop {
-      0%   { transform: scale(1); }
-      40%  { transform: scale(1.45); color: #FFD700; }
-      70%  { transform: scale(0.9); }
-      100% { transform: scale(1); }
-    }
-    .animate-pop { animation: scorePop 0.35s ease-out forwards; }
-
-    /* ── 3PT Stepper Buttons (UX #3) ── */
-    .stepper-wrap {
-      display: flex; align-items: center; justify-content: center; gap: 0;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 10px; overflow: hidden;
-    }
-    .stepper-btn {
-      background: rgba(255,255,255,.08);
-      color: #fff; border: none; cursor: pointer;
-      width: 32px; height: 36px;
-      font-size: 1.1rem; font-weight: 800;
-      line-height: 1; transition: background .15s;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    .stepper-btn:active { background: rgba(255,215,0,.3); }
-    .stepper-val {
-      min-width: 28px; text-align: center;
-      font-size: 1rem; font-weight: 700; color: #FFD700;
-      padding: 0 2px;
-    }
-
-    /* ── Master Reset Section (Feature #2) ── */
-    .nuclear-card {
-      background: rgba(239,68,68,.08);
-      border: 1px solid rgba(239,68,68,.3);
-      border-radius: 16px;
-      padding: 1.25rem;
-      margin-top: 1.5rem;
-    }
-
-    /* ══════════════════════════════════════════
-       JUMBOTRON MODE
-    ══════════════════════════════════════════ */
-    @keyframes urgentPulse {
-      0%,100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0); }
-      50%      { box-shadow: inset 0 0 80px 20px rgba(239,68,68,0.35), 0 0 60px 10px rgba(239,68,68,0.2); }
-    }
-    @keyframes jScoreIn {
-      0%   { opacity:0; transform:scale(0.6) translateY(30px); }
-      60%  { transform:scale(1.06) translateY(-4px); }
-      100% { opacity:1; transform:scale(1) translateY(0); }
-    }
-    @keyframes jTimerTick {
-      0%,100% { opacity:1; } 48%,52% { opacity:0.7; }
-    }
-    #jumbotron-view {
-      display: none;
-      position: fixed; inset: 0; z-index: 20000;
-      background: #020810;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: box-shadow 0.5s ease;
-    }
-    #jumbotron-view.urgent { animation: urgentPulse 1.2s ease-in-out infinite; }
-    .jumb-team-name  { font-size: clamp(1.5rem, 5vw, 3.5rem); font-weight: 900; letter-spacing: .05em; opacity:.7; }
-    .jumb-score      { font-size: clamp(5rem, 22vw, 14rem); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-    .jumb-vs         { font-size: clamp(1.5rem,5vw,3rem); color:rgba(255,255,255,.2); font-weight:900; }
-    .jumb-timer      { font-size: clamp(2.5rem,10vw,6rem); font-weight:900; font-family:monospace; letter-spacing:.05em; animation: jTimerTick 1s step-start infinite; }
-    .jumb-half       { font-size: clamp(.9rem,3vw,1.6rem); opacity:.5; letter-spacing:.2em; text-transform:uppercase; }
-    .jumb-event-label{ font-size: clamp(.8rem,2.5vw,1.2rem); letter-spacing:.3em; text-transform:uppercase; opacity:.4; margin-bottom:1rem; }
-    .jumb-wins-bar   { display:flex; gap:2vw; margin-top:3vh; }
-    .jumb-win-chip   { display:flex; flex-direction:column; align-items:center; gap:.3rem; }
-    .jumb-win-label  { font-size:clamp(.6rem,2vw,1rem); opacity:.4; font-weight:700; letter-spacing:.15em; }
-    .jumb-win-count  { font-size:clamp(1.2rem,5vw,2.8rem); font-weight:900; }
-    .jumb-score-blue { color:#60a5fa; }
-    .jumb-score-red  { color:#f87171; }
-    .jumb-exit-btn   {
-      position:fixed; top:1.5rem; right:1.5rem; z-index:20001;
-      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
-      color:rgba(255,255,255,.5); border-radius:50%; width:44px; height:44px;
-      font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
-      transition:all .2s;
-    }
-    .jumb-exit-btn:hover { background:rgba(255,255,255,.18); color:#fff; }
-
-    /* ══ PWA Install Banner ══ */
-    #pwa-banner {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 99990;
-      background: linear-gradient(135deg, #001F3F, #003070);
-      border-top: 1px solid rgba(255,215,0,.3);
-      padding: 1rem 1.25rem;
-      display: none;
-      align-items: center; gap: 1rem;
-      box-shadow: 0 -8px 32px rgba(0,0,0,.5);
-      animation: slideInUp .4s ease forwards;
-    }
-    #pwa-banner .pwa-icon { font-size: 2.5rem; flex-shrink:0; }
-    #pwa-banner .pwa-text { flex:1; }
-    #pwa-banner .pwa-title { font-weight:800; color:#FFD700; font-size:1rem; }
-    #pwa-banner .pwa-sub   { font-size:.8rem; color:rgba(255,255,255,.6); margin-top:.15rem; }
-    #pwa-banner .pwa-install-btn {
-      background: linear-gradient(135deg,#FFD700,#ffa500);
-      color:#000; font-weight:800; border:none; border-radius:10px;
-      padding:.6rem 1.1rem; font-size:.9rem; cursor:pointer; flex-shrink:0;
-      white-space:nowrap;
-    }
-    #pwa-banner .pwa-dismiss { background:none; border:none; color:rgba(255,255,255,.4); font-size:1.3rem; cursor:pointer; flex-shrink:0; padding:.2rem; }
+    @keyframes floatLeft { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
   </style>
 </head>
 <body class="h-full w-full">
 
-<!-- Toast container (UX #4) -->
-<div id="toast-container"></div>
+<div id="danmaku-container"></div>
 
-<!-- ══════════════════════════════════════════
-     ROLE SELECTION OVERLAY
-══════════════════════════════════════════ -->
-<div id="role-overlay" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
+<div id="role-overlay" class="fixed inset-0 bg-black/95 z-[99999] flex items-center justify-center">
   <div class="glass-card-lg p-8 max-w-md w-full mx-4 animate-slideInUp text-center">
     <div class="text-5xl mb-3">🏀</div>
     <h2 class="text-3xl font-bold text-yellow-400 mb-1">2026 英美籃球交流賽</h2>
@@ -310,76 +116,50 @@
     <div class="space-y-4">
       <button id="role-staff"  class="w-full btn-primary  py-4 text-xl">👨‍💻 工作人員 (寫入)</button>
       <button id="role-player" class="w-full btn-secondary py-4 text-xl">🏀 球員觀看 (唯讀)</button>
-      <button id="role-jumbotron" class="w-full py-4 text-xl font-bold" style="background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid rgba(129,140,248,.4);border-radius:12px;color:#a5b4fc;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(165,180,252,.8)'" onmouseout="this.style.borderColor='rgba(129,140,248,.4)'">🖥️ 大螢幕轉播</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     STAFF VIEW
-══════════════════════════════════════════ -->
-<!-- FIX #1 — "切換球員視角" button in header + Guide button -->
 <header class="staff-only bg-black/40 border-b border-white/10 px-4 py-3 shrink-0 justify-between items-center">
   <h1 class="text-lg font-bold text-yellow-400">🏀 後台管理系統</h1>
   <div class="flex items-center gap-2">
-    <button id="btn-guide" onclick="showGuide()" class="btn-secondary text-xs py-1 px-3">📖 說明</button>
-    <button id="switch-to-player" class="btn-secondary text-xs py-1 px-3">👁 球員視角</button>
-    <div class="text-xs font-bold text-green-500 animate-blink border border-green-500/30 px-3 py-1 rounded-full">🟢 已連線</div>
+    <button onclick="$('log-modal').classList.add('open')" class="btn-secondary text-xs py-1 px-3">📜 日誌</button>
+    <button id="switch-to-player" class="btn-secondary text-xs py-1 px-3">👁 預覽</button>
+    <div class="text-xs font-bold text-green-500 animate-blink border border-green-500/30 px-3 py-1 rounded-full">🟢</div>
   </div>
 </header>
 
 <nav class="staff-only bg-black/20 border-b border-white/10 px-4 py-2 shrink-0 gap-2" id="staff-nav">
-  <button class="nav-tab active" data-page="0">首頁/日誌</button>
+  <button class="nav-tab active" data-page="0">首頁</button>
   <button class="nav-tab" data-page="1">趣味競賽</button>
   <button class="nav-tab" data-page="2">三分球</button>
   <button class="nav-tab" data-page="3">五五賽</button>
   <button class="nav-tab" data-page="4">頒獎台</button>
 </nav>
 
-<main id="staff-main" class="staff-only flex-1 overflow-auto p-4 w-full max-w-7xl mx-auto">
-
-  <!-- Page 0 -->
+<main id="staff-main" class="staff-only flex-1 overflow-auto p-4 w-full max-w-7xl mx-auto pb-20">
   <section id="page-0" class="page">
     <div class="glass-card p-6 mb-6">
       <h3 class="text-2xl font-bold text-yellow-400 mb-4 text-center">🏆 隊伍總積分</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-        <div class="bg-blue-500/20  p-4 rounded-xl"><div class="text-gray-300 mb-2 font-semibold">Team A</div><div class="score-display" id="dash-a">0</div><div class="text-gray-400 text-sm mt-1">局</div></div>
-        <div class="bg-red-500/20   p-4 rounded-xl"><div class="text-gray-300 mb-2 font-semibold">Team B</div><div class="score-display" id="dash-b">0</div><div class="text-gray-400 text-sm mt-1">局</div></div>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="bg-blue-500/20 p-4 rounded-xl"><div class="text-gray-300 mb-2 font-semibold">Team A</div><div class="score-display" id="dash-a">0</div><div class="text-gray-400 text-sm mt-1">局</div></div>
+        <div class="bg-red-500/20 p-4 rounded-xl"><div class="text-gray-300 mb-2 font-semibold">Team B</div><div class="score-display" id="dash-b">0</div><div class="text-gray-400 text-sm mt-1">局</div></div>
         <div class="bg-green-500/20 p-4 rounded-xl"><div class="text-gray-300 mb-2 font-semibold">Team C</div><div class="score-display" id="dash-c">0</div><div class="text-gray-400 text-sm mt-1">局</div></div>
       </div>
     </div>
-    <div class="glass-card p-4 border border-gray-600">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-yellow-400">📝 操作日誌</h3>
-        <button class="btn-secondary text-xs p-2" onclick="clearLog()">清除</button>
-      </div>
-      <div id="sys-logs" class="h-48 overflow-y-auto font-mono text-sm text-gray-400 space-y-1">系統啟動...</div>
+    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-center">
+      <h3 class="text-red-400 font-bold mb-2">⚠️ 賽前準備與重置</h3>
+      <button onclick="masterReset()" class="btn-danger text-sm py-2 px-6">💣 清空所有賽事資料 (0000)</button>
     </div>
-
-    <!-- ⚠️ Master Reset Section (Feature #2) -->
-    <div class="nuclear-card">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="text-2xl">⚠️</span>
-        <h3 class="text-red-400 font-bold text-lg">系統總重置 (Master Reset)</h3>
-      </div>
-      <p class="text-gray-400 text-sm mb-4">重置前會自動備份目前所有資料至 Firebase。如誤按可立即還原。</p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="masterReset()" class="btn-danger flex-1 text-sm py-2">
-          💣 系統總重置 (密碼:9999)
-        </button>
-        <button onclick="restoreBackup()" class="btn-secondary flex-1 text-sm py-2" style="border-color:rgba(251,191,36,.4);color:#fbbf24">
-          🔄 還原備份 (密碼:admin)
-        </button>
-      </div>
-      <div id="backup-status" class="mt-3 text-xs text-gray-500 text-center"></div>
+    <div class="text-center mt-4">
+      <button onclick="$('log-modal').classList.add('open')" class="btn-secondary w-full py-4 text-lg">🔍 開啟詳細操作日誌 (除錯用)</button>
     </div>
   </section>
 
-  <!-- Page 1: Dice -->
   <section id="page-1" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">🎲 趣味競賽</h2>
-      <button class="btn-danger p-2 text-sm" onclick="resetData('dice')">🧹 清除重置</button>
+      <button onclick="resetData('dice')" class="btn-danger text-xs py-1 px-3">🔄 重置</button>
     </div>
     <div class="glass-card p-6 mb-6 text-center">
       <h3 id="dice-team" class="text-3xl font-bold text-yellow-400 mb-2">Team A (第1輪)</h3>
@@ -390,120 +170,113 @@
       </div>
       <div class="flex gap-2 justify-center flex-wrap">
         <button id="d-next" class="btn-primary">⏭️ 下一隊</button>
-        <button id="d-r2"   class="btn-success hidden">▶️ 第二輪</button>
-        <button id="d-fin"  class="btn-danger hidden">🏆 結算成績</button>
+        <button id="d-r2"   class="btn-success hidden">▶️ 進入第二輪</button>
+        <button id="d-fin"  class="btn-danger hidden">🏆 結算總成績</button>
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dice-scores"></div>
   </section>
 
-  <!-- Page 2: 3-Point -->
   <section id="page-2" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">🧱 三分球</h2>
-      <button class="btn-danger p-2 text-sm" onclick="resetData('3pt')">🧹 清除重置</button>
+      <button onclick="resetData('3pt')" class="btn-danger text-xs py-1 px-3">🔄 重置</button>
     </div>
     <div id="pt-r1">
-      <button id="pt-r1-fin" class="btn-success w-full mb-4">✅ 結算小組賽 (取前兩名)</button>
+      <button id="pt-r1-fin" class="btn-success w-full mb-4 py-3">✅ 結算小組賽 (晉級前兩名)</button>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="pt-inputs"></div>
     </div>
     <div id="pt-fin" class="hidden">
-      <button id="pt-f-fin" class="btn-danger w-full mb-4">🏆 結算決賽</button>
+      <button id="pt-f-fin" class="btn-danger w-full mb-4 py-3">🏆 結算決賽冠軍</button>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="pt-f-inputs"></div>
     </div>
   </section>
 
-  <!-- Page 3: 5v5 -->
   <section id="page-3" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">⚔️ 五五賽</h2>
-      <button class="btn-danger p-2 text-sm" onclick="resetData('5v5')">🧹 清除重置</button>
+      <button onclick="resetData('5v5')" class="btn-danger text-xs py-1 px-3">🔄 重置</button>
     </div>
-    <div class="flex gap-2 justify-center mb-4">
-      <button class="btn-secondary f-match active" data-m="ab">A vs B</button>
-      <button class="btn-secondary f-match" data-m="ac">A vs C</button>
-      <button class="btn-secondary f-match" data-m="bc">B vs C</button>
+    <div class="flex items-center justify-center gap-2 mb-4">
+      <div class="match-step" id="step-ab" onclick="jumpMatch('ab')"><span class="match-step-icon" id="step-ab-icon">⭕</span><span>A vs B</span></div>
+      <div class="text-gray-500 text-xl font-bold">›</div>
+      <div class="match-step" id="step-ac" onclick="jumpMatch('ac')"><span class="match-step-icon" id="step-ac-icon">⭕</span><span>A vs C</span></div>
+      <div class="text-gray-500 text-xl font-bold">›</div>
+      <div class="match-step" id="step-bc" onclick="jumpMatch('bc')"><span class="match-step-icon" id="step-bc-icon">⭕</span><span>B vs C</span></div>
     </div>
-    <div class="glass-card p-6 text-center mb-4">
-      <div class="text-xl text-gray-400 mb-2" id="f-half">上半場</div>
-      <div class="text-6xl text-yellow-400 font-mono mb-4" id="f-time">10:00</div>
-      <button id="f-toggle" class="btn-primary w-full mb-6">▶️ 啟動計時</button>
-      <div class="flex justify-between items-center">
-        <div class="flex-1">
-          <div id="f-t1" class="text-2xl text-blue-400 font-bold mb-2">Team A</div>
-          <div id="f-s1" class="text-6xl text-blue-400 font-bold mb-4">0</div>
+    <div class="glass-card p-5 mb-4">
+      <div class="text-center mb-3"><div class="text-lg font-bold text-gray-400" id="f-half">上半場</div></div>
+      <div class="flex justify-center mb-4">
+        <svg viewBox="0 0 140 140" class="w-36 h-36 md:w-44 md:h-44">
+          <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+          <circle id="f-ring" cx="70" cy="70" r="58" fill="none" stroke="#FFD700" stroke-width="10" stroke-linecap="round" stroke-dasharray="364.4" stroke-dashoffset="0" transform="rotate(-90 70 70)" style="transition:stroke-dashoffset .25s linear"/>
+          <text x="70" y="64" text-anchor="middle" font-size="22" font-weight="900" fill="#FFD700" font-family="monospace" id="f-time-txt">10:00</text>
+          <text x="70" y="83" text-anchor="middle" font-size="11" fill="#9ca3af" id="f-half-txt">上半場</text>
+        </svg>
+      </div>
+      <div class="flex justify-between items-center mb-5">
+        <div class="flex-1 text-center">
+          <div class="text-xl text-blue-400 font-black mb-2" id="f-t1">Team A</div>
+          <div class="text-6xl font-black text-blue-400 mb-3" id="f-s1">0</div>
           <div class="flex flex-wrap justify-center gap-1">
-            <button class="btn-primary p-2 text-sm" onclick="addF(1,1)">+1</button>
-            <button class="btn-primary p-2 text-sm" onclick="addF(1,2)">+2</button>
-            <button class="btn-primary p-2 text-sm" style="background:linear-gradient(135deg,#f97316,#ea580c)" onclick="addF(1,3)">+3</button>
-            <button class="btn-secondary p-2 text-sm" onclick="addF(1,-1)">-1</button>
+            <button class="btn-primary py-2 px-3 text-sm" onclick="addF(1,1)">+1</button>
+            <button class="btn-primary py-2 px-3 text-sm" onclick="addF(1,2)">+2</button>
+            <button class="py-2 px-3 text-sm font-bold rounded-xl cursor-pointer border-none text-black" style="background:linear-gradient(135deg,#f97316,#ea580c)" onclick="addF(1,3)">+3</button>
+            <button class="btn-secondary py-2 px-3 text-sm" onclick="addF(1,-1)">-1</button>
           </div>
         </div>
-        <div class="px-4 text-3xl font-black text-gray-500 text-center">VS<br><button class="text-sm btn-secondary mt-4" onclick="resF()">歸零</button></div>
-        <div class="flex-1">
-          <div id="f-t2" class="text-2xl text-red-400 font-bold mb-2">Team B</div>
-          <div id="f-s2" class="text-6xl text-red-400 font-bold mb-4">0</div>
+        <div class="px-4 text-center">
+          <div class="text-3xl font-black text-gray-600">VS</div>
+          <button class="btn-secondary text-xs mt-2 py-1 px-2" onclick="resF()">歸零</button>
+        </div>
+        <div class="flex-1 text-center">
+          <div class="text-xl text-red-400 font-black mb-2" id="f-t2">Team B</div>
+          <div class="text-6xl font-black text-red-400 mb-3" id="f-s2">0</div>
           <div class="flex flex-wrap justify-center gap-1">
-            <button class="btn-primary p-2 text-sm" onclick="addF(2,1)">+1</button>
-            <button class="btn-primary p-2 text-sm" onclick="addF(2,2)">+2</button>
-            <button class="btn-primary p-2 text-sm" style="background:linear-gradient(135deg,#f97316,#ea580c)" onclick="addF(2,3)">+3</button>
-            <button class="btn-secondary p-2 text-sm" onclick="addF(2,-1)">-1</button>
+            <button class="btn-primary py-2 px-3 text-sm" onclick="addF(2,1)">+1</button>
+            <button class="btn-primary py-2 px-3 text-sm" onclick="addF(2,2)">+2</button>
+            <button class="py-2 px-3 text-sm font-bold rounded-xl cursor-pointer border-none text-black" style="background:linear-gradient(135deg,#f97316,#ea580c)" onclick="addF(2,3)">+3</button>
+            <button class="btn-secondary py-2 px-3 text-sm" onclick="addF(2,-1)">-1</button>
           </div>
         </div>
       </div>
+      <button id="f-toggle" class="btn-secondary w-full border-yellow-400 text-yellow-400 mb-3 hover:bg-yellow-400/20">▶️ 啟動/暫停計時 (非必須)</button>
     </div>
-    <div class="glass-card p-4 mb-4">
-      <h4 class="text-yellow-400 font-bold mb-2 text-sm">📊 各場累積得分</h4>
-      <div class="grid grid-cols-3 gap-2 text-center text-sm">
-        <div class="bg-white/5 rounded p-2"><div class="text-gray-400">A vs B</div><div id="f-score-ab" class="font-bold text-white">0 - 0</div></div>
-        <div class="bg-white/5 rounded p-2"><div class="text-gray-400">A vs C</div><div id="f-score-ac" class="font-bold text-white">0 - 0</div></div>
-        <div class="bg-white/5 rounded p-2"><div class="text-gray-400">B vs C</div><div id="f-score-bc" class="font-bold text-white">0 - 0</div></div>
-      </div>
-    </div>
-    <button id="f-fin" class="btn-success w-full">✅ 結算此場並累加</button>
+    <button id="f-fin" class="btn-success w-full text-xl py-5 shadow-lg">✅ 提早結算此場並累加比分</button>
   </section>
 
-  <!-- Page 4: Podium — FIX #6 staggered animations -->
   <section id="page-4" class="page hidden-page text-center">
     <div id="pod-lock" class="py-20 cursor-pointer" onclick="forceUnlock()">
       <div class="text-6xl mb-4">🔒</div>
       <div class="text-2xl text-red-400">賽事未全數結算</div>
       <div class="text-gray-400 mt-2">(點擊強制解鎖)</div>
     </div>
+    
+    <div id="sd-panel" class="hidden py-10 glass-card">
+      </div>
+
     <div id="pod-show" class="hidden py-6">
       <div class="pod-place mb-6" id="pod-p1" style="animation-delay:.1s">
         <div class="pod-trophy text-8xl">🏆</div>
-        <div class="text-4xl font-black text-yellow-400 mt-3 pod-name" id="p1"></div>
-        <div class="text-2xl text-gray-300 mt-1" id="p1s"></div>
+        <div class="text-5xl font-black text-yellow-400 mt-3 pod-name" id="p1"></div>
+        <div class="text-2xl text-gray-300 mt-2" id="p1s"></div>
       </div>
-      <div class="flex justify-around mt-2">
+      <div class="flex justify-around mt-6">
         <div class="pod-place glass-card px-6 py-4" id="pod-p2" style="animation-delay:.5s">
-          <div class="text-4xl">🥈</div>
-          <div class="text-xl font-bold text-gray-200 mt-1" id="p2"></div>
-          <div class="text-sm text-gray-400" id="p2s"></div>
+          <div class="text-4xl">🥈</div><div class="text-xl font-bold text-gray-200 mt-1" id="p2"></div><div class="text-sm text-gray-400" id="p2s"></div>
         </div>
         <div class="pod-place glass-card px-6 py-4" id="pod-p3" style="animation-delay:.85s">
-          <div class="text-4xl">🥉</div>
-          <div class="text-xl font-bold text-gray-200 mt-1" id="p3"></div>
-          <div class="text-sm text-gray-400" id="p3s"></div>
+          <div class="text-4xl">🥉</div><div class="text-xl font-bold text-gray-200 mt-1" id="p3"></div><div class="text-sm text-gray-400" id="p3s"></div>
         </div>
       </div>
     </div>
   </section>
-
 </main>
 
-<!-- ══════════════════════════════════════════
-     PLAYER VIEW — FIX #2: Full static HTML, safeSet only
-══════════════════════════════════════════ -->
-<div id="player-view" class="player-only w-full h-full flex-col fixed inset-0 z-[1000] bg-slate-50 text-slate-800" style="display:none">
-  <!-- FIX #1 — "返回工作人員" button in player header -->
-  <header class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center shadow-md sticky top-0 z-50 shrink-0">
-    <div class="font-bold">
-      🏀 球員觀賽
-      <span class="text-[10px] bg-green-400 text-black px-2 py-0.5 rounded-full animate-pulse ml-1">實時同步</span>
-    </div>
-    <button id="p-back" class="text-xs bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition-colors">👨‍💻 返回工作人員</button>
+<div id="player-view" class="player-only w-full h-full flex-col fixed inset-0 z-[1000] bg-slate-50 text-slate-800 pb-[64px]" style="display:none">
+  <header class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center shadow-md sticky top-0 z-50">
+    <div class="font-bold">🏀 球員觀賽 <span class="text-[10px] bg-green-400 text-black px-2 py-0.5 rounded-full animate-pulse ml-1">實時同步</span></div>
+    <button id="p-back" class="text-xs bg-white/20 px-3 py-1 rounded">返回後台</button>
   </header>
   <nav class="bg-white border-b px-2 py-3 flex gap-2 overflow-x-auto shadow-sm shrink-0" id="player-nav">
     <button class="nav-tab active" data-page="0">首頁</button>
@@ -512,52 +285,28 @@
     <button class="nav-tab" data-page="3">五五</button>
     <button class="nav-tab" data-page="4">頒獎</button>
   </nav>
-
-  <div class="flex-1 overflow-y-auto">
-
-    <!-- P0 Home -->
+  <div class="flex-1 overflow-y-auto relative">
     <div class="p-page active p-4" data-ppage="0">
       <div class="bg-white rounded-xl shadow p-6 mb-4">
         <h3 class="font-bold text-lg mb-4 text-indigo-700">🏆 總積分排行</h3>
         <div class="space-y-3">
-          <div class="bg-blue-50  rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-blue-600">Team A</span><span class="text-2xl font-black text-blue-600"><span id="pw-a">0</span> 局</span></div>
-          <div class="bg-red-50   rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-red-600">Team B</span><span class="text-2xl font-black text-red-600"><span id="pw-b">0</span> 局</span></div>
-          <div class="bg-green-50 rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-green-600">Team C</span><span class="text-2xl font-black text-green-600"><span id="pw-c">0</span> 局</span></div>
+          <div class="bg-blue-50 rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-blue-600">Team A</span><span class="text-2xl font-black text-blue-600" id="pw-a">0</span></div>
+          <div class="bg-red-50 rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-red-600">Team B</span><span class="text-2xl font-black text-red-600" id="pw-b">0</span></div>
+          <div class="bg-green-50 rounded-lg p-3 flex justify-between items-center"><span class="font-bold text-green-600">Team C</span><span class="text-2xl font-black text-green-600" id="pw-c">0</span></div>
         </div>
       </div>
-      <div class="bg-white rounded-xl shadow p-4 text-sm text-gray-500 text-center">
-        賽事狀態：趣味競賽 <span id="pst-d">⏳</span> | 三分球 <span id="pst-p3">⏳</span> | 五五賽 <span id="pst-f">⏳</span>
-      </div>
     </div>
-
-    <!-- P1 Dice -->
     <div class="p-page p-4" data-ppage="1">
       <div class="bg-white rounded-xl shadow p-6 mb-4 text-center">
         <h3 class="font-bold text-indigo-700 mb-1">🎲 趣味競賽</h3>
-        <div class="text-sm text-gray-500 mb-3">當前：Team <span id="p-dice-team">A</span> (第<span id="p-dice-round">1</span>輪)</div>
         <div class="text-5xl font-mono text-orange-500 my-4" id="p-dice-timer">--:--.-</div>
-      </div>
-      <div class="bg-white rounded-xl shadow p-4">
-        <h4 class="font-bold mb-3 text-gray-700">成績紀錄</h4>
-        <div class="flex justify-between border-b py-2 text-sm">
-          <span class="font-bold">Team A</span>
-          <span class="text-gray-500 font-mono"><span id="p-d-r1a">--:--.-</span> / <span id="p-d-r2a">--:--.-</span></span>
-          <span class="font-bold text-indigo-600 font-mono" id="p-d-ta">--</span>
-        </div>
-        <div class="flex justify-between border-b py-2 text-sm">
-          <span class="font-bold">Team B</span>
-          <span class="text-gray-500 font-mono"><span id="p-d-r1b">--:--.-</span> / <span id="p-d-r2b">--:--.-</span></span>
-          <span class="font-bold text-indigo-600 font-mono" id="p-d-tb">--</span>
-        </div>
-        <div class="flex justify-between py-2 text-sm">
-          <span class="font-bold">Team C</span>
-          <span class="text-gray-500 font-mono"><span id="p-d-r1c">--:--.-</span> / <span id="p-d-r2c">--:--.-</span></span>
-          <span class="font-bold text-indigo-600 font-mono" id="p-d-tc">--</span>
+        <div class="flex justify-between text-sm mt-4 border-t pt-4">
+          <span class="font-bold">Team A</span><span class="font-mono text-indigo-600" id="p-d-ta">--</span>
+          <span class="font-bold">Team B</span><span class="font-mono text-indigo-600" id="p-d-tb">--</span>
+          <span class="font-bold">Team C</span><span class="font-mono text-indigo-600" id="p-d-tc">--</span>
         </div>
       </div>
     </div>
-
-    <!-- P2 3-Point -->
     <div class="p-page p-4" data-ppage="2">
       <div class="bg-white rounded-xl shadow p-4 mb-4">
         <h3 class="font-bold mb-3 text-indigo-700">🧱 小組賽總分</h3>
@@ -576,8 +325,6 @@
         </div>
       </div>
     </div>
-
-    <!-- P3 5v5 -->
     <div class="p-page p-4" data-ppage="3">
       <div class="bg-white rounded-xl shadow p-6 mb-4">
         <div class="flex justify-between text-gray-500 font-bold mb-4">
@@ -590,1360 +337,315 @@
           <div class="flex-1"><div class="text-sm text-gray-500 mb-1">Team <span id="p-f-t2">B</span></div><div class="text-6xl font-black text-red-600" id="p-f-s2">0</div></div>
         </div>
       </div>
-      <div class="bg-white rounded-xl shadow p-4">
-        <h4 class="font-bold mb-3 text-gray-700">各場紀錄</h4>
-        <div class="flex justify-between border-b py-2 text-sm"><span class="font-bold">A vs B</span><span class="font-mono font-black text-indigo-600" id="p-fs-ab">0 - 0</span></div>
-        <div class="flex justify-between border-b py-2 text-sm"><span class="font-bold">A vs C</span><span class="font-mono font-black text-indigo-600" id="p-fs-ac">0 - 0</span></div>
-        <div class="flex justify-between py-2 text-sm"><span class="font-bold">B vs C</span><span class="font-mono font-black text-indigo-600" id="p-fs-bc">0 - 0</span></div>
-      </div>
     </div>
-
-    <!-- P4 Podium -->
     <div class="p-page p-4" data-ppage="4">
-      <div id="p-pod-lock" class="text-center py-16">
-        <div class="text-6xl mb-4">🔒</div>
-        <div class="font-bold text-gray-500 text-xl">賽事鎖定中</div>
-        <div class="text-gray-400 mt-2 text-sm">等待所有賽事結算...</div>
+      <div id="p-pod-lock" class="text-center py-16"><div class="text-6xl mb-4">🔒</div><div class="font-bold text-gray-500 text-xl">賽事鎖定中</div></div>
+      
+      <div id="p-sd-panel" class="hidden bg-red-900/10 rounded-xl shadow p-8 text-center border-2 border-red-500">
+         <div class="text-5xl mb-3 animate-pulse">🚨</div>
+         <h2 class="text-2xl font-black text-red-600 mb-2">吃分驟死賽進行中</h2>
+         <p class="text-gray-600 font-bold">出現極端平局！請觀看場上最終對決！</p>
       </div>
+
       <div id="p-pod-show" class="hidden bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl shadow p-8 text-center border-2 border-yellow-300">
         <div class="text-5xl mb-3">🏆</div>
         <div class="text-3xl font-black text-yellow-600 mb-1" id="pp1"></div>
         <div class="text-indigo-600 font-black text-xl mb-6" id="pp1s"></div>
         <div class="flex justify-between text-sm text-gray-600 border-t border-yellow-200 pt-4">
-          <span class="font-bold" id="pp2"></span>
-          <span class="font-bold" id="pp3"></span>
+          <span class="font-bold" id="pp2"></span><span class="font-bold" id="pp3"></span>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     JUMBOTRON VIEW — Full-screen broadcast mode
-══════════════════════════════════════════ -->
-<div id="jumbotron-view">
-  <button class="jumb-exit-btn" onclick="exitJumbotron()" title="退出轉播模式">✕</button>
-
-  <!-- Event label -->
-  <div class="jumb-event-label" id="j-event-label">五五賽</div>
-
-  <!-- Main scoreboard -->
-  <div id="j-scoreboard" style="width:100%;display:flex;align-items:center;justify-content:center;gap:4vw;padding:0 4vw;">
-    <!-- Team 1 -->
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-      <div class="jumb-team-name jumb-score-blue" id="j-t1">Team A</div>
-      <div class="jumb-score jumb-score-blue" id="j-s1">0</div>
-    </div>
-    <!-- Center: VS + timer -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:2vh;min-width:30vw;">
-      <div class="jumb-vs">VS</div>
-      <div class="jumb-timer" id="j-timer" style="color:#FFD700;">10:00</div>
-      <div class="jumb-half"  id="j-half">上半場</div>
-    </div>
-    <!-- Team 2 -->
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-      <div class="jumb-team-name jumb-score-red" id="j-t2">Team B</div>
-      <div class="jumb-score jumb-score-red" id="j-s2">0</div>
-    </div>
-  </div>
-
-  <!-- Win totals bar -->
-  <div class="jumb-wins-bar" id="j-wins-bar">
-    <div class="jumb-win-chip">
-      <div class="jumb-win-label">Team A 總積分</div>
-      <div class="jumb-win-count jumb-score-blue" id="j-w-a">0</div>
-    </div>
-    <div style="width:2px;background:rgba(255,255,255,.1);border-radius:2px;"></div>
-    <div class="jumb-win-chip">
-      <div class="jumb-win-label">Team B 總積分</div>
-      <div class="jumb-win-count jumb-score-red"  id="j-w-b">0</div>
-    </div>
-    <div style="width:2px;background:rgba(255,255,255,.1);border-radius:2px;"></div>
-    <div class="jumb-win-chip">
-      <div class="jumb-win-label">Team C 總積分</div>
-      <div class="jumb-win-count" style="color:#4ade80" id="j-w-c">0</div>
-    </div>
-  </div>
-
-  <!-- Tap hint -->
-  <div style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.75rem;color:rgba(255,255,255,.18);letter-spacing:.15em;">按右上角 ✕ 退出轉播</div>
+<div id="player-reaction-bar" class="player-only fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 p-2 flex gap-2 items-center z-[1050] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('🔥')">🔥</button>
+  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('😂')">😂</button>
+  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('🧱')">🧱</button>
+  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('阿嬤都比你準👵')">👵</button>
+  <input type="text" id="danmaku-input" class="flex-1 border border-gray-300 rounded-full px-3 py-1.5 text-sm bg-white focus:outline-none focus:border-indigo-500" placeholder="輸入垃圾話...">
+  <button class="bg-indigo-600 text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-md active:scale-95" onclick="sendDanmaku($('danmaku-input').value); $('danmaku-input').value='';">發送</button>
 </div>
 
-<!-- PWA Install Banner -->
-<div id="pwa-banner">
-  <div class="pwa-icon">🏀</div>
-  <div class="pwa-text">
-    <div class="pwa-title">加入主畫面</div>
-    <div class="pwa-sub">像 App 一樣全螢幕體驗，無網址列</div>
+<div id="log-modal">
+  <div class="glass-card-lg w-[92%] max-w-2xl h-[75vh] flex flex-col p-6 rounded-2xl relative">
+    <div class="flex justify-between items-center mb-4 border-b border-white/20 pb-3">
+      <h2 class="text-yellow-400 text-xl font-bold">📜 系統操作詳細日誌</h2>
+      <div class="flex gap-2">
+        <button onclick="copyLogs()" class="bg-blue-600 hover:bg-blue-500 text-white py-1 px-3 rounded text-sm font-bold">📋 複製</button>
+        <button onclick="$('log-modal').classList.remove('open')" class="bg-gray-600 hover:bg-gray-500 text-white py-1 px-3 rounded text-sm font-bold">關閉</button>
+      </div>
+    </div>
+    <div id="sys-logs" class="flex-1 overflow-y-auto font-mono text-sm text-gray-300 space-y-2 pr-2"></div>
   </div>
-  <button class="pwa-install-btn" id="pwa-install-btn">安裝</button>
-  <button class="pwa-dismiss" onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-dismissed','1')">✕</button>
 </div>
 
-<!-- Confetti canvas — FIX #6 -->
+<div id="celeb-overlay">
+  <div class="celeb-card">
+    <span class="celeb-trophy animate-bounce" style="font-size:6rem">🏆</span>
+    <div id="celeb-label" style="font-size:1.2rem;font-weight:800;color:#92400e;margin-top:1rem">賽事</div>
+    <div class="celeb-name text-4xl font-black text-amber-900 mt-2" id="celeb-name">Team A</div>
+    <div class="font-black text-xl text-amber-800 mt-3">🎉 奪得冠軍 🎉</div>
+  </div>
+</div>
 <canvas id="confetti-canvas"></canvas>
+
+<div id="toast-el" style="position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:rgba(34,197,94,.95);color:#fff;font-weight:700;padding:.75rem 1.5rem;border-radius:12px;z-index:99998;font-size:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .4s ease;opacity:0;pointer-events:none;white-space:nowrap"></div>
 
 <script>
 // ════════════════════════════════════════════════════════
-// STATE
+// 核心狀態
 // ════════════════════════════════════════════════════════
-let role = 'staff';
-let logs = [];
-let step = 0;
-
-// Dice
-let dSt = { r:1, i:0 };
-let tInt = null, tMs = 0, tRun = false, tStartTime = 0;
-
-// Wins
-let w = { A:0, B:0, C:0 };
-let m = { d:null, p3:null, f:null };
-let fSt = { d:false, p3:false, f:false, u:false };
-
-// FIX #3 — 5v5 timer uses Date.now() deadlines, not decrement
-// remMs[half] = remaining milliseconds when paused
-// endMs = absolute deadline (Date.now() + remMs) when running, else null
-let fM = {
-  ab: { s1:0, s2:0, h:1, remMs:{ 1:600000, 2:600000 }, endMs:null },
-  ac: { s1:0, s2:0, h:1, remMs:{ 1:600000, 2:600000 }, endMs:null },
-  bc: { s1:0, s2:0, h:1, remMs:{ 1:600000, 2:600000 }, endMs:null }
+let role='staff', logs=[], step=0;
+let w={A:0,B:0,C:0};
+let m={d:null, p3:null, f:null, sd:null}; // 加上 sd (驟死賽贏家)
+let fSt={d:false, p3:false, f:false, u:false};
+let fSettled={ab:false,ac:false,bc:false};
+let dSt={r:1,i:0};
+let tInt=null,tMs=0,tRun=false,tStartTime=0;
+let fM={
+  ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},
+  ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},
+  bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}
 };
-let fC = 'ab', fInt = null, fRun = false;
-let fSettled = { ab:false, ac:false, bc:false }; // 防止每場重複累加
-
-let gd = {
-  d:  { A:[0,0], B:[0,0], C:[0,0] },
-  p3: {
-    r1: { A:{p:Array(10).fill(0),t:0}, B:{p:Array(10).fill(0),t:0}, C:{p:Array(10).fill(0),t:0} },
-    f:  { q:[], t:{} }
-  },
-  f: { A:0, B:0, C:0 }
+let fC='ab',fInt=null,fRun=false;
+let gd={
+  d:{A:[0,0],B:[0,0],C:[0,0]},
+  p3:{r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}},
+  f:{A:0,B:0,C:0}
 };
+const tm=['A','B','C'];
+let podiumShown=false;
+let _suppressListener=false;
 
-const tm = ['A','B','C'];
-let pTab = 0;
-let podiumShown = false;
+// 球員端動畫同步追蹤器
+let prevFSt = { d:false, p3:false, f:false };
+let prevSd = null;
 
-// ════════════════════════════════════════════════════════
-// UTILITIES
-// ════════════════════════════════════════════════════════
-const $ = id => document.getElementById(id);
-
-function safeSet(id, val) {
-  const el = $(id);
-  if (el) el.textContent = String(val);
-}
-
-function fmt(ms) {
-  if (!ms && ms !== 0) return '--:--.-';
-  const min   = Math.floor(ms / 60000);
-  const sec   = Math.floor((ms % 60000) / 1000);
-  const tenth = Math.floor((ms % 1000) / 100);
-  return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${tenth}`;
-}
-
-function fmtMs(ms) {
-  const totalSec = Math.max(0, Math.ceil(ms / 1000));
-  return `${String(Math.floor(totalSec/60)).padStart(2,'0')}:${String(totalSec%60).padStart(2,'0')}`;
+function refreshWins(){
+  w={A:0,B:0,C:0};
+  if(m.d)  w[m.d]++;
+  if(m.p3) w[m.p3]++;
+  if(m.f)  w[m.f]++;
+  if(m.sd) w[m.sd]++; // 加上驟死賽的1局積分
 }
 
 // ════════════════════════════════════════════════════════
-// LOGGING
+// 工具函數
 // ════════════════════════════════════════════════════════
-function addLog(msg) {
-  if (role !== 'staff') return;
-  const d  = new Date();
-  const ts = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+const $=id=>document.getElementById(id);
+function safeSet(id,val){const el=$(id);if(el)el.textContent=String(val);}
+function fmt(ms){if(!ms&&ms!==0)return'--:--.-';const min=Math.floor(ms/60000),sec=Math.floor((ms%60000)/1000),tenth=Math.floor((ms%1000)/100);return`${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${tenth}`;}
+function fmtMs(ms){const s=Math.max(0,Math.ceil(ms/1000));return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+function haptic(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+
+function showToast(msg,isError=false){
+  const t=$('toast-el'); t.textContent=msg;
+  t.style.background=isError?'rgba(239,68,68,.95)':'rgba(34,197,94,.95)';
+  t.style.opacity='1'; clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},2800);
+}
+
+function addLog(msg){
+  if(role!=='staff')return;
+  const d=new Date(),ts=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
   logs.unshift(`[${ts}] ${msg}`);
-  if (logs.length > 30) logs.pop();
-  renderLogs();
+  if(logs.length>100)logs.pop(); renderLogs();
 }
-
-function renderLogs() {
-  const el = $('sys-logs');
-  if (!el) return;
-  el.innerHTML = logs.length
-    ? logs.map(x=>`<div class="border-b border-white/5 pb-1">${x}</div>`).join('')
-    : '<div class="text-gray-600">無紀錄</div>';
+function renderLogs(){
+  const el=$('sys-logs');
+  if(el)el.innerHTML=logs.length?logs.map(x=>`<div class="border-b border-white/10 pb-1">${x}</div>`).join(''):'無紀錄';
 }
-
-function clearLog() {
-  if (!confirm('清空日誌？')) return;
-  logs = []; renderLogs(); syncLogs();
+function copyLogs(){
+  navigator.clipboard.writeText(logs.join('\n')).then(()=>showToast('✅ 日誌已複製！')).catch(()=>showToast('複製失敗',true));
 }
 
 // ════════════════════════════════════════════════════════
-// FIREBASE — FIX #4: Granular write paths
+// 智慧按鈕閃爍引導系統
 // ════════════════════════════════════════════════════════
-const fbConfig = {
-  apiKey:      "AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",
-  authDomain:  "basketball-2026.firebaseapp.com",
-  databaseURL: "https://basketball-2026-default-rtdb.firebaseio.com",
-  projectId:   "basketball-2026"
-};
-
-let fbReady = false;
-try {
-  if (firebase.apps.length === 0) firebase.initializeApp(fbConfig);
-  fbReady = true;
-} catch(e) { console.warn('Firebase init failed:', e); }
-
-const DB     = () => firebase.database().ref('yingmei2026');
-const DB_BKP = () => firebase.database().ref('yingmei2026_backup');
-
-// Granular writers — each only writes its own sub-tree
-function syncWins()          { if (!fbReady||role!=='staff') return; DB().child('w').set(w); }
-function syncFlags()         { if (!fbReady||role!=='staff') return; DB().child('fSt').set(fSt); }
-function syncMarkers()       { if (!fbReady||role!=='staff') return; DB().child('m').set(m); }
-function syncDice()          { if (!fbReady||role!=='staff') return; DB().child('gd/d').set(gd.d); DB().child('dSt').set(dSt); }
-function sync3pt()           { if (!fbReady||role!=='staff') return; DB().child('gd/p3').set(gd.p3); }
-function syncFiveVFive(key)  {
-  if (!fbReady||role!=='staff') return;
-  if (key) DB().child('fM/'+key).set(fM[key]);
-  else     DB().child('fM').set(fM);
-  DB().child('fC').set(fC);
-  DB().child('gd/f').set(gd.f);
-  DB().child('fSettled').set(fSettled);
-}
-function syncLogs()          { if (!fbReady||role!=='staff') return; DB().child('logs').set(logs); }
-function syncAll()           { if (!fbReady||role!=='staff') return; DB().set({gd,step,w,m,fM,fC,fSt,logs,dSt}); }
-
-// ════════════════════════════════════════════════════════
-// TOAST SYSTEM  (UX #4)
-// ════════════════════════════════════════════════════════
-function showToast(msg, type='success', duration=2500) {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-  const toast = document.createElement('div');
-  toast.className = `toast${type!=='success'?' toast-'+type:''}`;
-  const icons = { success:'✅', warn:'⚠️', error:'❌', info:'ℹ️' };
-  toast.textContent = (icons[type]||'') + ' ' + msg;
-  container.appendChild(toast);
-  // Trigger show on next frame
-  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
-
-// ════════════════════════════════════════════════════════
-// MASTER RESET & BACKUP  (Feature #2)
-// ════════════════════════════════════════════════════════
-function masterReset() {
-  const pwd = prompt('⚠️ 系統總重置！輸入密碼 9999 確認（重置前將自動備份）');
-  if (pwd !== '9999') { if(pwd!==null) showToast('密碼錯誤', 'error'); return; }
-  if (!confirm('確認清空所有賽事資料？此操作不可逆（但可透過「還原備份」恢復）')) return;
-
-  // 1. Deep-copy current state to backup node FIRST
-  const snapshot = JSON.parse(JSON.stringify({ gd, step, w, m, fM, fC, fSt, logs, dSt }));
-  const bkpRef = DB_BKP();
-  const backupPromise = fbReady ? bkpRef.set({ ...snapshot, _backedUpAt: Date.now() }) : Promise.resolve();
-
-  backupPromise.then(() => {
-    // 2. Reset all local state
-    gd = {
-      d:  { A:[0,0], B:[0,0], C:[0,0] },
-      p3: {
-        r1: { A:{p:Array(10).fill(0),t:0}, B:{p:Array(10).fill(0),t:0}, C:{p:Array(10).fill(0),t:0} },
-        f:  { q:[], t:{} }
-      },
-      f: { A:0, B:0, C:0 }
-    };
-    step = 0;
-    w = { A:0, B:0, C:0 };
-    m = { d:null, p3:null, f:null };
-    fSt = { d:false, p3:false, f:false, u:false };
-    fM = {
-      ab: { s1:0, s2:0, h:1, remMs:{1:600000,2:600000}, endMs:null },
-      ac: { s1:0, s2:0, h:1, remMs:{1:600000,2:600000}, endMs:null },
-      bc: { s1:0, s2:0, h:1, remMs:{1:600000,2:600000}, endMs:null }
-    };
-    fC = 'ab'; fRun = false; clearInterval(fInt); clearInterval(tInt);
-    tMs = 0; tRun = false; dSt = { r:1, i:0 };
-    logs = [];
-    podiumShown = false;
-
-    // 3. Push blank state to Firebase
-    if (fbReady) {
-      DB().set({ gd, step, w, m, fM, fC, fSt, logs, dSt });
-    }
-
-    // 4. Update backup status label
-    const ts = new Date().toLocaleTimeString('zh-TW');
-    const el = document.getElementById('backup-status');
-    if (el) el.textContent = `✅ 已於 ${ts} 備份並重置`;
-
-    addLog('⚠️ 系統總重置執行完畢（已備份）');
-    syncLogs();
-    showToast('系統總重置完成，備份已儲存', 'warn', 3500);
-    updateUI();
-  }).catch(err => {
-    console.error('Backup failed', err);
-    showToast('備份失敗，重置已取消', 'error');
-  });
-}
-
-function restoreBackup() {
-  const pwd = prompt('輸入密碼 admin 從備份還原');
-  if (pwd !== 'admin') { if(pwd!==null) showToast('密碼錯誤', 'error'); return; }
-  if (!fbReady) { showToast('Firebase 未連線', 'error'); return; }
-  if (!confirm('確認從備份還原？目前所有資料將被覆蓋')) return;
-
-  DB_BKP().once('value').then(snap => {
-    const backup = snap.val();
-    if (!backup) { showToast('找不到備份資料', 'error'); return; }
-
-    // Strip our metadata key before restoring
-    const { _backedUpAt, ...restoreData } = backup;
-
-    // Overwrite main node
-    DB().set(restoreData).then(() => {
-      showToast('備份還原成功！', 'success', 3000);
-      addLog('🔄 備份還原執行完畢');
-      const ts = new Date().toLocaleTimeString('zh-TW');
-      const el = document.getElementById('backup-status');
-      if (el) el.textContent = `🔄 已於 ${ts} 從備份還原`;
-      // Listener will pick up the new data and call updateUI automatically
-    }).catch(err => {
-      console.error('Restore failed', err);
-      showToast('還原失敗', 'error');
-    });
-  }).catch(err => {
-    console.error('Backup fetch failed', err);
-    showToast('讀取備份失敗', 'error');
-  });
-}
-if (fbReady) {
-  DB().on('value', snap => {
-    const data = snap.val();
-    if (!data) return;
-
-    if (data.gd) {
-      if (data.gd.d)  Object.assign(gd.d, data.gd.d);
-      if (data.gd.p3) {
-        if (data.gd.p3.r1) {
-          Object.assign(gd.p3.r1, data.gd.p3.r1);
-          ['A','B','C'].forEach(t => {
-            const n = gd.p3.r1[t];
-            if (n && !Array.isArray(n.p)) n.p = Array.from({length:10},(_,i)=>Number(n.p?.[i]??0));
-          });
-        }
-        if (data.gd.p3.f) {
-          Object.assign(gd.p3.f, data.gd.p3.f);
-          // Firebase 把 Array 存成 Object {0:'A',1:'B'}，必須還原
-          if (gd.p3.f.q && !Array.isArray(gd.p3.f.q)) gd.p3.f.q = Object.values(gd.p3.f.q);
-          if (gd.p3.f.t) Object.keys(gd.p3.f.t).forEach(t => {
-            const n = gd.p3.f.t[t];
-            if (n && !Array.isArray(n.p)) n.p = Array.from({length:10},(_,i)=>Number(n.p?.[i]??0));
-          });
-        }
-      }
-      if (data.gd.f) Object.assign(gd.f, data.gd.f);
-    }
-    if (data.step  !== undefined) step = data.step;
-    if (data.w)    Object.assign(w,   data.w);
-    if (data.m)    Object.assign(m,   data.m);
-    if (data.fM)   ['ab','ac','bc'].forEach(k => { if(data.fM[k]) Object.assign(fM[k], data.fM[k]); });
-    if (data.fC)   fC = data.fC;
-    if (data.fSt)     Object.assign(fSt, data.fSt);
-    if (data.fSettled) Object.assign(fSettled, data.fSettled);
-    if (data.dSt)  Object.assign(dSt, data.dSt);
-    if (data.logs) logs = data.logs;
-
-    // Flicker-free — safeSet handles all updates
-    if (role === 'staff')       renderStaff();
-    else if (role === 'jumbotron') renderJumbotron();
-    else                        renderPlayer();
-  });
-}
-
-// ════════════════════════════════════════════════════════
-// RESET  — fully fixed: step rollback, UI unlock, idempotent
-// ════════════════════════════════════════════════════════
-function resetData(type) {
-  if (prompt('輸入 0000 清除數據') !== '0000') { showToast('密碼錯誤', 'error'); return; }
-
-  if (type === 'dice') {
-    gd.d = { A:[0,0], B:[0,0], C:[0,0] };
-    dSt  = { r:1, i:0 };
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.d && m.d) {
-      w[m.d] = Math.max(0, w[m.d] - 1);
-    }
-    m.d = null;
-    fSt.d = false;
-    // Step rollback: dice is step-1 territory; roll back if we were past it
-    if (step >= 1) step = 0;
-    tMs=0; tRun=false; clearInterval(tInt);
-    safeSet('dice-timer','00:00.0');
-    $('d-start').disabled=false; $('d-stop').disabled=true;
-    $('d-r2').classList.add('hidden');
-    $('d-fin').classList.add('hidden');
-    $('d-next').classList.remove('hidden');
-    // Explicitly reset finalize button text & state
-    $('d-fin').disabled=false;
-    $('d-fin').textContent='🏆 結算成績';
-    addLog('清除趣味競賽');
-    syncDice(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+function guideEl(id,color){const el=$(id);if(el)el.classList.add('pulse-'+color);}
+function updateGuide(){
+  document.querySelectorAll('.pulse-y,.pulse-g,.pulse-r').forEach(el=>el.classList.remove('pulse-y','pulse-g','pulse-r'));
+  if(!fSt.d){
+    if(tRun){guideEl('d-stop','r');}else if(dSt.i<tm.length){guideEl(tMs===0?'d-start':'d-next','y');}else if(dSt.r===1){guideEl('d-r2','g');}else{guideEl('d-fin','r');}
   }
-
-  if (type === '3pt') {
-    gd.p3 = { r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}}, f:{q:[],t:{}} };
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.p3 && m.p3) {
-      w[m.p3] = Math.max(0, w[m.p3] - 1);
-    }
-    m.p3 = null;
-    fSt.p3 = false;
-    // Step rollback
-    if (step >= 2) step = 1;
-    $('pt-r1').classList.remove('hidden');
-    $('pt-fin').classList.add('hidden');
-    const pfin=$('pt-f-fin');
-    if (pfin) { pfin.disabled=false; pfin.textContent='🏆 結算決賽'; }
-    const r1fin=$('pt-r1-fin');
-    if (r1fin) { r1fin.disabled=false; r1fin.textContent='✅ 結算小組賽 (取前兩名)'; }
-    build3Pt();
-    addLog('清除三分球');
-    sync3pt(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+  if(!fSt.p3){
+    if(!gd.p3.f.q||gd.p3.f.q.length<2){guideEl('pt-r1-fin','g');}else{guideEl('pt-f-fin','r');}
   }
-
-  if (type === '5v5') {
-    fM = {
-      ab:{ s1:0,s2:0,h:1, remMs:{1:600000,2:600000}, endMs:null },
-      ac:{ s1:0,s2:0,h:1, remMs:{1:600000,2:600000}, endMs:null },
-      bc:{ s1:0,s2:0,h:1, remMs:{1:600000,2:600000}, endMs:null }
-    };
-    gd.f={A:0,B:0,C:0};
-    // Only deduct win if this game was actually finalized (idempotent guard)
-    if (fSt.f && m.f) {
-      w[m.f] = Math.max(0, w[m.f] - 1);
-    }
-    m.f = null;
-    fSt.f = false;
-    // Step rollback
-    if (step >= 3) step = 2;
-    fC='ab'; fRun=false; clearInterval(fInt);
-    document.querySelectorAll('.f-match').forEach(b=>b.classList.remove('active'));
-    document.querySelector('[data-m="ab"]').classList.add('active');
-    // Explicitly reset finalize button text & state
-    const ffin=$('f-fin');
-    if (ffin) { ffin.disabled=false; ffin.textContent='✅ 結算此場並累加'; }
-    addLog('清除五五賽');
-    syncFiveVFive(); syncWins(); syncFlags(); syncMarkers(); syncLogs();
+  if(!fSt.f){
+    if(fRun){guideEl('f-toggle','y');}else if(!fSettled[fC]){guideEl('f-fin','g');if(fM[fC].s1===0&&fM[fC].s2===0)guideEl('f-toggle','y');}
   }
-
-  // Also reset podium forced-unlock when any game resets
-  fSt.u = false;
-  podiumShown = false;
-
-  updateUI();
+  if(fSt.d&&fSt.p3&&fSt.f&&!fSt.u)guideEl('pod-lock','y');
 }
 
 // ════════════════════════════════════════════════════════
-// ROLE SWITCHING — FIX #1
+// 慶典特效
 // ════════════════════════════════════════════════════════
-$('role-staff').onclick = () => {
-  role='staff'; $('role-overlay').style.display='none';
-  updateUI(); addLog('工作人員登入'); syncLogs();
-};
-$('role-player').onclick = () => {
-  role='player'; $('role-overlay').style.display='none'; updateUI();
-};
-$('role-jumbotron').onclick = () => {
-  role='jumbotron'; $('role-overlay').style.display='none'; enterJumbotron();
-};
-$('p-back').onclick = () => { role='staff'; updateUI(); };
-$('switch-to-player').onclick = () => { role='player'; updateUI(); };
+let _ac=null;
+function _getAC(){if(!_ac)try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return _ac;}
+function unlockAudio(){const ac=_getAC();if(!ac)return;if(ac.state==='suspended')ac.resume().catch(()=>{});try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);}catch(e){}}
+function playSound(type){
+  const ac=_getAC();if(!ac||ac.state==='suspended')return;
+  const t=ac.currentTime;
+  if(type==='tada'){[523.25,659.25,783.99,1046.50].forEach((freq,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type='triangle';const st=t+i*.11;o.frequency.setValueAtTime(freq,st);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.2,st+.05);g.gain.exponentialRampToValueAtTime(.001,st+.58);o.start(st);o.stop(st+.59);});}
+}
+function triggerCelebration(team,name){
+  safeSet('celeb-label',name);safeSet('celeb-name','Team '+team);
+  const card = document.querySelector('.celeb-card');
+  if(card){ card.style.animation='none'; void card.offsetWidth; card.style.animation=''; } // reset animation
+  $('celeb-overlay').classList.add('open');
+  playSound('tada');launchConfetti();
+  setTimeout(()=>$('celeb-overlay').classList.remove('open'),5000);
+}
+function launchConfetti(){
+  const canvas=$('confetti-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const COLORS=['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FF9FF3','#54A0FF','#FFEAA7','#FD79A8'];
+  const ps=Array.from({length:200},()=>({x:Math.random()*canvas.width,y:Math.random()*-canvas.height*.5,w:Math.random()*12+5,h:Math.random()*6+3,vy:Math.random()*3+2,vx:(Math.random()-.5)*2,rot:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.15,c:COLORS[Math.floor(Math.random()*COLORS.length)],alpha:1}));
+  let frame=0;const TOTAL=350;
+  function tick(){ctx.clearRect(0,0,canvas.width,canvas.height);ps.forEach(p=>{p.y+=p.vy*(1+frame/TOTAL);p.x+=p.vx;p.rot+=p.rs;p.alpha=Math.max(0,1-frame/TOTAL);ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});frame++;if(frame<TOTAL)requestAnimationFrame(tick);else ctx.clearRect(0,0,canvas.width,canvas.height);}tick();
+}
 
 // ════════════════════════════════════════════════════════
-// NAV TABS
+// 💬 實時彈幕 (Danmaku) 系統
 // ════════════════════════════════════════════════════════
-let currentPage = 0; // tracks active staff page for context-aware guide
+let chatListenerInit = false;
+function DB_CHAT() { return firebase.database().ref('yingmei2026_chats'); }
 
-document.querySelectorAll('#staff-nav .nav-tab').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('#staff-nav .nav-tab').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('#staff-main .page').forEach(x=>x.classList.add('hidden-page'));
-    $(`page-${btn.dataset.page}`).classList.remove('hidden-page');
-    currentPage = parseInt(btn.dataset.page);
-  };
+function sendDanmaku(text) {
+  if(!text || !text.trim() || !fbReady) return;
+  DB_CHAT().push({ t: text.trim(), ts: firebase.database.ServerValue.TIMESTAMP });
+  haptic(10); showToast('已發送 🚀');
+}
+
+// 綁定 Enter 鍵發送
+document.addEventListener('DOMContentLoaded', () => {
+  const input = $('danmaku-input');
+  if(input) { input.addEventListener('keypress', (e) => { if(e.key==='Enter') { sendDanmaku(input.value); input.value=''; } }); }
 });
 
-document.querySelectorAll('#player-nav .nav-tab').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('#player-nav .nav-tab').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.p-page').forEach(x=>x.classList.remove('active'));
-    document.querySelector(`.p-page[data-ppage="${btn.dataset.page}"]`).classList.add('active');
-    pTab = parseInt(btn.dataset.page);
-  };
-});
-
-// ════════════════════════════════════════════════════════
-// MAIN CONTROLLER
-// ════════════════════════════════════════════════════════
-function updateUI() {
-  if (role === 'staff') {
-    document.body.className = 'staff-mode h-full w-full';
-    $('player-view').style.display = 'none';
-    $('jumbotron-view').style.display = 'none';
-    renderStaff();
-  } else if (role === 'jumbotron') {
-    document.body.className = 'h-full w-full';
-    $('player-view').style.display = 'none';
-    // jumbotron managed by enterJumbotron/renderJumbotron
-  } else {
-    document.body.className = 'player-mode h-full w-full';
-    $('player-view').style.display = 'flex';
-    $('jumbotron-view').style.display = 'none';
-    renderPlayer();
-  }
+function spawnDanmaku(text) {
+  const container = $('danmaku-container'); if(!container) return;
+  const el = document.createElement('div');
+  el.className = 'danmaku-item';
+  el.textContent = text;
+  // 隨機高度 10% 到 90%
+  el.style.top = Math.floor(Math.random() * 80 + 10) + '%';
+  // 隨機速度 4秒到 7秒
+  const duration = 4 + Math.random() * 3; 
+  el.style.animationDuration = duration + 's';
+  container.appendChild(el);
+  setTimeout(() => el.remove(), duration * 1000);
 }
 
 // ════════════════════════════════════════════════════════
-// STAFF RENDER — all via safeSet, zero innerHTML for data
+// FIREBASE 同步與接收
 // ════════════════════════════════════════════════════════
-function renderStaff() {
-  // Dashboard
-  safeSet('dash-a', w.A); safeSet('dash-b', w.B); safeSet('dash-c', w.C);
-  renderLogs();
+const fbConfig={apiKey:"AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",authDomain:"basketball-2026.firebaseapp.com",databaseURL:"https://basketball-2026-default-rtdb.firebaseio.com",projectId:"basketball-2026"};
+let fbReady=false;try{if(firebase.apps.length===0)firebase.initializeApp(fbConfig);fbReady=true;}catch(e){}
+const DB=()=>firebase.database().ref('yingmei2026');
 
-  // Dice scores table
-  let dH = '';
-  tm.forEach(t => {
-    const r1=gd.d[t]?gd.d[t][0]:0, r2=gd.d[t]?gd.d[t][1]:0;
-    dH += `<div class="glass-card p-4 text-center">
-      <div class="text-lg font-bold text-yellow-400 mb-2">Team ${t}</div>
-      <div class="text-gray-300 text-sm">第1輪: <span class="text-white font-mono">${fmt(r1)}</span></div>
-      <div class="text-gray-300 text-sm">第2輪: <span class="text-white font-mono">${fmt(r2)}</span></div>
-      <div class="text-yellow-400 font-bold mt-2">合計: <span class="font-mono">${(r1>0&&r2>0)?fmt(r1+r2):'--'}</span></div>
-    </div>`;
-  });
-  $('dice-scores').innerHTML = dH;
-  // Dice — boundary guard: dSt.i may be 3 when a round finishes
-  const diceTeamLabel = dSt.i < tm.length
-    ? `Team ${tm[dSt.i]} (第${dSt.r}輪)`
-    : `本輪結束 (第${dSt.r}輪)`;
-  safeSet('dice-team', diceTeamLabel);
-  if (!tRun && tMs===0) safeSet('dice-timer','00:00.0');
-  // Lock/unlock finalize button based on current fSt (supports reset)
-  if (fSt.d) {
-    $('d-fin').textContent='🔒 已結算'; $('d-fin').disabled=true;
-  } else {
-    if ($('d-fin').textContent==='🔒 已結算') {
-      $('d-fin').textContent='🏆 結算成績'; $('d-fin').disabled=false;
+function syncAll(){
+  if(!fbReady||role!=='staff')return;
+  _suppressListener=true; clearTimeout(window._suppressTO); window._suppressTO=setTimeout(()=>{_suppressListener=false;},1500);
+  const safeFM={};['ab','ac','bc'].forEach(k=>safeFM[k]={...fM[k],endMs:null});
+  DB().set({gd,step,w,m,fM:safeFM,fC,fSt,logs,dSt,fSettled});
+}
+
+if(fbReady){
+  // 1. 監聽主資料庫
+  DB().on('value',snap=>{
+    if(_suppressListener)return;
+    const data=snap.val();if(!data)return;
+    if(data.gd){
+      if(data.gd.d){Object.assign(gd.d,data.gd.d);tm.forEach(t=>{if(gd.d[t]&&!Array.isArray(gd.d[t]))gd.d[t]=[Number(gd.d[t][0]||0),Number(gd.d[t][1]||0)];});}
+      if(data.gd.p3){
+        if(data.gd.p3.r1){Object.assign(gd.p3.r1,data.gd.p3.r1);tm.forEach(t=>{if(gd.p3.r1[t]&&!Array.isArray(gd.p3.r1[t].p))gd.p3.r1[t].p=Array.from({length:10},(_,i)=>Number(gd.p3.r1[t].p?.[i]||0));});}
+        if(data.gd.p3.f){Object.assign(gd.p3.f,data.gd.p3.f);if(gd.p3.f.q&&!Array.isArray(gd.p3.f.q))gd.p3.f.q=Object.values(gd.p3.f.q);if(gd.p3.f.t)Object.keys(gd.p3.f.t).forEach(t=>{if(gd.p3.f.t[t]&&!Array.isArray(gd.p3.f.t[t].p))gd.p3.f.t[t].p=Array.from({length:10},(_,i)=>Number(gd.p3.f.t[t].p?.[i]||0));});}
+      }
+      if(data.gd.f)Object.assign(gd.f,data.gd.f);
     }
-  }
+    if(data.w)Object.assign(w,data.w);
+    if(data.m)Object.assign(m,data.m);
+    if(data.fM)['ab','ac','bc'].forEach(k=>{if(data.fM[k])Object.assign(fM[k],data.fM[k]);});
+    if(data.fC)fC=data.fC;
+    if(data.fSt)Object.assign(fSt,data.fSt);
+    if(data.dSt)Object.assign(dSt,data.dSt);
+    if(data.logs)logs=data.logs;
+    if(data.fSettled)Object.assign(fSettled,data.fSettled);
 
-  // 3pt
-  if (gd.p3.f.q && gd.p3.f.q.length===2) { $('pt-r1').classList.add('hidden'); $('pt-fin').classList.remove('hidden'); }
-  else { $('pt-r1').classList.remove('hidden'); $('pt-fin').classList.add('hidden'); }
-  const _ptfBtn = $('pt-f-fin');
-  if (_ptfBtn) { _ptfBtn.textContent = fSt.p3 ? '🔒 已結算' : '🏆 結算決賽'; _ptfBtn.disabled = !!fSt.p3; }
+    // ★ 球員端特效觸發器 (利用 prev 變數判斷是否為新結算)
+    if(role==='player') {
+      if(data.fSt) {
+        if(data.fSt.d  && !prevFSt.d) triggerCelebration(data.m.d, '趣味競賽');
+        if(data.fSt.p3 && !prevFSt.p3) triggerCelebration(data.m.p3, '三分磚頭王');
+        if(data.fSt.f  && !prevFSt.f) triggerCelebration(data.m.f, '五打五賽 ⚔️');
+        prevFSt = { ...data.fSt };
+      }
+      // 驟死賽特效觸發
+      if(data.m && data.m.sd && !prevSd) {
+        triggerCelebration(data.m.sd, '最終總冠軍 🏆');
+        prevSd = data.m.sd;
+      } else if (data.m && !data.m.sd) {
+        prevSd = null;
+      }
+    }
 
-  // 5v5
-  const mc    = fM[fC];
-  const half  = mc.h;
-  const remMs = fRun ? Math.max(0, mc.endMs - Date.now()) : mc.remMs[half];
-  safeSet('f-t1',  'Team ' + fC[0].toUpperCase());
-  safeSet('f-t2',  'Team ' + fC[1].toUpperCase());
-  safeSet('f-s1',  mc.s1); safeSet('f-s2', mc.s2);
-  safeSet('f-half', half===1 ? '上半場' : '下半場');
-  safeSet('f-time', fmtMs(remMs));
-  const ft=$('f-toggle');
-  if (ft) ft.textContent = fRun ? '⏹️ 暫停計時' : (remMs<=0&&half===2 ? '⏱️ 比賽結束' : '▶️ 啟動計時');
-  safeSet('f-score-ab', `${fM.ab.s1} - ${fM.ab.s2}`);
-  safeSet('f-score-ac', `${fM.ac.s1} - ${fM.ac.s2}`);
-  safeSet('f-score-bc', `${fM.bc.s1} - ${fM.bc.s2}`);
-  // 無條件根據 fSt.f 設定（不做 textContent 比較）
-  if (fSt.f) { $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true; }
-  else        { $('f-fin').textContent='✅ 結算此場並累加'; $('f-fin').disabled=false; }
-
-  // Podium
-  const allDone = fSt.u || (fSt.d && fSt.p3 && fSt.f);
-  if (!allDone) { $('pod-lock').classList.remove('hidden'); $('pod-show').classList.add('hidden'); }
-  else          { $('pod-lock').classList.add('hidden');    $('pod-show').classList.remove('hidden'); renderPodium(); }
-}
-
-// ════════════════════════════════════════════════════════
-// PLAYER RENDER — FIX #2: safeSet ONLY, zero innerHTML
-// ════════════════════════════════════════════════════════
-
-// Animated score set: compares old value, triggers .animate-pop on change
-function safeSetScore(id, val) {
-  const el = $(id);
-  if (!el) return;
-  const prev = el.textContent;
-  el.textContent = String(val);
-  if (String(prev) !== String(val)) {
-    el.classList.remove('animate-pop');
-    void el.offsetWidth; // force reflow to restart animation
-    el.classList.add('animate-pop');
-    el.addEventListener('animationend', () => el.classList.remove('animate-pop'), { once: true });
-  }
-}
-
-function renderPlayer() {
-  // P0 scores
-  safeSet('pw-a', w.A); safeSet('pw-b', w.B); safeSet('pw-c', w.C);
-  safeSet('pst-d',  fSt.d  ? '✅' : '⏳');
-  safeSet('pst-p3', fSt.p3 ? '✅' : '⏳');
-  safeSet('pst-f',  fSt.f  ? '✅' : '⏳');
-
-  // P1 dice
-  safeSet('p-dice-team',  tm[dSt.i]||'A');
-  safeSet('p-dice-round', dSt.r);
-  safeSet('p-dice-timer', fmt(tMs));
-  ['A','B','C'].forEach(t => {
-    const lc=t.toLowerCase(), r1=gd.d[t]?gd.d[t][0]:0, r2=gd.d[t]?gd.d[t][1]:0;
-    safeSet(`p-d-r1${lc}`, fmt(r1));
-    safeSet(`p-d-r2${lc}`, fmt(r2));
-    safeSet(`p-d-t${lc}`,  (r1>0&&r2>0)?fmt(r1+r2):'--');
+    if(role==='staff')renderStaff();else renderPlayer();
+    updateGuide();
   });
 
-  // P2 3pt
-  safeSet('p-p3-ra', gd.p3.r1.A?gd.p3.r1.A.t:0);
-  safeSet('p-p3-rb', gd.p3.r1.B?gd.p3.r1.B.t:0);
-  safeSet('p-p3-rc', gd.p3.r1.C?gd.p3.r1.C.t:0);
-  const finWrap = $('p-p3-fin-wrap');
-  if (gd.p3.f.q && gd.p3.f.q.length===2) {
-    finWrap.style.display='';
-    const q=gd.p3.f.q;
-    safeSet('p-p3-fq0', q[0]); safeSet('p-p3-fq1', q[1]);
-    safeSet('p-p3-fs0', gd.p3.f.t[q[0]]?gd.p3.f.t[q[0]].t:0);
-    safeSet('p-p3-fs1', gd.p3.f.t[q[1]]?gd.p3.f.t[q[1]].t:0);
-  } else finWrap.style.display='none';
-
-  // P3 5v5
-  const mc2    = fM[fC];
-  const half2  = mc2.h;
-  const rem2   = fRun ? Math.max(0, mc2.endMs - Date.now()) : mc2.remMs[half2];
-  safeSet('p-f-half', half2===1?'⏱️ 上半場':'⏱️ 下半場');
-  safeSet('p-f-time', fmtMs(rem2));
-  safeSet('p-f-t1',   fC[0].toUpperCase());
-  safeSet('p-f-t2',   fC[1].toUpperCase());
-  safeSetScore('p-f-s1', mc2.s1);
-  safeSetScore('p-f-s2', mc2.s2);
-  safeSet('p-fs-ab', `${fM.ab.s1} - ${fM.ab.s2}`);
-  safeSet('p-fs-ac', `${fM.ac.s1} - ${fM.ac.s2}`);
-  safeSet('p-fs-bc', `${fM.bc.s1} - ${fM.bc.s2}`);
-
-  // P4 podium
-  const allDone = fSt.u || (fSt.d && fSt.p3 && fSt.f);
-  if (!allDone) {
-    $('p-pod-lock').classList.remove('hidden');
-    $('p-pod-show').classList.add('hidden');
-  } else {
-    $('p-pod-lock').classList.add('hidden');
-    $('p-pod-show').classList.remove('hidden');
-    const sorted=tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s);
-    safeSet('pp1',  `Team ${sorted[0].t}`);
-    safeSet('pp1s', `${sorted[0].s} 局`);
-    safeSet('pp2',  `🥈 Team ${sorted[1].t} (${sorted[1].s} 局)`);
-    safeSet('pp3',  `🥉 Team ${sorted[2].t} (${sorted[2].s} 局)`);
-  }
-}
-
-// ════════════════════════════════════════════════════════
-// PODIUM ANIMATIONS — FIX #6
-// ════════════════════════════════════════════════════════
-function renderPodium() {
-  const sorted = tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s);
-  safeSet('p1',  `Team ${sorted[0].t}`);
-  safeSet('p1s', `${sorted[0].s} 局`);
-  safeSet('p2',  `Team ${sorted[1].t}`);
-  safeSet('p2s', `${sorted[1].s} 局`);
-  safeSet('p3',  `Team ${sorted[2].t}`);
-  safeSet('p3s', `${sorted[2].s} 局`);
-
-  if (!podiumShown) {
-    podiumShown = true;
-    // Staggered rise-up animations
-    ['pod-p1','pod-p2','pod-p3'].forEach(id => {
-      const el = $(id);
-      if (!el) return;
-      el.classList.remove('risen');
-      void el.offsetWidth; // force reflow
-      el.classList.add('risen');
+  // 2. 監聽彈幕資料庫
+  if (!chatListenerInit) {
+    chatListenerInit = true;
+    let initialLoad = true;
+    DB_CHAT().limitToLast(1).on('child_added', snap => {
+      if (initialLoad) { initialLoad = false; return; } // 不顯示舊彈幕
+      const msg = snap.val();
+      if(msg && msg.t) spawnDanmaku(msg.t);
     });
-    launchConfetti();
   }
 }
 
-function launchConfetti() {
-  const canvas = $('confetti-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const COLORS = ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FF9FF3','#54A0FF','#FFEAA7','#FD79A8'];
-  const N = 180;
-  const particles = Array.from({length:N}, () => ({
-    x:   Math.random() * canvas.width,
-    y:   Math.random() * -canvas.height * 0.5,
-    w:   Math.random() * 12 + 5,
-    h:   Math.random() * 6  + 3,
-    vy:  Math.random() * 3  + 2,
-    vx:  (Math.random() - 0.5) * 2,
-    rot: Math.random() * Math.PI * 2,
-    rs:  (Math.random() - 0.5) * 0.15,
-    c:   COLORS[Math.floor(Math.random()*COLORS.length)],
-    alpha: 1
-  }));
-  let frame = 0;
-  const TOTAL = 320;
-  function tick() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p => {
-      p.y   += p.vy * (1 + frame/TOTAL);
-      p.x   += p.vx;
-      p.rot += p.rs;
-      p.alpha = Math.max(0, 1 - frame/TOTAL);
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.c;
-      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      ctx.restore();
-    });
-    frame++;
-    if (frame < TOTAL) requestAnimationFrame(tick);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-  tick();
+// ════════════════════════════════════════════════════════
+// 重置
+// ════════════════════════════════════════════════════════
+function masterReset(){
+  if(prompt('輸入 0000 清空所有數據')!=='0000')return;
+  addLog('執行系統總重置');
+  gd={d:{A:[0,0],B:[0,0],C:[0,0]},p3:{r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}},f:{A:0,B:0,C:0}};
+  m={d:null,p3:null,f:null,sd:null};fSt={d:false,p3:false,f:false,u:false};fSettled={ab:false,ac:false,bc:false};
+  fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}};
+  fC='ab';fRun=false;clearInterval(fInt);clearInterval(tInt);tMs=0;tRun=false;dSt={r:1,i:0};podiumShown=false;
+  $('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');
+  build3Pt();refreshWins();syncAll();showToast('✅ 系統已清空');updateUI();
+}
+function resetData(type){
+  if(prompt('輸入 0000 清除此項數據')!=='0000')return;
+  addLog(`重置單項賽事: ${type}`);
+  if(type==='dice'){gd.d={A:[0,0],B:[0,0],C:[0,0]};dSt={r:1,i:0};m.d=null;fSt.d=false;tMs=0;tRun=false;clearInterval(tInt);$('d-start').disabled=false;$('d-stop').disabled=true;}
+  if(type==='3pt'){gd.p3={r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}};m.p3=null;fSt.p3=false;$('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');build3Pt();}
+  if(type==='5v5'){fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}};fC='ab';gd.f={A:0,B:0,C:0};fSettled={ab:false,ac:false,bc:false};m.f=null;fSt.f=false;fRun=false;clearInterval(fInt);}
+  if(m.sd) { m.sd=null; addLog('驟死賽紀錄已連帶清除'); }
+  fSt.u=false;podiumShown=false;refreshWins();syncAll();renderStaff();showToast('✅ 已重置');
 }
 
 // ════════════════════════════════════════════════════════
-// DICE
+// 路由
 // ════════════════════════════════════════════════════════
-$('d-start').onclick = () => {
-  if (tRun) return;
-  if (dSt.i >= tm.length) { showToast('本輪已結束，請進入下一輪', 'warn'); return; }
-  tRun=true; tStartTime=Date.now()-tMs;
-  $('d-start').disabled=true; $('d-stop').disabled=false;
-  addLog(`開始計時 Team ${tm[dSt.i]} R${dSt.r}`); syncLogs();
-  tInt = setInterval(() => {
-    tMs = Date.now() - tStartTime;
-    safeSet('dice-timer', fmt(tMs));
-    safeSet('p-dice-timer', fmt(tMs));
-  }, 50);
-};
-
-$('d-stop').onclick = () => {
-  if (!tRun) return;
-  tRun=false; clearInterval(tInt);
-  const t=tm[dSt.i];
-  if (!gd.d[t]) gd.d[t]=[0,0];
-  gd.d[t][dSt.r-1]=tMs;
-  $('d-start').disabled=false; $('d-stop').disabled=true;
-  addLog(`停止計時 Team ${t} R${dSt.r}: ${fmt(tMs)}`);
-  syncDice(); syncLogs(); renderStaff();
-};
-
-$('d-next').onclick = () => {
-  if (tRun) { showToast('請先停止計時', 'warn'); return; }
-  dSt.i++; tMs=0;
-  safeSet('dice-timer','00:00.0');
-  $('d-start').disabled=false; $('d-stop').disabled=true;
-  // Boundary guard: if all 3 teams done for this round, show round-end buttons
-  if (dSt.i >= tm.length) {
-    $('d-next').classList.add('hidden');
-    if (dSt.r===1) { $('d-r2').classList.remove('hidden'); }
-    else           { $('d-fin').classList.remove('hidden'); }
-  }
-  const nextLabel = dSt.i < tm.length ? `Team ${tm[dSt.i]}` : '本輪結束';
-  addLog(`切換至 ${nextLabel}`);
-  syncDice(); syncLogs(); renderStaff();
-};
-
-$('d-r2').onclick = () => {
-  dSt.r=2; dSt.i=0; tMs=0;
-  safeSet('dice-timer','00:00.0');
-  $('d-start').disabled=false; $('d-stop').disabled=true;
-  $('d-r2').classList.add('hidden'); $('d-next').classList.remove('hidden');
-  addLog('進入第二輪');
-  syncDice(); syncLogs(); renderStaff();
-};
-
-$('d-fin').onclick = () => {
-  if (!confirm('確認結算趣味競賽？')) return;
-  const scores = tm.map(t=>({ t, s:(gd.d[t]?gd.d[t][0]:0)+(gd.d[t]?gd.d[t][1]:0) }))
-                   .filter(x=>x.s>0).sort((a,b)=>a.s-b.s);
-  if (scores.length<3) { showToast('數據不足，請完成所有計時', 'warn'); return; }
-  w[scores[0].t]++; m.d=scores[0].t; fSt.d=true;
-  $('d-fin').textContent='🔒 已結算'; $('d-fin').disabled=true;
-  addLog(`趣味競賽結算：冠軍 Team ${scores[0].t}`);
-  syncWins(); syncFlags(); syncMarkers(); syncLogs(); renderStaff();
-};
-
-// ════════════════════════════════════════════════════════
-// 3-POINT — Stepper UI (UX #3, no virtual keyboard)
-// ════════════════════════════════════════════════════════
-function build3Pt() {
-  let h='';
-  tm.forEach(t => {
-    const col=t==='A'?'text-blue-400':t==='B'?'text-red-400':'text-green-400';
-    if (!gd.p3.r1[t]) gd.p3.r1[t]={p:Array(10).fill(0),t:0};
-    h += `<div class="glass-card p-4 text-center"><h4 class="font-bold ${col} mb-3 text-lg">Team ${t}</h4><div class="grid grid-cols-5 gap-2 mb-3">`;
-    for (let i=0;i<10;i++) {
-      const v = gd.p3.r1[t].p[i] || 0;
-      h += `<div class="stepper-wrap">
-        <button class="stepper-btn" ontouchstart="" onclick="p3Step('r1','${t}',${i},-1)">−</button>
-        <span class="stepper-val" id="p3r-${t}-${i}">${v}</span>
-        <button class="stepper-btn" ontouchstart="" onclick="p3Step('r1','${t}',${i},1)">＋</button>
-      </div>`;
-    }
-    h+=`</div><div class="text-yellow-400 font-bold text-lg">總計: <span id="p3t-${t}">${gd.p3.r1[t].t}</span> 分</div></div>`;
-  });
-  $('pt-inputs').innerHTML=h;
-}
-build3Pt();
-
-// Stepper handler — called by both group-stage and finals steppers
-function p3Step(stage, team, idx, delta) {
-  let obj;
-  if (stage === 'r1') {
-    if (!gd.p3.r1[team]) gd.p3.r1[team]={p:Array(10).fill(0),t:0};
-    obj = gd.p3.r1[team];
-    const valEl = document.getElementById(`p3r-${team}-${idx}`);
-    const totEl = document.getElementById(`p3t-${team}`);
-    obj.p[idx] = Math.max(0, Math.min(5, (obj.p[idx]||0) + delta));
-    obj.t = obj.p.reduce((a,b)=>a+b,0);
-    if (valEl) valEl.textContent = obj.p[idx];
-    if (totEl) totEl.textContent = obj.t;
-  } else {
-    if (!gd.p3.f.t[team]) gd.p3.f.t[team]={p:Array(10).fill(0),t:0};
-    obj = gd.p3.f.t[team];
-    const valEl = document.getElementById(`p3f-${team}-${idx}`);
-    const totEl = document.getElementById(`p3ft-${team}`);
-    obj.p[idx] = Math.max(0, Math.min(5, (obj.p[idx]||0) + delta));
-    obj.t = obj.p.reduce((a,b)=>a+b,0);
-    if (valEl) valEl.textContent = obj.p[idx];
-    if (totEl) totEl.textContent = obj.t;
-  }
-  sync3pt();
-}
-
-$('pt-r1-fin').onclick = () => {
-  const scores = tm.map(t=>({t,s:gd.p3.r1[t]?gd.p3.r1[t].t:0})).sort((a,b)=>b.s-a.s);
-  if (scores[1].s === scores[2].s) {
-    // FIX #5 — Updated tie-breaker modal copy
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="bg-gray-900 border border-white/20 p-8 rounded-2xl w-96 text-center">
-        <div class="text-4xl mb-3">⚠️</div>
-        <h2 class="text-xl font-bold text-red-400 mb-2">平局！</h2>
-        <p class="text-gray-300 mb-6">請勾選『最終晉級決賽』的兩支隊伍（包含第一名與勝出的平手隊伍）</p>
-        <div class="space-y-2 text-left mb-6">
-          ${scores.map(x=>`<label class="flex items-center gap-3 bg-white/5 p-3 rounded-lg cursor-pointer hover:bg-white/10">
-            <input type="checkbox" class="t-cb w-4 h-4" value="${x.t}">
-            <span class="font-bold">Team ${x.t}</span><span class="text-gray-400 text-sm ml-auto">${x.s} 分</span>
-          </label>`).join('')}
-        </div>
-        <button class="btn-primary w-full" onclick="
-          const c=Array.from(document.querySelectorAll('.t-cb:checked')).map(x=>x.value);
-          if(c.length!==2){alert('請選擇恰好 2 支隊伍');return;}
-          gd.p3.f.q=c;this.closest('.modal-overlay').remove();build3f();sync3pt();">✅ 確認晉級</button>
-        <button class="btn-secondary w-full mt-2" onclick="this.closest('.modal-overlay').remove()">取消</button>
-      </div>`;
-    document.body.appendChild(modal);
-  } else {
-    gd.p3.f.q=[scores[0].t, scores[1].t];
-    build3f(); sync3pt();
-  }
-  addLog('三分球小組賽結算'); syncLogs();
-};
-
-function build3f() {
-  $('pt-r1').classList.add('hidden'); $('pt-fin').classList.remove('hidden');
-  const q=gd.p3.f.q; let h='';
-  q.forEach(t => {
-    if (!gd.p3.f.t[t]) gd.p3.f.t[t]={p:Array(10).fill(0),t:0};
-    h+=`<div class="glass-card p-4 text-center"><h4 class="font-bold text-yellow-400 mb-3 text-lg">Team ${t} (決賽)</h4><div class="grid grid-cols-5 gap-2 mb-3">`;
-    for (let i=0;i<10;i++) {
-      const v = gd.p3.f.t[t].p[i] || 0;
-      h+=`<div class="stepper-wrap">
-        <button class="stepper-btn" ontouchstart="" onclick="p3Step('f','${t}',${i},-1)">−</button>
-        <span class="stepper-val" id="p3f-${t}-${i}">${v}</span>
-        <button class="stepper-btn" ontouchstart="" onclick="p3Step('f','${t}',${i},1)">＋</button>
-      </div>`;
-    }
-    h+=`</div><div class="text-yellow-400 font-bold text-lg">總計: <span id="p3ft-${t}">${gd.p3.f.t[t].t}</span> 分</div></div>`;
-  });
-  $('pt-f-inputs').innerHTML=h; sync3pt();
-}
-
-$('pt-f-fin').onclick = () => {
-  if (!confirm('確認結算三分球決賽？')) return;
-  const q=gd.p3.f.q;
-  if (!q||q.length<2) { showToast('晉級隊伍數據異常','error'); return; }
-  const s1=(gd.p3.f.t&&gd.p3.f.t[q[0]])?(gd.p3.f.t[q[0]].t||0):0;
-  const s2=(gd.p3.f.t&&gd.p3.f.t[q[1]])?(gd.p3.f.t[q[1]].t||0):0;
-  const winner=s1>=s2?q[0]:q[1];
-  w[winner]++; m.p3=winner; fSt.p3=true;
-  const _b=$('pt-f-fin'); if(_b){_b.textContent='🔒 已結算';_b.disabled=true;}
-  addLog(`三分球結算：冠軍 Team ${winner}`);
-  showToast(`🏆 三分球冠軍：Team ${winner}！`, 'success', 4000);
-  syncWins(); syncFlags(); syncMarkers(); sync3pt(); syncLogs(); renderStaff();
-};
-
-// ════════════════════════════════════════════════════════
-// 5v5 — FIX #3: Date.now()-based timer, no decrement
-// ════════════════════════════════════════════════════════
-document.querySelectorAll('.f-match').forEach(btn => {
-  btn.onclick = () => {
-    if (fRun) { showToast('請先暫停計時', 'warn'); return; }
-    document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');
-    fC = btn.dataset.m;
-    addLog(`切換至 ${fC.toUpperCase()} 場次`);
-    syncFiveVFive(fC); syncLogs(); renderStaff();
-  };
-});
-
-$('f-toggle').onclick = () => {
-  if (fRun) {
-    // Pause: snapshot remaining time
-    fRun=false; clearInterval(fInt);
-    const mc=fM[fC];
-    mc.remMs[mc.h] = Math.max(0, mc.endMs - Date.now());
-    mc.endMs=null;
-    addLog('暫停五五賽');
-    syncFiveVFive(fC); syncLogs(); renderStaff();
-  } else {
-    const mc=fM[fC];
-    if (mc.remMs[mc.h]<=0 && mc.h===2) { showToast('比賽已結束，請結算此場', 'warn'); return; }
-    // Set absolute deadline
-    mc.endMs = Date.now() + mc.remMs[mc.h];
-    fRun=true;
-    addLog('啟動五五賽計時');
-
-    fInt = setInterval(() => {
-      const mc2=fM[fC];
-      const left=mc2.endMs - Date.now();
-      // Live display update — cheap, no full render
-      safeSet('f-time',   fmtMs(left));
-      safeSet('p-f-time', fmtMs(left));
-      if (left <= 0) {
-        mc2.remMs[mc2.h]=0; mc2.endMs=null; fRun=false; clearInterval(fInt);
-        if (mc2.h===1) {
-          mc2.h=2;
-          syncFiveVFive(fC); renderStaff(); renderPlayer();
-          setTimeout(()=>showToast('🔔 上半場結束！', 'info', 4000), 80);
-        } else {
-          syncFiveVFive(fC); renderStaff(); renderPlayer();
-          setTimeout(()=>showToast('🏁 全場結束！請結算此場', 'warn', 5000), 80);
-        }
-      }
-    }, 250);
-    renderStaff();
-  }
-};
-
-function addF(side, pts) {
-  const mc=fM[fC];
-  if (side===1) mc.s1=Math.max(0,mc.s1+pts);
-  else          mc.s2=Math.max(0,mc.s2+pts);
-  addLog(`五五賽 ${fC.toUpperCase()} T${side} ${pts>0?'+':''}${pts}`);
-  syncFiveVFive(fC); syncLogs(); renderStaff(); renderPlayer();
-}
-
-function resF() {
-  if (!confirm('確認歸零本場比分？')) return;
-  fM[fC].s1=0; fM[fC].s2=0;
-  addLog(`五五賽 ${fC.toUpperCase()} 比分歸零`);
-  showToast('比分已歸零', 'info');
-  syncFiveVFive(fC); syncLogs(); renderStaff(); renderPlayer();
-}
-
-$('f-fin').onclick = () => {
-  if (fSettled[fC]) { showToast('此場已結算', 'warn'); return; }
-  if (!confirm('確認結算此場並累加積分？')) return;
-  fSettled[fC] = true; // 立即鎖定防止重複
-  const mc=fM[fC], t1=fC[0].toUpperCase(), t2=fC[1].toUpperCase();
-  gd.f[t1]=(gd.f[t1]||0)+mc.s1; gd.f[t2]=(gd.f[t2]||0)+mc.s2;
-  fRun=false; clearInterval(fInt); mc.endMs=null;
-  addLog(`五五賽 ${t1} vs ${t2} 結算: ${mc.s1}-${mc.s2}`);
-
-  const order=['ab','ac','bc'], idx=order.indexOf(fC);
-  if (idx<2) {
-    const winner = mc.s1>=mc.s2?t1:t2;
-    fC=order[idx+1];
-    document.querySelectorAll('.f-match').forEach(x=>x.classList.remove('active'));
-    document.querySelector(`[data-m="${fC}"]`).classList.add('active');
-    addLog(`自動切換至 ${fC.toUpperCase()}`);
-    showToast(`✅ 本場 Team ${winner} 勝！切換至下一場`, 'success', 3000);
-  } else {
-    const sorted=tm.map(t=>({t,s:gd.f[t]||0})).sort((a,b)=>b.s-a.s);
-    w[sorted[0].t]++; m.f=sorted[0].t; fSt.f=true;
-    $('f-fin').textContent='🔒 已結算'; $('f-fin').disabled=true;
-    addLog(`五五賽全部結算：積分王 Team ${sorted[0].t}`);
-    showToast(`🏆 五五賽冠軍：Team ${sorted[0].t}！`, 'success', 5000);
-    syncWins(); syncFlags(); syncMarkers();
-  }
-  syncFiveVFive(); syncLogs(); renderStaff(); renderPlayer();
-};
-
-// ════════════════════════════════════════════════════════
-// PODIUM
-// ════════════════════════════════════════════════════════
-function forceUnlock() {
-  const pwd=prompt('輸入管理員密碼解鎖頒獎台');
-  if (pwd==='admin') {
-    fSt.u=true; addLog('強制解鎖頒獎台'); syncFlags(); syncLogs(); renderStaff();
-  } else if (pwd!==null) showToast('密碼錯誤', 'error');
+$('role-staff').onclick=()=>{unlockAudio();role='staff';$('role-overlay').style.display='none';addLog('進入工作人員模式');updateUI();};
+$('role-player').onclick=()=>{unlockAudio();role='player';$('role-overlay').style.display='none';updateUI();};
+$('p-back').onclick=()=>{role='staff';updateUI();};
+$('switch-to-player').onclick=()=>{role='player';updateUI();};
+document.querySelectorAll('#staff-nav .nav-tab').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#staff-nav .nav-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('#staff-main .page').forEach(x=>x.classList.add('hidden-page'));$(`page-${b.dataset.page}`).classList.remove('hidden-page');updateGuide();};});
+document.querySelectorAll('#player-nav .nav-tab').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#player-nav .nav-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.p-page').forEach(x=>x.classList.remove('active'));document.querySelector(`.p-page[data-ppage="${b.dataset.page}"]`).classList.add('active');};});
+function updateUI(){
+  if(role==='staff'){document.body.className='staff-mode h-full w-full';$('player-view').style.display='none';renderStaff();updateGuide();}
+  else{document.body.className='player-mode h-full w-full';$('player-view').style.display='flex';renderPlayer();}
 }
 
 // ════════════════════════════════════════════════════════
-// CONTEXT-AWARE GUIDE MODAL  (Feature #2)
+// 渲染
 // ════════════════════════════════════════════════════════
-const GUIDE_DATA = [
-  {
-    page: 0,
-    icon: '👋',
-    title: '首頁 / 總控台',
-    intro: '歡迎！這裡是總控台。',
-    body: '您可以在此查看各隊的總積分（勝出局數），以及下方所有的系統操作日誌。請從上方導覽列選擇賽事開始紀錄！',
-    steps: []
-  },
-  {
-    page: 1,
-    icon: '🎲',
-    title: '趣味競賽說明',
-    intro: '按照以下步驟進行趣味競賽：',
-    body: '',
-    steps: [
-      '依序為 A、B、C 三隊進行計時。',
-      '點擊投擲骰子決定動作。',
-      '兩輪皆完成後，點擊結算，系統將自動把 1 局積分加給總時間最短的隊伍！'
-    ]
-  },
-  {
-    page: 2,
-    icon: '🧱',
-    title: '三分磚頭王說明',
-    intro: '按照以下步驟進行三分球競賽：',
-    body: '',
-    steps: [
-      '小組賽：依序輸入各隊 10 位球員的進球數。',
-      '結算小組賽後，總分最低的隊伍將淘汰。',
-      '進入決賽後，輸入兩隊最終得分並結算冠軍！'
-    ]
-  },
-  {
-    page: 3,
-    icon: '⚔️',
-    title: '五五賽說明',
-    intro: '按照以下步驟進行五對五循環賽：',
-    body: '',
-    steps: [
-      '採用循環賽（A vs B, A vs C, B vs C）。',
-      '計時器為實時同步，請確實按暫停／啟動。',
-      '三場比賽皆打完後，點擊最終結算，系統會結算總分最高的隊伍！'
-    ]
-  },
-  {
-    page: 4,
-    icon: '🏆',
-    title: '頒獎台說明',
-    intro: '',
-    body: '當三大賽事皆結算完畢後，這裡將解鎖並揭曉最終名次。若遇緊急狀況，可點擊鎖頭輸入密碼強制解鎖。',
-    steps: []
-  }
-];
-
-function showGuide() {
-  // Remove any existing guide modal
-  const existing = document.querySelector('.guide-overlay');
-  if (existing) existing.remove();
-
-  const data = GUIDE_DATA[currentPage] || GUIDE_DATA[0];
-
-  const stepsHtml = data.steps.map((s, i) => `
-    <div class="guide-step">
-      <div class="guide-step-num">${i + 1}</div>
-      <div class="guide-step-text">${s}</div>
-    </div>`).join('');
-
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay guide-overlay';
-  // Click backdrop to close
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-
-  overlay.innerHTML = `
-    <div class="guide-modal-box animate-slideInUp">
-      <button class="guide-close-btn" onclick="this.closest('.guide-overlay').remove()">✕</button>
-
-      <div class="guide-icon-ring">${data.icon}</div>
-
-      <h2 class="text-center text-xl font-black text-yellow-400 mb-1">${data.title}</h2>
-
-      ${data.intro ? `<p class="text-center text-gray-300 text-sm mb-4">${data.intro}</p>` : ''}
-
-      ${data.body ? `
-        <div class="guide-step">
-          <div class="guide-step-text">${data.body}</div>
-        </div>
-      ` : ''}
-
-      ${stepsHtml ? `<div class="mt-3">${stepsHtml}</div>` : ''}
-
-      <button
-        class="btn-primary w-full mt-5 text-sm"
-        onclick="this.closest('.guide-overlay').remove()"
-      >👍 我知道了！</button>
-    </div>`;
-
-  document.body.appendChild(overlay);
-}
-
-// ════════════════════════════════════════════════════════
-// JUMBOTRON MODE — Full-screen broadcast
-// ════════════════════════════════════════════════════════
-let _jInt = null;
-
-function enterJumbotron() {
-  const jv = $('jumbotron-view');
-  jv.style.display = 'flex';
-  // Request fullscreen if supported
-  try {
-    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-    else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-  } catch(e) {}
-
-  renderJumbotron();
-
-  // Realtime tick for timer
-  _jInt = setInterval(renderJumbotron, 250);
-}
-
-function exitJumbotron() {
-  clearInterval(_jInt); _jInt = null;
-  $('jumbotron-view').style.display = 'none';
-  $('jumbotron-view').classList.remove('urgent');
-  try { if (document.exitFullscreen) document.exitFullscreen(); } catch(e) {}
-  role = 'staff';
-  $('role-overlay').style.display = 'flex';
-}
-
-function renderJumbotron() {
-  const jv = $('jumbotron-view');
-  if (!jv || jv.style.display === 'none') return;
-
-  // Update win totals
-  safeSet('j-w-a', w.A); safeSet('j-w-b', w.B); safeSet('j-w-c', w.C);
-
-  // Detect which event is currently most active
-  // Priority: running 5v5 > 5v5 not finished > 3pt final > 3pt group > dice
-  if (!fSt.f) {
-    // 5v5 active or in progress
-    _renderJumb5v5();
-  } else if (!fSt.p3) {
-    _renderJumb3pt();
-  } else if (!fSt.d) {
-    _renderJumbDice();
-  } else {
-    // All done — show final standings
-    _renderJumbPodium();
-  }
-}
-
-function _renderJumb5v5() {
-  const mc    = fM[fC];
-  const half  = mc.h;
-  const remMs = fRun ? Math.max(0, mc.endMs - Date.now()) : mc.remMs[half];
-  const t1    = fC[0].toUpperCase(), t2 = fC[1].toUpperCase();
-  const isUrgent = remMs < 60000 && remMs > 0;
-
-  safeSet('j-event-label', `五五賽 · ${fC.toUpperCase()}`);
-  safeSet('j-t1', `Team ${t1}`); safeSet('j-t2', `Team ${t2}`);
-  safeSet('j-s1', mc.s1);        safeSet('j-s2', mc.s2);
-  safeSet('j-timer', fRun || remMs > 0 ? fmtMs(remMs) : '結束');
-  safeSet('j-half',  half === 1 ? '上半場' : '下半場');
-
-  const jv = $('jumbotron-view');
-  if (isUrgent) jv.classList.add('urgent');
-  else          jv.classList.remove('urgent');
-
-  // Timer color
-  const timerEl = $('j-timer');
-  if (timerEl) timerEl.style.color = isUrgent ? '#ef4444' : remMs < 180000 ? '#f59e0b' : '#FFD700';
-}
-
-function _renderJumb3pt() {
-  safeSet('j-event-label', '三分球大賽');
-  $('jumbotron-view').classList.remove('urgent');
-
-  if (gd.p3.f.q && gd.p3.f.q.length === 2) {
-    // Final round
-    const q  = gd.p3.f.q;
-    const s1 = gd.p3.f.t[q[0]] ? gd.p3.f.t[q[0]].t : 0;
-    const s2 = gd.p3.f.t[q[1]] ? gd.p3.f.t[q[1]].t : 0;
-    safeSet('j-t1', `Team ${q[0]}`); safeSet('j-t2', `Team ${q[1]}`);
-    safeSet('j-s1', s1);              safeSet('j-s2', s2);
-    safeSet('j-timer', '決賽');       safeSet('j-half', '三分球');
-  } else {
-    // Group stage — show totals
-    const scores = tm.map(t => ({ t, s: gd.p3.r1[t] ? gd.p3.r1[t].t : 0 })).sort((a,b) => b.s-a.s);
-    safeSet('j-t1', `Team ${scores[0].t}`); safeSet('j-t2', `Team ${scores[1].t}`);
-    safeSet('j-s1', scores[0].s);            safeSet('j-s2', scores[1].s);
-    safeSet('j-timer', `${scores[2].t}: ${scores[2].s}`); safeSet('j-half', '小組賽進行中');
-  }
-  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#FFD700';
-}
-
-function _renderJumbDice() {
-  safeSet('j-event-label', '趣味競賽');
-  $('jumbotron-view').classList.remove('urgent');
-  const curTeam = dSt.i < tm.length ? `Team ${tm[dSt.i]}` : '計時結束';
-  safeSet('j-t1', curTeam); safeSet('j-t2', '');
-  safeSet('j-s1', ''); safeSet('j-s2', '');
-  safeSet('j-timer', tRun ? fmt(tMs) : (tMs > 0 ? fmt(tMs) : '--:--.-'));
-  safeSet('j-half', `第 ${dSt.r} 輪`);
-  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#FFD700';
-}
-
-function _renderJumbPodium() {
-  $('jumbotron-view').classList.remove('urgent');
-  safeSet('j-event-label', '最終頒獎');
-  const sorted = tm.map(t => ({ t, s: w[t] })).sort((a,b) => b.s-a.s);
-  safeSet('j-t1', `🥇 Team ${sorted[0].t}`); safeSet('j-t2', `🥈 Team ${sorted[1].t}`);
-  safeSet('j-s1', `${sorted[0].s} 局`);       safeSet('j-s2', `${sorted[1].s} 局`);
-  safeSet('j-timer', `🥉 Team ${sorted[2].t}`);
-  safeSet('j-half',  `${sorted[2].s} 局`);
-  const tEl = $('j-timer'); if (tEl) tEl.style.color = '#a5b4fc';
-}
-
-// ════════════════════════════════════════════════════════
-// PWA — Manifest + Icon + Install Prompt
-// ════════════════════════════════════════════════════════
-(function initPWA() {
-  // 1. Generate app icon via canvas (basketball design)
-  const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 512;
-  const ctx = canvas.getContext('2d');
-
-  // Background gradient
-  const bg = ctx.createRadialGradient(256,220,20,256,256,280);
-  bg.addColorStop(0, '#003070'); bg.addColorStop(1, '#000d1f');
-  ctx.fillStyle = bg; ctx.beginPath();
-  ctx.roundRect(0,0,512,512,80); ctx.fill();
-
-  // Basketball circle
-  const ball = ctx.createRadialGradient(256,230,30,256,256,160);
-  ball.addColorStop(0,'#f97316'); ball.addColorStop(0.6,'#ea580c'); ball.addColorStop(1,'#9a3412');
-  ctx.fillStyle = ball;
-  ctx.beginPath(); ctx.arc(256,256,155,0,Math.PI*2); ctx.fill();
-
-  // Ball lines
-  ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=8; ctx.lineCap='round';
-  // Vertical line
-  ctx.beginPath(); ctx.moveTo(256,101); ctx.lineTo(256,411); ctx.stroke();
-  // Horizontal line
-  ctx.beginPath(); ctx.moveTo(101,256); ctx.lineTo(411,256); ctx.stroke();
-  // Curves
-  ctx.beginPath(); ctx.arc(256,256,100,0,Math.PI,false); ctx.stroke();
-  ctx.beginPath(); ctx.arc(256,256,100,Math.PI,Math.PI*2,false); ctx.stroke();
-
-  // Gold ring around ball
-  ctx.strokeStyle='rgba(255,215,0,.6)'; ctx.lineWidth=6;
-  ctx.beginPath(); ctx.arc(256,256,160,0,Math.PI*2); ctx.stroke();
-
-  // Text
-  ctx.fillStyle='#FFD700';
-  ctx.font='bold 52px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(0,0,0,.8)'; ctx.shadowBlur=12;
-  ctx.fillText('英美', 256, 430);
-
-  const iconUrl = canvas.toDataURL('image/png');
-
-  // Set apple-touch-icon
-  const touchIcon = document.getElementById('apple-touch-icon');
-  if (touchIcon) touchIcon.href = iconUrl;
-
-  // 2. Build and inject manifest as blob URL
-  const manifest = {
-    name: '2026 英美回娘家籃球交流賽',
-    short_name: '英美籃球賽',
-    description: '英美籃球交流賽即時計分系統',
-    start_url: window.location.href,
-    display: 'standalone',
-    background_color: '#000d1f',
-    theme_color: '#001F3F',
-    orientation: 'any',
-    icons: [
-      { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-      { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-    ]
-  };
-  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-  const manifestUrl  = URL.createObjectURL(manifestBlob);
-  const manifestLink = document.getElementById('pwa-manifest');
-  if (manifestLink) manifestLink.href = manifestUrl;
-
-  // 3. PWA Install prompt (Android Chrome)
-  let _deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    _deferredPrompt = e;
-    // Only show if not dismissed before
-    if (!localStorage.getItem('pwa-dismissed')) {
-      setTimeout(() => {
-        const banner = $('pwa-banner');
-        if (banner) banner.style.display = 'flex';
-      }, 3000);
-    }
-  });
-
-  const installBtn = $('pwa-install-btn');
-  if (installBtn) {
-    installBtn.onclick = async () => {
-      if (_deferredPrompt) {
-        _deferredPrompt.prompt();
-        const { outcome } = await _deferredPrompt.userChoice;
-        _deferredPrompt = null;
-        const banner = $('pwa-banner');
-        if (banner) banner.style.display = 'none';
-        if (outcome === 'accepted') showToast('已加入主畫面！🎉', 'success', 3000);
-      } else {
-        // iOS / fallback: show instructions
-        showToast('請點選瀏覽器分享鍵 → 加入主畫面', 'info', 5000);
-        const banner = $('pwa-banner');
-        if (banner) banner.style.display = 'none';
-      }
-    };
-  }
-
-  // iOS detection — show banner with instructions after delay
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone;
-  if (isIOS && !localStorage.getItem('pwa-dismissed')) {
-    setTimeout(() => {
-      const banner = $('pwa-banner');
-      if (banner) {
-        banner.style.display = 'flex';
-        const btn = $('pwa-install-btn');
-        if (btn) btn.textContent = '如何安裝？';
-      }
-    }, 4000);
-  }
-
-  // Already installed (standalone mode) — hide banner
-  if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-    const banner = $('pwa-banner');
-    if (banner) banner.style.display = 'none';
-  }
-})();
-
-// ════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════
-setTimeout(() => updateUI(), 200);
-</script>
-</body>
-</html>
+function renderStaff(){
+  safeSet('dash-a',w.A);safeSet
