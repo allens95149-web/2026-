@@ -25,6 +25,7 @@
     @keyframes pulseYellow{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.8)}60%{box-shadow:0 0 0 12px rgba(255,215,0,0)}}
     @keyframes pulseGreen {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.8)} 60%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
     @keyframes pulseRed   {0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.8)} 60%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+
     .pulse-y{animation:pulseYellow 1.5s infinite!important;outline:3px solid #FFD700!important;outline-offset:2px}
     .pulse-g{animation:pulseGreen  1.5s infinite!important;outline:3px solid #22c55e!important;outline-offset:2px}
     .pulse-r{animation:pulseRed    1.5s infinite!important;outline:3px solid #ef4444!important;outline-offset:2px}
@@ -94,20 +95,23 @@
     #log-modal{position:fixed;inset:0;z-index:99990;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(5px)}
     #log-modal.open{display:flex}
 
-    /* 💬 實時彈幕系統 (Danmaku) CSS */
-    #danmaku-container { position: fixed; top: 12%; bottom: 25%; left: 0; right: 0; pointer-events: none; z-index: 99995; overflow: hidden; }
-    .danmaku-item {
-      position: absolute; white-space: nowrap; font-size: clamp(1.4rem, 5vw, 2.8rem); font-weight: 900;
-      color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-      animation: floatLeft linear forwards;
-    }
-    @keyframes floatLeft { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+    /* ⚡ 驟死賽警戒 */
+    @keyframes dangerPulse{0%,100%{background:rgba(239,68,68,.15);box-shadow:0 0 0 0 rgba(239,68,68,.8)}50%{background:rgba(239,68,68,.35);box-shadow:0 0 0 18px rgba(239,68,68,0)}}
+    @keyframes textFlash{0%,100%{opacity:1;color:#ef4444}50%{opacity:.5;color:#fca5a5}}
+    .ot-warning{animation:dangerPulse 1s infinite;border:3px solid #ef4444!important;border-radius:16px}
+    .ot-title{animation:textFlash .8s infinite;font-size:2rem;font-weight:900;letter-spacing:.1em}
+
+    /* 球員推播 */
+    @keyframes pushSlideIn{from{transform:translateY(-120%);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes pushSlideOut{from{transform:translateY(0);opacity:1}to{transform:translateY(-120%);opacity:0}}
+    #p-push{position:fixed;top:0;left:0;right:0;z-index:99999;display:none}
+    #p-push.in{display:block;animation:pushSlideIn .4s cubic-bezier(.22,.68,0,1.35) forwards}
+    #p-push.out{display:block;animation:pushSlideOut .4s ease-in forwards}
   </style>
 </head>
 <body class="h-full w-full">
 
-<div id="danmaku-container"></div>
-
+<!-- 身分選擇 -->
 <div id="role-overlay" class="fixed inset-0 bg-black/95 z-[99999] flex items-center justify-center">
   <div class="glass-card-lg p-8 max-w-md w-full mx-4 animate-slideInUp text-center">
     <div class="text-5xl mb-3">🏀</div>
@@ -120,6 +124,7 @@
   </div>
 </div>
 
+<!-- 工作人員 Header -->
 <header class="staff-only bg-black/40 border-b border-white/10 px-4 py-3 shrink-0 justify-between items-center">
   <h1 class="text-lg font-bold text-yellow-400">🏀 後台管理系統</h1>
   <div class="flex items-center gap-2">
@@ -129,6 +134,7 @@
   </div>
 </header>
 
+<!-- 工作人員 Nav -->
 <nav class="staff-only bg-black/20 border-b border-white/10 px-4 py-2 shrink-0 gap-2" id="staff-nav">
   <button class="nav-tab active" data-page="0">首頁</button>
   <button class="nav-tab" data-page="1">趣味競賽</button>
@@ -137,7 +143,9 @@
   <button class="nav-tab" data-page="4">頒獎台</button>
 </nav>
 
-<main id="staff-main" class="staff-only flex-1 overflow-auto p-4 w-full max-w-7xl mx-auto pb-20">
+<main id="staff-main" class="staff-only flex-1 overflow-auto p-4 w-full max-w-7xl mx-auto">
+
+  <!-- 首頁 -->
   <section id="page-0" class="page">
     <div class="glass-card p-6 mb-6">
       <h3 class="text-2xl font-bold text-yellow-400 mb-4 text-center">🏆 隊伍總積分</h3>
@@ -156,6 +164,7 @@
     </div>
   </section>
 
+  <!-- 趣味競賽 -->
   <section id="page-1" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">🎲 趣味競賽</h2>
@@ -177,6 +186,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dice-scores"></div>
   </section>
 
+  <!-- 三分球 -->
   <section id="page-2" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">🧱 三分球</h2>
@@ -192,11 +202,14 @@
     </div>
   </section>
 
+  <!-- 五五賽 -->
   <section id="page-3" class="page hidden-page">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold text-yellow-400">⚔️ 五五賽</h2>
       <button onclick="resetData('5v5')" class="btn-danger text-xs py-1 px-3">🔄 重置</button>
     </div>
+
+    <!-- 進度絲帶 -->
     <div class="flex items-center justify-center gap-2 mb-4">
       <div class="match-step" id="step-ab" onclick="jumpMatch('ab')"><span class="match-step-icon" id="step-ab-icon">⭕</span><span>A vs B</span></div>
       <div class="text-gray-500 text-xl font-bold">›</div>
@@ -204,8 +217,11 @@
       <div class="text-gray-500 text-xl font-bold">›</div>
       <div class="match-step" id="step-bc" onclick="jumpMatch('bc')"><span class="match-step-icon" id="step-bc-icon">⭕</span><span>B vs C</span></div>
     </div>
+
     <div class="glass-card p-5 mb-4">
       <div class="text-center mb-3"><div class="text-lg font-bold text-gray-400" id="f-half">上半場</div></div>
+
+      <!-- 圓形計時器 -->
       <div class="flex justify-center mb-4">
         <svg viewBox="0 0 140 140" class="w-36 h-36 md:w-44 md:h-44">
           <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
@@ -214,6 +230,7 @@
           <text x="70" y="83" text-anchor="middle" font-size="11" fill="#9ca3af" id="f-half-txt">上半場</text>
         </svg>
       </div>
+
       <div class="flex justify-between items-center mb-5">
         <div class="flex-1 text-center">
           <div class="text-xl text-blue-400 font-black mb-2" id="f-t1">Team A</div>
@@ -242,19 +259,28 @@
       </div>
       <button id="f-toggle" class="btn-secondary w-full border-yellow-400 text-yellow-400 mb-3 hover:bg-yellow-400/20">▶️ 啟動/暫停計時 (非必須)</button>
     </div>
-    <button id="f-fin" class="btn-success w-full text-xl py-5 shadow-lg">✅ 提早結算此場並累加比分</button>
+
+    <button id="f-fin" class="btn-success w-full text-xl py-5 shadow-lg">✅ 結算此場並累加比分</button>
+
+    <!-- ⚡ 驟死賽覆蓋層 -->
+    <div id="ot-overlay" class="hidden glass-card ot-warning p-6 mt-4 text-center">
+      <div class="ot-title mb-1">⚡ 吃分驟死賽 ⚡</div>
+      <div class="text-gray-300 text-sm mb-4" id="ot-subtitle">平局！由以下隊伍進行驟死賽</div>
+      <div class="flex gap-3 justify-center">
+        <button id="ot-t1-btn" class="btn-primary flex-1 py-4 text-lg font-black" onclick="otWin(1)"></button>
+        <button id="ot-t2-btn" class="btn-danger  flex-1 py-4 text-lg font-black" onclick="otWin(2)"></button>
+      </div>
+      <div class="text-gray-500 text-xs mt-3">點擊獲勝隊伍即完成此場結算</div>
+    </div>
   </section>
 
+  <!-- 頒獎台 -->
   <section id="page-4" class="page hidden-page text-center">
     <div id="pod-lock" class="py-20 cursor-pointer" onclick="forceUnlock()">
       <div class="text-6xl mb-4">🔒</div>
       <div class="text-2xl text-red-400">賽事未全數結算</div>
       <div class="text-gray-400 mt-2">(點擊強制解鎖)</div>
     </div>
-    
-    <div id="sd-panel" class="hidden py-10 glass-card">
-      </div>
-
     <div id="pod-show" class="hidden py-6">
       <div class="pod-place mb-6" id="pod-p1" style="animation-delay:.1s">
         <div class="pod-trophy text-8xl">🏆</div>
@@ -270,10 +296,34 @@
         </div>
       </div>
     </div>
+  <!-- ⚡ 頒獎台驟死賽 overlay（1:1:1平局） -->
+  <div id="pod-ot-overlay" class="hidden glass-card ot-warning p-6 mt-6 text-center">
+    <div class="ot-title mb-1">⚡ 大局數平局 1:1:1 ⚡</div>
+    <div class="text-gray-300 text-sm mb-5">三隊大局數相同！請手動選擇最終冠軍</div>
+    <div class="flex gap-3 justify-center flex-wrap" id="pod-ot-btns"></div>
+    <div class="text-gray-500 text-xs mt-3">點擊冠軍隊伍即完成頒獎</div>
+  </div>
   </section>
+
 </main>
 
-<div id="player-view" class="player-only w-full h-full flex-col fixed inset-0 z-[1000] bg-slate-50 text-slate-800 pb-[64px]" style="display:none">
+<!-- 球員推播橫幅 -->
+<div id="p-push">
+  <div id="p-push-inner" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 4px 24px rgba(0,0,0,.4)">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <div id="p-push-icon" style="font-size:2.2rem">🏆</div>
+      <div>
+        <div id="p-push-label" style="font-size:.75rem;opacity:.8;font-weight:600;letter-spacing:.05em">賽事結果</div>
+        <div id="p-push-team" style="font-size:1.4rem;font-weight:900">Team A</div>
+        <div id="p-push-sub" style="font-size:.85rem;opacity:.85">奪得此局冠軍！</div>
+      </div>
+    </div>
+    <button onclick="dismissPush()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:.4rem .8rem;cursor:pointer;font-size:.8rem;font-weight:700">關閉</button>
+  </div>
+</div>
+
+<!-- 球員視角 -->
+<div id="player-view" class="player-only w-full h-full flex-col fixed inset-0 z-[1000] bg-slate-50 text-slate-800" style="display:none">
   <header class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center shadow-md sticky top-0 z-50">
     <div class="font-bold">🏀 球員觀賽 <span class="text-[10px] bg-green-400 text-black px-2 py-0.5 rounded-full animate-pulse ml-1">實時同步</span></div>
     <button id="p-back" class="text-xs bg-white/20 px-3 py-1 rounded">返回後台</button>
@@ -285,7 +335,7 @@
     <button class="nav-tab" data-page="3">五五</button>
     <button class="nav-tab" data-page="4">頒獎</button>
   </nav>
-  <div class="flex-1 overflow-y-auto relative">
+  <div class="flex-1 overflow-y-auto">
     <div class="p-page active p-4" data-ppage="0">
       <div class="bg-white rounded-xl shadow p-6 mb-4">
         <h3 class="font-bold text-lg mb-4 text-indigo-700">🏆 總積分排行</h3>
@@ -340,13 +390,6 @@
     </div>
     <div class="p-page p-4" data-ppage="4">
       <div id="p-pod-lock" class="text-center py-16"><div class="text-6xl mb-4">🔒</div><div class="font-bold text-gray-500 text-xl">賽事鎖定中</div></div>
-      
-      <div id="p-sd-panel" class="hidden bg-red-900/10 rounded-xl shadow p-8 text-center border-2 border-red-500">
-         <div class="text-5xl mb-3 animate-pulse">🚨</div>
-         <h2 class="text-2xl font-black text-red-600 mb-2">吃分驟死賽進行中</h2>
-         <p class="text-gray-600 font-bold">出現極端平局！請觀看場上最終對決！</p>
-      </div>
-
       <div id="p-pod-show" class="hidden bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl shadow p-8 text-center border-2 border-yellow-300">
         <div class="text-5xl mb-3">🏆</div>
         <div class="text-3xl font-black text-yellow-600 mb-1" id="pp1"></div>
@@ -359,15 +402,24 @@
   </div>
 </div>
 
-<div id="player-reaction-bar" class="player-only fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 p-2 flex gap-2 items-center z-[1050] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('🔥')">🔥</button>
-  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('😂')">😂</button>
-  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('🧱')">🧱</button>
-  <button class="text-xl p-1.5 bg-gray-100 rounded-full active:scale-90" onclick="sendDanmaku('阿嬤都比你準👵')">👵</button>
-  <input type="text" id="danmaku-input" class="flex-1 border border-gray-300 rounded-full px-3 py-1.5 text-sm bg-white focus:outline-none focus:border-indigo-500" placeholder="輸入垃圾話...">
-  <button class="bg-indigo-600 text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-md active:scale-95" onclick="sendDanmaku($('danmaku-input').value); $('danmaku-input').value='';">發送</button>
+<!-- 自訂密碼輸入 Modal (取代 prompt，手機相容) -->
+<div id="pw-modal" style="position:fixed;inset:0;z-index:99995;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(6px)">
+  <div class="glass-card-lg p-7 w-[88%] max-w-xs text-center">
+    <div class="text-3xl mb-2" id="pw-modal-icon">🔐</div>
+    <h3 class="text-yellow-400 font-bold text-lg mb-1" id="pw-modal-title">輸入密碼</h3>
+    <p class="text-gray-400 text-sm mb-4" id="pw-modal-hint">請輸入 0000 確認</p>
+    <input id="pw-modal-input" type="text" inputmode="numeric" maxlength="10"
+      class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-widest font-mono mb-5 focus:outline-none focus:border-yellow-400"
+      placeholder="----" autocomplete="off">
+    <div class="flex gap-3">
+      <button id="pw-cancel" class="btn-secondary flex-1 py-3">取消</button>
+      <button id="pw-confirm" class="btn-primary  flex-1 py-3">確認</button>
+    </div>
+    <div id="pw-error" class="text-red-400 text-sm mt-3 hidden">❌ 密碼錯誤，請再試一次</div>
+  </div>
 </div>
 
+<!-- 日誌 Modal -->
 <div id="log-modal">
   <div class="glass-card-lg w-[92%] max-w-2xl h-[75vh] flex flex-col p-6 rounded-2xl relative">
     <div class="flex justify-between items-center mb-4 border-b border-white/20 pb-3">
@@ -381,6 +433,7 @@
   </div>
 </div>
 
+<!-- 慶祝彈窗 -->
 <div id="celeb-overlay">
   <div class="celeb-card">
     <span class="celeb-trophy animate-bounce" style="font-size:6rem">🏆</span>
@@ -391,6 +444,7 @@
 </div>
 <canvas id="confetti-canvas"></canvas>
 
+<!-- Toast -->
 <div id="toast-el" style="position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:rgba(34,197,94,.95);color:#fff;font-weight:700;padding:.75rem 1.5rem;border-radius:12px;z-index:99998;font-size:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .4s ease;opacity:0;pointer-events:none;white-space:nowrap"></div>
 
 <script>
@@ -399,17 +453,18 @@
 // ════════════════════════════════════════════════════════
 let role='staff', logs=[], step=0;
 let w={A:0,B:0,C:0};
-let m={d:null, p3:null, f:null, sd:null}; // 加上 sd (驟死賽贏家)
-let fSt={d:false, p3:false, f:false, u:false};
+let m={d:null,p3:null,f:null};
+let fSt={d:false,p3:false,f:false,u:false};
 let fSettled={ab:false,ac:false,bc:false};
 let dSt={r:1,i:0};
 let tInt=null,tMs=0,tRun=false,tStartTime=0;
 let fM={
-  ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},
-  ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},
-  bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}
+  ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},
+  ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},
+  bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null}
 };
 let fC='ab',fInt=null,fRun=false;
+let lastWin={event:'',team:'',label:'',ts:0};
 let gd={
   d:{A:[0,0],B:[0,0],C:[0,0]},
   p3:{r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}},
@@ -417,18 +472,14 @@ let gd={
 };
 const tm=['A','B','C'];
 let podiumShown=false;
+// ★ 核心修復：防止 Firebase listener 回觸發覆蓋剛設好的本地狀態
 let _suppressListener=false;
-
-// 球員端動畫同步追蹤器
-let prevFSt = { d:false, p3:false, f:false };
-let prevSd = null;
 
 function refreshWins(){
   w={A:0,B:0,C:0};
   if(m.d)  w[m.d]++;
   if(m.p3) w[m.p3]++;
   if(m.f)  w[m.f]++;
-  if(m.sd) w[m.sd]++; // 加上驟死賽的1局積分
 }
 
 // ════════════════════════════════════════════════════════
@@ -441,23 +492,65 @@ function fmtMs(ms){const s=Math.max(0,Math.ceil(ms/1000));return`${String(Math.f
 function haptic(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 
 function showToast(msg,isError=false){
-  const t=$('toast-el'); t.textContent=msg;
+  const t=$('toast-el');
+  t.textContent=msg;
   t.style.background=isError?'rgba(239,68,68,.95)':'rgba(34,197,94,.95)';
-  t.style.opacity='1'; clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},2800);
+  t.style.opacity='1';
+  clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';},2800);
 }
 
 function addLog(msg){
   if(role!=='staff')return;
-  const d=new Date(),ts=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+  const d=new Date(),ts=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}.${String(d.getMilliseconds()).padStart(3,'0')}`;
   logs.unshift(`[${ts}] ${msg}`);
-  if(logs.length>100)logs.pop(); renderLogs();
+  if(logs.length>100)logs.pop();
+  renderLogs();
 }
 function renderLogs(){
   const el=$('sys-logs');
   if(el)el.innerHTML=logs.length?logs.map(x=>`<div class="border-b border-white/10 pb-1">${x}</div>`).join(''):'無紀錄';
 }
+// ─── 自訂密碼輸入 (取代 prompt，手機相容) ───
+function askPassword(title, hint, expectedPwd, onSuccess, icon='🔐'){
+  const modal=$('pw-modal');
+  $('pw-modal-icon').textContent=icon;
+  $('pw-modal-title').textContent=title;
+  $('pw-modal-hint').textContent=hint;
+  $('pw-modal-input').value='';
+  $('pw-error').classList.add('hidden');
+  modal.style.display='flex';
+  setTimeout(()=>$('pw-modal-input').focus(),100);
+  const doConfirm=()=>{
+    const val=$('pw-modal-input').value.trim();
+    if(val===String(expectedPwd)){
+      modal.style.display='none';
+      onSuccess();
+    }else{
+      $('pw-error').classList.remove('hidden');
+      $('pw-modal-input').value='';
+      $('pw-modal-input').focus();
+    }
+  };
+  $('pw-confirm').onclick=doConfirm;
+  $('pw-modal-input').onkeydown=e=>{if(e.key==='Enter')doConfirm();};
+  $('pw-cancel').onclick=()=>{modal.style.display='none';addLog('⚠️ 密碼輸入取消');};
+}
+
 function copyLogs(){
-  navigator.clipboard.writeText(logs.join('\n')).then(()=>showToast('✅ 日誌已複製！')).catch(()=>showToast('複製失敗',true));
+  const text=logs.join('\n');
+  // 優先用 clipboard API，fallback 用 textarea + execCommand (HTTP 環境)
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('✅ 日誌已複製！')).catch(()=>_copyFallback(text));
+  }else{_copyFallback(text);}
+}
+function _copyFallback(text){
+  try{
+    const ta=document.createElement('textarea');ta.value=text;
+    ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,99999);
+    document.execCommand('copy');document.body.removeChild(ta);
+    showToast('✅ 日誌已複製！');
+  }catch(e){showToast('複製失敗，請手動選取日誌文字',true);}
 }
 
 // ════════════════════════════════════════════════════════
@@ -466,15 +559,27 @@ function copyLogs(){
 function guideEl(id,color){const el=$(id);if(el)el.classList.add('pulse-'+color);}
 function updateGuide(){
   document.querySelectorAll('.pulse-y,.pulse-g,.pulse-r').forEach(el=>el.classList.remove('pulse-y','pulse-g','pulse-r'));
+  // 趣味競賽
   if(!fSt.d){
-    if(tRun){guideEl('d-stop','r');}else if(dSt.i<tm.length){guideEl(tMs===0?'d-start':'d-next','y');}else if(dSt.r===1){guideEl('d-r2','g');}else{guideEl('d-fin','r');}
+    if(tRun){guideEl('d-stop','r');}
+    else if(dSt.i<tm.length){guideEl(tMs===0?'d-start':'d-next','y');}
+    else if(dSt.r===1){guideEl('d-r2','g');}
+    else{guideEl('d-fin','r');}
   }
+  // 三分球
   if(!fSt.p3){
-    if(!gd.p3.f.q||gd.p3.f.q.length<2){guideEl('pt-r1-fin','g');}else{guideEl('pt-f-fin','r');}
+    if(!gd.p3.f.q||gd.p3.f.q.length<2){guideEl('pt-r1-fin','g');}
+    else{guideEl('pt-f-fin','r');}
   }
+  // 五五賽
   if(!fSt.f){
-    if(fRun){guideEl('f-toggle','y');}else if(!fSettled[fC]){guideEl('f-fin','g');if(fM[fC].s1===0&&fM[fC].s2===0)guideEl('f-toggle','y');}
+    if(fRun){guideEl('f-toggle','y');}
+    else if(!fSettled[fC]){
+      guideEl('f-fin','g');
+      if(fM[fC].s1===0&&fM[fC].s2===0)guideEl('f-toggle','y');
+    }
   }
+  // 頒獎台解鎖
   if(fSt.d&&fSt.p3&&fSt.f&&!fSt.u)guideEl('pod-lock','y');
 }
 
@@ -491,11 +596,35 @@ function playSound(type){
 }
 function triggerCelebration(team,name){
   safeSet('celeb-label',name);safeSet('celeb-name','Team '+team);
-  const card = document.querySelector('.celeb-card');
-  if(card){ card.style.animation='none'; void card.offsetWidth; card.style.animation=''; } // reset animation
   $('celeb-overlay').classList.add('open');
   playSound('tada');launchConfetti();
   setTimeout(()=>$('celeb-overlay').classList.remove('open'),5000);
+}
+
+// 推播獲勝通知（工作人員端呼叫 → 同步給球員）
+function _broadcastWin(eventName,team,sub,isChampion=false){
+  lastWin={event:eventName,team:'Team '+team,label:sub,ts:Date.now(),champion:isChampion};
+  // 如果本地是球員模式也要顯示
+  showPlayerPush(lastWin);
+}
+
+// 球員端推播橫幅
+let _pushTO=null;
+function showPlayerPush(win){
+  if(!win||!win.team)return;
+  const el=$('p-push');if(!el)return;
+  safeSet('p-push-label',win.event);
+  safeSet('p-push-team',win.team);
+  safeSet('p-push-sub',(win.champion?'🏆 奪得冠軍！🎉 ':'🏀 獲得此場勝利！ ')+win.label);
+  $('p-push-icon').textContent=win.champion?'🏆':'🥊';
+  el.className='in';
+  clearTimeout(_pushTO);
+  _pushTO=setTimeout(()=>dismissPush(),8000);
+  if(role==='player')launchConfetti();
+}
+function dismissPush(){
+  const el=$('p-push');if(!el)return;
+  el.className='out';setTimeout(()=>{el.className='';},420);
 }
 function launchConfetti(){
   const canvas=$('confetti-canvas');if(!canvas)return;
@@ -507,39 +636,7 @@ function launchConfetti(){
 }
 
 // ════════════════════════════════════════════════════════
-// 💬 實時彈幕 (Danmaku) 系統
-// ════════════════════════════════════════════════════════
-let chatListenerInit = false;
-function DB_CHAT() { return firebase.database().ref('yingmei2026_chats'); }
-
-function sendDanmaku(text) {
-  if(!text || !text.trim() || !fbReady) return;
-  DB_CHAT().push({ t: text.trim(), ts: firebase.database.ServerValue.TIMESTAMP });
-  haptic(10); showToast('已發送 🚀');
-}
-
-// 綁定 Enter 鍵發送
-document.addEventListener('DOMContentLoaded', () => {
-  const input = $('danmaku-input');
-  if(input) { input.addEventListener('keypress', (e) => { if(e.key==='Enter') { sendDanmaku(input.value); input.value=''; } }); }
-});
-
-function spawnDanmaku(text) {
-  const container = $('danmaku-container'); if(!container) return;
-  const el = document.createElement('div');
-  el.className = 'danmaku-item';
-  el.textContent = text;
-  // 隨機高度 10% 到 90%
-  el.style.top = Math.floor(Math.random() * 80 + 10) + '%';
-  // 隨機速度 4秒到 7秒
-  const duration = 4 + Math.random() * 3; 
-  el.style.animationDuration = duration + 's';
-  container.appendChild(el);
-  setTimeout(() => el.remove(), duration * 1000);
-}
-
-// ════════════════════════════════════════════════════════
-// FIREBASE 同步與接收
+// FIREBASE 同步（含 _suppressListener 修復）
 // ════════════════════════════════════════════════════════
 const fbConfig={apiKey:"AIzaSyCbHTwcgiHHWgIyZ9BD7hn3KnkI_sad3iw",authDomain:"basketball-2026.firebaseapp.com",databaseURL:"https://basketball-2026-default-rtdb.firebaseio.com",projectId:"basketball-2026"};
 let fbReady=false;try{if(firebase.apps.length===0)firebase.initializeApp(fbConfig);fbReady=true;}catch(e){}
@@ -547,13 +644,14 @@ const DB=()=>firebase.database().ref('yingmei2026');
 
 function syncAll(){
   if(!fbReady||role!=='staff')return;
-  _suppressListener=true; clearTimeout(window._suppressTO); window._suppressTO=setTimeout(()=>{_suppressListener=false;},1500);
+  _suppressListener=true;
+  clearTimeout(window._suppressTO);
+  window._suppressTO=setTimeout(()=>{_suppressListener=false;},1500);
   const safeFM={};['ab','ac','bc'].forEach(k=>safeFM[k]={...fM[k],endMs:null});
-  DB().set({gd,step,w,m,fM:safeFM,fC,fSt,logs,dSt,fSettled});
+  DB().set({gd,step,w,m,fM:safeFM,fC,fSt,logs,dSt,fSettled,lastWin});
 }
 
 if(fbReady){
-  // 1. 監聽主資料庫
   DB().on('value',snap=>{
     if(_suppressListener)return;
     const data=snap.val();if(!data)return;
@@ -573,61 +671,65 @@ if(fbReady){
     if(data.dSt)Object.assign(dSt,data.dSt);
     if(data.logs)logs=data.logs;
     if(data.fSettled)Object.assign(fSettled,data.fSettled);
+    // sync lastWin + trigger player push notification
+    if(data.lastWin && data.lastWin.ts && data.lastWin.ts !== lastWin.ts){
+      lastWin=data.lastWin;
+      // only show push if the win happened within the last 15 seconds
+      if(Date.now()-lastWin.ts < 15000) showPlayerPush(lastWin);
+    }
 
-    // ★ 球員端特效觸發器 (利用 prev 變數判斷是否為新結算)
-    if(role==='player') {
-      if(data.fSt) {
-        if(data.fSt.d  && !prevFSt.d) triggerCelebration(data.m.d, '趣味競賽');
-        if(data.fSt.p3 && !prevFSt.p3) triggerCelebration(data.m.p3, '三分磚頭王');
-        if(data.fSt.f  && !prevFSt.f) triggerCelebration(data.m.f, '五打五賽 ⚔️');
-        prevFSt = { ...data.fSt };
-      }
-      // 驟死賽特效觸發
-      if(data.m && data.m.sd && !prevSd) {
-        triggerCelebration(data.m.sd, '最終總冠軍 🏆');
-        prevSd = data.m.sd;
-      } else if (data.m && !data.m.sd) {
-        prevSd = null;
-      }
+    // sync fM.ot fields
+    if(data.fM)['ab','ac','bc'].forEach(k=>{if(data.fM[k]&&data.fM[k].ot!==undefined)fM[k].ot=data.fM[k].ot;});
+    let staleFixed = false;
+    if(fSt.d  && !m.d)  { fSt.d  = false; staleFixed = true; addLog('⚠️ 修正: fSt.d=true 但 m.d 為空，解鎖趣味競賽'); }
+    if(fSt.p3 && !m.p3) { fSt.p3 = false; staleFixed = true; addLog('⚠️ 修正: fSt.p3=true 但 m.p3 為空，解鎖三分球'); }
+    if(fSt.f  && !m.f)  { fSt.f  = false; staleFixed = true; addLog('⚠️ 修正: fSt.f=true 但 m.f 為空，解鎖五五賽'); }
+    // ★★★ 交叉驗證 fSettled（修復：Firebase 殘留 fSettled=true 但 gd.f 全為 0）
+    // disabled 按鈕根本不觸發 onclick，所以 log 看不到 → 改為不 disabled，改用 onclick 內部判斷
+    const fTotalScore = (gd.f.A||0)+(gd.f.B||0)+(gd.f.C||0);
+    if((fSettled.ab||fSettled.ac||fSettled.bc) && fTotalScore===0 && !m.f){
+      fSettled={ab:false,ac:false,bc:false};staleFixed=true;
+      addLog('⚠️ 修正: fSettled 殘留但 gd.f 全為 0，重置五五賽結算狀態');
+    }
+    if(staleFixed){
+      showToast('⚠️ 偵測到資料庫殘留舊資料，已自動修正！', true);
+      // 把修正後的狀態寫回 Firebase，防止下次再觸發同樣問題
+      _suppressListener=true;
+      clearTimeout(window._suppressTO);
+      window._suppressTO=setTimeout(()=>{_suppressListener=false;},1500);
+      const safeFM2={};['ab','ac','bc'].forEach(k=>safeFM2[k]={...fM[k],endMs:null});
+      DB().set({gd,step,w,m,fM:safeFM2,fC,fSt,logs,dSt,fSettled});
     }
 
     if(role==='staff')renderStaff();else renderPlayer();
     updateGuide();
   });
-
-  // 2. 監聽彈幕資料庫
-  if (!chatListenerInit) {
-    chatListenerInit = true;
-    let initialLoad = true;
-    DB_CHAT().limitToLast(1).on('child_added', snap => {
-      if (initialLoad) { initialLoad = false; return; } // 不顯示舊彈幕
-      const msg = snap.val();
-      if(msg && msg.t) spawnDanmaku(msg.t);
-    });
-  }
 }
 
 // ════════════════════════════════════════════════════════
 // 重置
 // ════════════════════════════════════════════════════════
-function masterReset(){
-  if(prompt('輸入 0000 清空所有數據')!=='0000')return;
+function _doMasterReset(){
   addLog('執行系統總重置');
   gd={d:{A:[0,0],B:[0,0],C:[0,0]},p3:{r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}},f:{A:0,B:0,C:0}};
-  m={d:null,p3:null,f:null,sd:null};fSt={d:false,p3:false,f:false,u:false};fSettled={ab:false,ac:false,bc:false};
-  fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}};
-  fC='ab';fRun=false;clearInterval(fInt);clearInterval(tInt);tMs=0;tRun=false;dSt={r:1,i:0};podiumShown=false;
+  m={d:null,p3:null,f:null};fSt={d:false,p3:false,f:false,u:false};fSettled={ab:false,ac:false,bc:false};
+  fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null}};
+  fC='ab';fRun=false;clearInterval(fInt);clearInterval(tInt);tMs=0;tRun=false;dSt={r:1,i:0};podiumShown=false;lastWin={event:'',team:'',label:'',ts:0};
   $('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');
+  $('ot-overlay').classList.add('hidden');
   build3Pt();refreshWins();syncAll();showToast('✅ 系統已清空');updateUI();
 }
+function masterReset(){
+  askPassword('清空所有賽事資料','輸入 0000 確認清空全部資料','0000',_doMasterReset,'💣');
+}
 function resetData(type){
-  if(prompt('輸入 0000 清除此項數據')!=='0000')return;
-  addLog(`重置單項賽事: ${type}`);
-  if(type==='dice'){gd.d={A:[0,0],B:[0,0],C:[0,0]};dSt={r:1,i:0};m.d=null;fSt.d=false;tMs=0;tRun=false;clearInterval(tInt);$('d-start').disabled=false;$('d-stop').disabled=true;}
-  if(type==='3pt'){gd.p3={r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}};m.p3=null;fSt.p3=false;$('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');build3Pt();}
-  if(type==='5v5'){fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null}};fC='ab';gd.f={A:0,B:0,C:0};fSettled={ab:false,ac:false,bc:false};m.f=null;fSt.f=false;fRun=false;clearInterval(fInt);}
-  if(m.sd) { m.sd=null; addLog('驟死賽紀錄已連帶清除'); }
-  fSt.u=false;podiumShown=false;refreshWins();syncAll();renderStaff();showToast('✅ 已重置');
+  askPassword(`重置 ${type==='dice'?'趣味競賽':type==='3pt'?'三分球':'五五賽'}`,`輸入 0000 確認重置此項`,'0000',()=>{
+    addLog(`重置單項賽事: ${type}`);
+    if(type==='dice'){gd.d={A:[0,0],B:[0,0],C:[0,0]};dSt={r:1,i:0};m.d=null;fSt.d=false;tMs=0;tRun=false;clearInterval(tInt);$('d-start').disabled=false;$('d-stop').disabled=true;}
+    if(type==='3pt'){gd.p3={r1:{A:{p:Array(10).fill(0),t:0},B:{p:Array(10).fill(0),t:0},C:{p:Array(10).fill(0),t:0}},f:{q:[],t:{}}};m.p3=null;fSt.p3=false;$('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');build3Pt();}
+    if(type==='5v5'){fM={ab:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},ac:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null},bc:{s1:0,s2:0,h:1,remMs:{1:600000,2:600000},endMs:null,ot:null}};fC='ab';gd.f={A:0,B:0,C:0};fSettled={ab:false,ac:false,bc:false};m.f=null;fSt.f=false;fRun=false;clearInterval(fInt);$('ot-overlay').classList.add('hidden');}
+    fSt.u=false;podiumShown=false;refreshWins();syncAll();renderStaff();showToast('✅ 已重置');
+  },'🔄');
 }
 
 // ════════════════════════════════════════════════════════
@@ -648,4 +750,379 @@ function updateUI(){
 // 渲染
 // ════════════════════════════════════════════════════════
 function renderStaff(){
-  safeSet('dash-a',w.A);safeSet
+  safeSet('dash-a',w.A);safeSet('dash-b',w.B);safeSet('dash-c',w.C);renderLogs();
+
+  // 趣味
+  let dH='';tm.forEach(t=>{const r1=gd.d[t]?gd.d[t][0]:0,r2=gd.d[t]?gd.d[t][1]:0;dH+=`<div class="glass-card p-4 text-center"><div class="text-lg font-bold text-yellow-400 mb-2">Team ${t}</div><div class="text-gray-300 text-sm">第1輪: <span class="text-white font-mono">${fmt(r1)}</span></div><div class="text-gray-300 text-sm">第2輪: <span class="text-white font-mono">${fmt(r2)}</span></div><div class="text-yellow-400 font-bold mt-2">合計: <span class="font-mono">${(r1>0||r2>0)?fmt(r1+r2):'--'}</span></div></div>`;});$('dice-scores').innerHTML=dH;
+  safeSet('dice-team',dSt.i<tm.length?`Team ${tm[dSt.i]} (第${dSt.r}輪)`:`本輪結束 (第${dSt.r}輪)`);
+  if(!tRun&&tMs===0)safeSet('dice-timer','00:00.0');
+  if(dSt.i>=tm.length){
+    $('d-next').classList.add('hidden');
+    // ★ 本輪結束：d-start 禁用，只能按「進入第二輪」或「結算」
+    $('d-start').disabled=true;
+    if(dSt.r===1){$('d-r2').classList.remove('hidden');$('d-fin').classList.add('hidden');}
+    else{$('d-r2').classList.add('hidden');$('d-fin').classList.remove('hidden');}
+  }else{
+    $('d-next').classList.remove('hidden');$('d-r2').classList.add('hidden');$('d-fin').classList.add('hidden');
+    // 本輪進行中：d-start 只在沒計時時可用
+    if(!tRun)$('d-start').disabled=false;
+  }
+  if(fSt.d){$('d-fin').textContent='🔒 已結算（點擊可查看）';$('d-fin').style.background='linear-gradient(135deg,#6b7280,#4b5563)';$('d-fin').style.color='#fff';}
+  else{$('d-fin').textContent='🏆 結算總成績';$('d-fin').style.background='';$('d-fin').style.color='';}
+
+  // 三分球（reload 後自動重建 build3f）
+  if(gd.p3.f.q&&gd.p3.f.q.length===2){
+    $('pt-r1').classList.add('hidden');$('pt-fin').classList.remove('hidden');
+    if(!$('pt-f-inputs').children.length)build3f();
+  }else{$('pt-r1').classList.remove('hidden');$('pt-fin').classList.add('hidden');}
+  if(fSt.p3){$('pt-f-fin').textContent='🔒 已結算（點擊可查看）';$('pt-f-fin').style.background='linear-gradient(135deg,#6b7280,#4b5563)';$('pt-f-fin').style.color='#fff';}
+  else{$('pt-f-fin').textContent='🏆 結算決賽冠軍';$('pt-f-fin').style.background='';$('pt-f-fin').style.color='';}
+
+  // 五五賽
+  ['ab','ac','bc'].forEach(k=>{
+    const el=$(`step-${k}`),ic=$(`step-${k}-icon`);if(!el)return;
+    el.classList.remove('active','done');
+    if(fSettled[k]){el.classList.add('done');ic.textContent='✅';}
+    else if(k===fC){el.classList.add('active');ic.textContent='🔵';}
+    else{ic.textContent='⭕';}
+  });
+  const mc=fM[fC],half=mc.h,remMs=fRun?Math.max(0,mc.endMs-Date.now()):mc.remMs[half];
+  safeSet('f-t1','Team '+fC[0].toUpperCase());safeSet('f-t2','Team '+fC[1].toUpperCase());
+  safeSet('f-s1',mc.s1);safeSet('f-s2',mc.s2);
+  const halfLabel=half===1?'上半場':'下半場';
+  safeSet('f-half',halfLabel);safeSet('f-half-txt',halfLabel);
+  const timeStr=fmtMs(remMs);safeSet('f-time-txt',timeStr);safeSet('p-f-time',timeStr);
+  if($('f-ring'))$('f-ring').style.strokeDashoffset=String(364.4*(1-Math.max(0,Math.min(1,remMs/600000))));
+  if($('f-toggle'))$('f-toggle').textContent=fRun?'⏸️ 暫停計時':(remMs<=0&&half===2?'⏱️ 比賽結束':'▶️ 啟動/暫停計時 (非必須)');
+  if(fSt.f){
+    $('f-fin').textContent='🔒 五五賽已全數結算（點擊可查看狀態）';
+    $('f-fin').style.background='linear-gradient(135deg,#6b7280,#4b5563)';
+    $('f-fin').style.color='#fff';
+  }else if(fSettled[fC]){
+    $('f-fin').textContent=`🔒 ${fC[0].toUpperCase()} vs ${fC[1].toUpperCase()} 已結算（點擊可查看）`;
+    $('f-fin').style.background='linear-gradient(135deg,#6b7280,#4b5563)';
+    $('f-fin').style.color='#fff';
+  }else{
+    $('f-fin').textContent='✅ 結算此場並累加比分';
+    $('f-fin').style.background='';$('f-fin').style.color='';
+  }
+
+  // 驟死賽 overlay（五五賽累計平局，等待選冠軍）
+  const otEl=$('ot-overlay');
+  if(window._otTeams && window._otTeams.length){
+    otEl.classList.remove('hidden');
+  }else{
+    otEl.classList.add('hidden');
+  }
+
+  // 頒獎台
+  const allDone=(fSt.d&&fSt.p3&&fSt.f);
+  if(fSt.u || allDone){
+    $('pod-lock').classList.add('hidden');$('pod-show').classList.remove('hidden');
+    const s=tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s);
+    safeSet('p1',`Team ${s[0].t}`);safeSet('p1s',`${s[0].s} 局`);
+    safeSet('p2',`Team ${s[1].t}`);safeSet('p2s',`${s[1].s} 局`);
+    safeSet('p3',`Team ${s[2].t}`);safeSet('p3s',`${s[2].s} 局`);
+
+    // ★ 頒獎台 1:1:1 驟死賽偵測
+    const podOtEl=$('pod-ot-overlay');
+    if(allDone && s[0].s===s[1].s && s[1].s===s[2].s && !fSt.u){
+      // 三隊全部同分 → 啟動驟死賽
+      podOtEl.classList.remove('hidden');
+      const btnEl=$('pod-ot-btns');
+      if(btnEl && !btnEl.innerHTML){
+        btnEl.innerHTML=tm.map(t=>`<button class="btn-primary flex-1 py-4 text-lg font-black" onclick="podOtWin('${t}')">🏆 Team ${t}</button>`).join('');
+      }
+    }else{
+      podOtEl.classList.add('hidden');
+    }
+
+    if(!podiumShown){podiumShown=true;['pod-p1','pod-p2','pod-p3'].forEach(id=>{const e=$(id);if(e){e.classList.remove('risen');void e.offsetWidth;e.classList.add('risen');}});if(!allDone||s[0].s!==s[1].s)launchConfetti();}
+  }else{$('pod-lock').classList.remove('hidden');$('pod-show').classList.add('hidden');$('pod-ot-overlay').classList.add('hidden');}
+}
+
+function renderPlayer(){
+  safeSet('pw-a',w.A);safeSet('pw-b',w.B);safeSet('pw-c',w.C);
+  safeSet('p-dice-timer',fmt(tMs));
+  tm.forEach(t=>{const lc=t.toLowerCase(),r1=gd.d[t]?gd.d[t][0]:0,r2=gd.d[t]?gd.d[t][1]:0;safeSet(`p-d-t${lc}`,(r1>0||r2>0)?fmt(r1+r2):'--');});
+  safeSet('p-p3-ra',gd.p3.r1.A?gd.p3.r1.A.t:0);safeSet('p-p3-rb',gd.p3.r1.B?gd.p3.r1.B.t:0);safeSet('p-p3-rc',gd.p3.r1.C?gd.p3.r1.C.t:0);
+  if(gd.p3.f.q&&gd.p3.f.q.length===2){$('p-p3-fin-wrap').style.display='';safeSet('p-p3-fq0',gd.p3.f.q[0]);safeSet('p-p3-fq1',gd.p3.f.q[1]);safeSet('p-p3-fs0',gd.p3.f.t[gd.p3.f.q[0]]?.t||0);safeSet('p-p3-fs1',gd.p3.f.t[gd.p3.f.q[1]]?.t||0);}else{$('p-p3-fin-wrap').style.display='none';}
+  const mc2=fM[fC],half2=mc2.h,rem2=fRun?Math.max(0,mc2.endMs-Date.now()):mc2.remMs[half2];
+  safeSet('p-f-half',half2===1?'⏱️ 上半場':'⏱️ 下半場');safeSet('p-f-time',fmtMs(rem2));safeSet('p-f-t1',fC[0].toUpperCase());safeSet('p-f-t2',fC[1].toUpperCase());
+  safeSet('p-f-s1',mc2.s1);safeSet('p-f-s2',mc2.s2);
+  // 球員端驟死賽提示
+  let pOtEl=document.getElementById('p-ot-warn');
+  if(!pOtEl){
+    pOtEl=document.createElement('div');pOtEl.id='p-ot-warn';
+    pOtEl.style.cssText='background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(239,68,68,.05));border:2px solid #ef4444;border-radius:12px;padding:1rem;text-align:center;margin:.75rem 1rem;display:none';
+    const pg3=document.querySelector('[data-ppage="3"]');if(pg3)pg3.appendChild(pOtEl);
+  }
+  if(!fSettled[fC] && fM[fC].ot==='pending'){
+    pOtEl.innerHTML='<div style="color:#ef4444;font-size:1.4rem;font-weight:900;animation:textFlash .8s infinite">⚡ 吃分驟死賽 ⚡</div><div style="color:#fca5a5;font-size:.85rem;margin-top:.25rem">平局！驟死賽進行中...</div>';
+    pOtEl.style.display='block';
+  }else{pOtEl.style.display='none';}
+  if(fSt.u||(fSt.d&&fSt.p3&&fSt.f)){
+    $('p-pod-lock').classList.add('hidden');$('p-pod-show').classList.remove('hidden');
+    const s=tm.map(t=>({t,s:w[t]})).sort((a,b)=>b.s-a.s);
+    safeSet('pp1',`Team ${s[0].t}`);safeSet('pp1s',`${s[0].s} 局`);
+    safeSet('pp2',`🥈 Team ${s[1].t} (${s[1].s} 局)`);safeSet('pp3',`🥉 Team ${s[2].t} (${s[2].s} 局)`);
+  }else{$('p-pod-lock').classList.remove('hidden');$('p-pod-show').classList.add('hidden');}
+}
+
+// ════════════════════════════════════════════════════════
+// 遊戲邏輯
+// ════════════════════════════════════════════════════════
+
+// ── 趣味競賽 ──
+$('d-start').onclick=()=>{
+  if(tRun)return;
+  // ★ 越界保護
+  if(dSt.i>=tm.length){addLog(`⚠️ d-start: 本輪已結束(dSt.i=${dSt.i})，請切換輪次`);showToast('本輪已結束，請按「進入第二輪」或「結算」',true);return;}
+  tRun=true;tStartTime=Date.now()-tMs;
+  $('d-start').disabled=true;$('d-stop').disabled=false;
+  addLog(`啟動計時 Team ${tm[dSt.i]}`);
+  tInt=setInterval(()=>{tMs=Date.now()-tStartTime;safeSet('dice-timer',fmt(tMs));safeSet('p-dice-timer',fmt(tMs));},50);
+  updateGuide();
+};
+$('d-stop').onclick=()=>{
+  if(!tRun)return;tRun=false;clearInterval(tInt);
+  $('d-start').disabled=false;$('d-stop').disabled=true;
+  // ★ 越界保護：dSt.i >= tm.length 代表本輪已結束，不寫入任何資料
+  if(dSt.i>=tm.length){addLog(`⚠️ d-stop: dSt.i=${dSt.i} 越界，忽略此次停止`);renderStaff();updateGuide();return;}
+  const t=tm[dSt.i];if(!t){addLog('⚠️ d-stop: team undefined，忽略');renderStaff();return;}
+  if(!gd.d[t])gd.d[t]=[0,0];gd.d[t][dSt.r-1]=tMs;
+  addLog(`停止計時 Team ${t}: ${fmt(tMs)}`);
+  syncAll();renderStaff();updateGuide();
+};
+$('d-next').onclick=()=>{
+  if(tRun)return;dSt.i++;tMs=0;safeSet('dice-timer','00:00.0');
+  $('d-start').disabled=false;$('d-stop').disabled=true;
+  addLog('切換下一隊');syncAll();renderStaff();updateGuide();
+};
+$('d-r2').onclick=()=>{
+  dSt.r=2;dSt.i=0;tMs=0;safeSet('dice-timer','00:00.0');
+  $('d-start').disabled=false;$('d-stop').disabled=true;
+  addLog('進入競賽第二輪');syncAll();renderStaff();updateGuide();
+};
+$('d-fin').onclick=()=>{
+  try{
+    addLog('📌 d-fin 被點擊');
+    if(fSt.d){addLog('⚠️ d-fin: 趣味競賽已結算(fSt.d=true)');showToast('趣味競賽已結算！如需重做請按重置',true);return;}
+    const notDone=tm.filter(t=>!gd.d[t]||gd.d[t][0]===0);
+    if(notDone.length>0){
+      addLog(`⚠️ d-fin: Team ${notDone.join('、')} 尚未完成計時`);
+      showToast(`⚠️ Team ${notDone.join('、')} 尚未計時，再按一次強制結算`,true);
+      if(!$('d-fin')._pendingForce){$('d-fin')._pendingForce=true;setTimeout(()=>{$('d-fin')._pendingForce=false;},4000);return;}
+      addLog('⚠️ d-fin: 強制結算（有隊伍未計時）');
+    }
+    const scores=tm.map(t=>({t,s:(gd.d[t]?gd.d[t][0]:0)+(gd.d[t]?gd.d[t][1]:0)})).sort((a,b)=>a.s-b.s);
+    m.d=scores[0].t;fSt.d=true;refreshWins();
+    addLog(`✅ 趣味競賽結算：Team ${scores[0].t} 奪冠 (${scores.map(x=>x.t+':'+fmt(x.s)).join(' / ')})`);
+    _broadcastWin('趣味競賽',scores[0].t,'最短時間奪冠',true);
+    syncAll();triggerCelebration(scores[0].t,'趣味競賽');renderStaff();updateGuide();
+  }catch(e){addLog('❌ 趣味競賽結算錯誤: '+e.message);showToast('結算發生錯誤: '+e.message,true);}
+};
+
+// ── 三分球 ──
+function build3Pt(){
+  let h='';tm.forEach(t=>{const col=t==='A'?'text-blue-400':t==='B'?'text-red-400':'text-green-400';if(!gd.p3.r1[t])gd.p3.r1[t]={p:Array(10).fill(0),t:0};h+=`<div class="glass-card p-4 text-center"><h4 class="font-bold ${col} mb-3 text-lg">Team ${t}</h4><div class="grid grid-cols-5 gap-2 mb-3">`;for(let i=0;i<10;i++){const v=gd.p3.r1[t].p[i]||0;h+=`<div class="stepper-wrap"><button class="stepper-btn" onclick="p3Step('r1','${t}',${i},-1)">－</button><span class="stepper-val" id="p3r-${t}-${i}">${v}</span><button class="stepper-btn" onclick="p3Step('r1','${t}',${i},1)">＋</button></div>`;}h+=`</div><div class="text-yellow-400 font-bold text-lg">總計: <span id="p3t-${t}">${gd.p3.r1[t].t}</span> 分</div></div>`;});$('pt-inputs').innerHTML=h;
+}build3Pt();
+
+function p3Step(stage,team,idx,delta){
+  haptic(10);let obj;
+  if(stage==='r1'){if(!gd.p3.r1[team])gd.p3.r1[team]={p:Array(10).fill(0),t:0};obj=gd.p3.r1[team];obj.p[idx]=Math.max(0,Math.min(5,(obj.p[idx]||0)+delta));obj.t=obj.p.reduce((a,b)=>a+b,0);const v=$(`p3r-${team}-${idx}`),tt=$(`p3t-${team}`);if(v)v.textContent=obj.p[idx];if(tt)tt.textContent=obj.t;}
+  else{if(!gd.p3.f.t[team])gd.p3.f.t[team]={p:Array(10).fill(0),t:0};obj=gd.p3.f.t[team];obj.p[idx]=Math.max(0,Math.min(5,(obj.p[idx]||0)+delta));obj.t=obj.p.reduce((a,b)=>a+b,0);const v=$(`p3f-${team}-${idx}`),tt=$(`p3ft-${team}`);if(v)v.textContent=obj.p[idx];if(tt)tt.textContent=obj.t;}
+  addLog(`三分球 ${team} #${idx+1} ${delta>0?'+':'-'}1`);
+  syncAll();
+}
+
+$('pt-r1-fin').onclick=()=>{
+  try{
+    addLog('📌 pt-r1-fin 被點擊');
+    const scores=tm.map(t=>({t,s:Number(gd.p3.r1[t]?gd.p3.r1[t].t:0)})).sort((a,b)=>b.s-a.s);
+    if(scores[1].s===scores[2].s){
+      // 平局 → 顯示手動選擇 UI 取代 prompt
+      addLog(`⚠️ 三分球小組賽平局: ${scores.map(x=>x.t+':'+x.s).join(', ')}`);
+      showToast(`⚠️ 平局！請從下方選擇晉級兩隊`,true);
+      // 建立選擇 UI
+      let tieHtml=`<div class="glass-card p-5 mt-4 text-center border-2 border-yellow-400/50"><div class="text-yellow-400 font-bold text-lg mb-1">⚠️ 三分球平局</div><div class="text-gray-300 text-sm mb-4">目前分數 — ${scores.map(x=>`Team ${x.t}: ${x.s}分`).join(' / ')}<br>請選擇晉級決賽的兩隊</div><div class="flex gap-2 flex-wrap justify-center">`;
+      // generate all combos
+      const combos=[['A','B'],['A','C'],['B','C']];
+      combos.forEach(([a,b])=>{
+        tieHtml+=`<button class="btn-primary py-2 px-4 text-sm" onclick="selectP3Finals('${a}','${b}')">Team ${a} &amp; Team ${b}</button>`;
+      });
+      tieHtml+=`</div></div>`;
+      // inject below pt-r1-fin button
+      let existingTie=document.getElementById('p3-tie-select');
+      if(!existingTie){existingTie=document.createElement('div');existingTie.id='p3-tie-select';$('pt-r1').appendChild(existingTie);}
+      existingTie.innerHTML=tieHtml;
+      return;
+    }
+    gd.p3.f.q=[scores[0].t,scores[1].t];
+    build3f();syncAll();
+    addLog(`✅ 三分球小組賽結算，晉級：${gd.p3.f.q.join('、')}`);
+    updateGuide();
+  }catch(e){addLog('❌ 小組結算錯誤: '+e.message);showToast('結算發生錯誤',true);}
+};
+function selectP3Finals(a,b){
+  gd.p3.f.q=[a,b];
+  const el=document.getElementById('p3-tie-select');if(el)el.remove();
+  build3f();syncAll();
+  addLog(`✅ 三分球小組賽結算（手動），晉級：${a}、${b}`);
+  updateGuide();
+}
+
+function build3f(){
+  $('pt-r1').classList.add('hidden');$('pt-fin').classList.remove('hidden');
+  const q=gd.p3.f.q;let h='';
+  q.forEach(t=>{if(!gd.p3.f.t[t])gd.p3.f.t[t]={p:Array(10).fill(0),t:0};h+=`<div class="glass-card p-4 text-center"><h4 class="font-bold text-yellow-400 mb-3 text-lg">Team ${t} (決賽)</h4><div class="grid grid-cols-5 gap-2 mb-3">`;for(let i=0;i<10;i++){const v=gd.p3.f.t[t].p[i]||0;h+=`<div class="stepper-wrap"><button class="stepper-btn" onclick="p3Step('f','${t}',${i},-1)">－</button><span class="stepper-val" id="p3f-${t}-${i}">${v}</span><button class="stepper-btn" onclick="p3Step('f','${t}',${i},1)">＋</button></div>`;}h+=`</div><div class="text-yellow-400 font-bold text-lg">總計: <span id="p3ft-${t}">${gd.p3.f.t[t].t}</span> 分</div></div>`;});$('pt-f-inputs').innerHTML=h;
+}
+
+$('pt-f-fin').onclick=()=>{
+  try{
+    addLog('📌 pt-f-fin 被點擊');
+    if(fSt.p3){addLog('⚠️ pt-f-fin: 三分球已結算(fSt.p3=true)');showToast('三分球已結算！如需重做請按重置',true);return;}
+    const q=gd.p3.f.q,s1=Number(gd.p3.f.t[q[0]]?.t||0),s2=Number(gd.p3.f.t[q[1]]?.t||0);
+    const winner=s1>=s2?q[0]:q[1];
+    m.p3=winner;fSt.p3=true;refreshWins();
+    addLog(`✅ 三分球決賽結算：Team ${winner} 奪冠`);
+    _broadcastWin('三分磚頭王',winner,'決賽冠軍',true);
+    syncAll();triggerCelebration(winner,'三分磚頭王');renderStaff();updateGuide();
+  }catch(e){addLog('❌ 決賽結算錯誤: '+e.message);showToast('結算發生錯誤',true);}
+};
+
+// ── 五五賽 ──
+function jumpMatch(key){
+  if(fRun){showToast('請先暫停計時再切換場次',true);return;}
+  fC=key;syncAll();renderStaff();updateGuide();
+}
+
+$('f-toggle').onclick=()=>{
+  if(fRun){
+    fRun=false;clearInterval(fInt);
+    const mc=fM[fC];mc.remMs[mc.h]=Math.max(0,mc.endMs-Date.now());mc.endMs=null;
+    addLog(`暫停計時 ${fC.toUpperCase()}`);syncAll();renderStaff();updateGuide();
+  }else{
+    const mc=fM[fC];if(mc.remMs[mc.h]<=0&&mc.h===2)return;
+    mc.endMs=Date.now()+mc.remMs[mc.h];fRun=true;
+    addLog(`啟動計時 ${fC.toUpperCase()} ${mc.h===1?'上半場':'下半場'}`);
+    fInt=setInterval(()=>{
+      const mc2=fM[fC],left=mc2.endMs-Date.now();
+      const ts=fmtMs(left);safeSet('f-time-txt',ts);safeSet('p-f-time',ts);
+      if($('f-ring'))$('f-ring').style.strokeDashoffset=String(364.4*(1-Math.max(0,Math.min(1,left/600000))));
+      if(left<=0){
+        mc2.remMs[mc2.h]=0;mc2.endMs=null;fRun=false;clearInterval(fInt);
+        if(mc2.h===1){mc2.h=2;showToast('⏰ 上半場結束！請啟動計時開始下半場');}
+        else{showToast('🔔 比賽結束！請按結算');}
+        syncAll();renderStaff();renderPlayer();updateGuide();
+      }
+    },250);
+    renderStaff();updateGuide();
+  }
+};
+
+function addF(side,pts){
+  haptic(15);const mc=fM[fC];
+  if(side===1)mc.s1=Math.max(0,mc.s1+pts);else mc.s2=Math.max(0,mc.s2+pts);
+  syncAll();renderStaff();renderPlayer();
+}
+function resF(){
+  if(!resF._pending){resF._pending=true;showToast('再按一次確認歸零本場比分',true);setTimeout(()=>{resF._pending=false;},3000);return;}
+  resF._pending=false;
+  fM[fC].s1=0;fM[fC].s2=0;addLog(`歸零本場比分 ${fC.toUpperCase()}`);syncAll();renderStaff();renderPlayer();
+}
+
+$('f-fin').onclick=()=>{
+  try{
+    addLog(`📌 f-fin 被點擊 (fC=${fC}, fSt.f=${fSt.f}, fSettled=${JSON.stringify(fSettled)})`);
+    if(fSt.f){addLog('⚠️ f-fin: 五五賽已全數結算(fSt.f=true)');showToast('五五賽已全數結算！如需重做請按重置',true);return;}
+    if(fSettled[fC]){addLog(`⚠️ f-fin: ${fC} 此場已結算，自動跳到下一未結算場次`);
+      if(!fSettled.ab)fC='ab';else if(!fSettled.ac)fC='ac';else if(!fSettled.bc)fC='bc';
+      syncAll();renderStaff();showToast(`此場已結算，已跳到 ${fC[0].toUpperCase()} vs ${fC[1].toUpperCase()}`,true);return;}
+    // ★ 單場直接結算（不在此做平局判斷）
+    _settleMatch(fC);
+  }catch(e){addLog('❌ 五五賽結算錯誤: '+e.message);showToast('結算發生錯誤: '+e.message,true);}
+};
+
+// 驟死賽獲勝選擇 (side: 1=左隊, 2=右隊，用於單場 ot overlay)
+function otWin(side){
+  try{
+    // 此函式現在用於五五賽累計分數平局後手動選冠軍
+    const teams=window._otTeams||[];
+    if(!teams.length)return;
+    const winner=teams[side-1];
+    addLog(`⚡ 五五賽累計積分驟死賽 → Team ${winner} 獲勝`);
+    m.f=winner;fSt.f=true;refreshWins();
+    window._otTeams=null;
+    $('ot-overlay').classList.add('hidden');
+    syncAll();triggerCelebration(winner,'五打五對抗賽');
+    renderStaff();renderPlayer();updateGuide();
+  }catch(e){addLog('❌ 驟死賽結算錯誤: '+e.message);showToast('結算發生錯誤: '+e.message,true);}
+}
+
+// 頒獎台 1:1:1 驟死賽：手動點選冠軍
+function podOtWin(team){
+  addLog(`⚡ 頒獎台驟死賽 → Team ${team} 奪冠`);
+  // 強制將此隊設為三項全冠（fSt.u 方式解鎖）
+  w[team]=3;  // 給最高分
+  fSt.u=true;
+  syncAll();triggerCelebration(team,'最終冠軍');
+  $('pod-ot-overlay').classList.add('hidden');
+  renderStaff();renderPlayer();updateGuide();
+}
+
+// 共用結算邏輯
+function _settleMatch(key){
+  fSettled[key]=true;
+  const mc=fM[key],t1=key[0].toUpperCase(),t2=key[1].toUpperCase();
+  gd.f[t1]=(gd.f[t1]||0)+mc.s1;gd.f[t2]=(gd.f[t2]||0)+mc.s2;
+  fRun=false;clearInterval(fInt);mc.endMs=null;
+  addLog(`✅ 五五賽 ${t1} vs ${t2}: ${mc.s1}-${mc.s2}`);
+  // 推播此場結果
+  const matchWinner=mc.s1>=mc.s2?t1:t2;
+  _broadcastWin(`五五賽 ${t1} vs ${t2}`,matchWinner,`${mc.s1}-${mc.s2}`,false);
+  // 自動跳到下一場
+  if(!fSettled.ab)fC='ab';else if(!fSettled.ac)fC='ac';else if(!fSettled.bc)fC='bc';
+
+  // ── 三場全結算 ──
+  if(fSettled.ab&&fSettled.ac&&fSettled.bc){
+    const scores=tm.map(t=>({t,s:Number(gd.f[t]||0)})).sort((a,b)=>b.s-a.s);
+    addLog(`📊 五五賽累計：${scores.map(x=>'Team '+x.t+':'+x.s).join(' / ')}`);
+
+    // ★ 累計積分平局偵測（前兩名同分）
+    if(scores[0].s===scores[1].s){
+      // 找出所有同分的隊伍
+      const topScore=scores[0].s;
+      const tiedTeams=scores.filter(x=>x.s===topScore).map(x=>x.t);
+      addLog(`⚡ 五五賽累計平局！同分隊伍：${tiedTeams.join('、')} (各${topScore}分)，進入驟死賽`);
+      window._otTeams=tiedTeams;
+      // 更新驟死賽 overlay 顯示平局隊伍
+      const t1b=tiedTeams[0],t2b=tiedTeams[1];
+      if($('ot-subtitle'))$('ot-subtitle').textContent=`累計積分平局！${t1b} vs ${t2b}，請選擇最終冠軍`;
+      if($('ot-t1-btn'))$('ot-t1-btn').textContent=`🏆 Team ${t1b} 奪冠`;
+      if($('ot-t2-btn'))$('ot-t2-btn').textContent=`🏆 Team ${t2b} 奪冠`;
+      $('ot-overlay').classList.remove('hidden');
+      syncAll();showToast('⚡ 累計積分平局！請選擇吃分驟死賽獲勝隊伍',true);
+    }else{
+      // 正常冠軍
+      m.f=scores[0].t;fSt.f=true;refreshWins();
+      addLog(`✅ 五五賽全數結算：積分王 Team ${scores[0].t}`);
+      syncAll();triggerCelebration(scores[0].t,'五打五對抗賽');
+    }
+  }else{
+    const nextLabel=`${fC[0].toUpperCase()} vs ${fC[1].toUpperCase()}`;
+    syncAll();showToast(`✅ ${t1} vs ${t2} 完成！自動切換到：${nextLabel}`);
+  }
+  renderStaff();renderPlayer();updateGuide();
+}
+
+function forceUnlock(){
+  askPassword('強制解鎖頒獎台','輸入管理員密碼','admin',()=>{
+    fSt.u=true;syncAll();renderStaff();
+  },'🔓');
+}
+
+setTimeout(()=>updateUI(),200);
+</script>
+</body>
+</html>
